@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Serviços FGV – Suporte a Concursos e Exames</title>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --fgv-blue: #003876;
+    --fgv-blue-mid: #004fa3;
+    --fgv-blue-light: #0063cc;
+    --fgv-orange: #e8671b;
+    --fgv-gray: #f5f6f7;
+    --fgv-border: #dfe1e6;
+    --fgv-text: #172b4d;
+    --fgv-text-muted: #6b778c;
+    --fgv-white: #ffffff;
+    --sidebar-width: 220px;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--fgv-text);
+    background: var(--fgv-gray);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--fgv-blue);
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .topbar-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
+  }
+  .topbar-breadcrumb a { color: rgba(255,255,255,0.75); text-decoration: none; }
+  .topbar-breadcrumb a:hover { color: #fff; }
+  .topbar-breadcrumb span { color: rgba(255,255,255,0.5); }
+
+  .topbar-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-logo svg { height: 22px; }
+
+  .topbar-logo-text {
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: rgba(255,255,255,0.8);
+  }
+  .topbar-actions svg { cursor: pointer; }
+  .topbar-actions svg:hover { color: #fff; }
+
+  .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--fgv-orange);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background:
+      linear-gradient(135deg, #001f4d 0%, #003876 40%, #004fa3 70%, #00336b 100%);
+    padding: 40px 20px 44px;
+    text-align: center;
+    color: white;
+  }
+
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  .search-bar {
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .search-bar input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    color: var(--fgv-text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .search-bar svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--fgv-text-muted);
+  }
+
+  /* ── BODY LAYOUT ── */
+  .page-body {
+    display: flex;
+    flex: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 28px 20px;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+  }
+
+  .sidebar-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--fgv-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    padding-left: 12px;
+  }
+
+  .sidebar-item {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--fgv-text);
+    transition: background 0.15s;
+    user-select: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .sidebar-item:hover { background: #e4e6ea; }
+  .sidebar-item.active {
+    background: var(--fgv-blue);
+    color: white;
+    font-weight: 600;
+  }
+
+  /* ── CONTENT ── */
+  .content { flex: 1; }
+
+  .content-title {
+    font-size: 15px;
+    color: var(--fgv-text);
+    margin-bottom: 20px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .service-card {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 18px;
+    background: white;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .service-card:hover {
+    background: #f0f4ff;
+    box-shadow: 0 2px 8px rgba(0,56,118,0.15);
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fgv-blue);
+    opacity: 0.75;
+  }
+  .card-icon svg { width: 28px; height: 28px; stroke-width: 1.5; }
+
+  .card-text {}
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fgv-text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--fgv-text-muted);
+    line-height: 1.45;
+  }
+
+  /* hidden category panels */
+  .category-panel { display: none; }
+  .category-panel.active { display: block; }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 4px;
+    width: 560px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+
+  .modal-header {
+    background: var(--fgv-blue);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h2 { font-size: 16px; font-weight: 600; }
+  .modal-close {
+    background: none; border: none; color: white; cursor: pointer; font-size: 20px; line-height: 1;
+  }
+
+  .modal-body { padding: 24px 20px; }
+
+  .form-row { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--fgv-text);
+    margin-bottom: 5px;
+  }
+  .form-label .required { color: #de350b; margin-left: 2px; }
+
+  .form-control {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid var(--fgv-border);
+    border-radius: 3px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--fgv-text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-control:focus { border-color: var(--fgv-blue-light); }
+  select.form-control { background-color: white; cursor: pointer; }
+  textarea.form-control { resize: vertical; min-height: 90px; }
+
+  .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--fgv-border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 8px 20px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    transition: background 0.15s;
+  }
+  .btn-primary { background: var(--fgv-blue); color: white; }
+  .btn-primary:hover { background: var(--fgv-blue-mid); }
+  .btn-secondary { background: var(--fgv-gray); color: var(--fgv-text); border: 1px solid var(--fgv-border); }
+  .btn-secondary:hover { background: #e4e6ea; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--fgv-blue);
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    margin-top: auto;
+  }
+  footer a { color: white; font-weight: 600; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <nav class="topbar-breadcrumb">
+    <a href="#">Portal de Serviços FGV</a>
+    <span>›</span>
+    <a href="#">Exames e Concursos</a>
+    <span>›</span>
+    <span>Suporte ao Candidato</span>
+  </nav>
+
+  <div class="topbar-logo">
+    <!-- FGV Logo SVG simplificado -->
+    <svg viewBox="0 0 60 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="0" y="18" font-family="Arial" font-weight="900" font-size="20" fill="white" letter-spacing="1">FGV</text>
+    </svg>
+  </div>
+
+  <div class="topbar-actions">
+    <!-- Search icon -->
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <!-- Settings icon -->
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <div class="avatar">EC</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Bem-vindo(a) ao Portal de Suporte – FGV Exames e Concursos</h1>
+  <div class="search-bar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Como podemos ajudar?">
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Categorias</div>
+    <button class="sidebar-item active" onclick="showCategory('inscricao', this)">Inscrição</button>
+    <button class="sidebar-item" onclick="showCategory('pagamento', this)">Pagamento e Boleto</button>
+    <button class="sidebar-item" onclick="showCategory('prova', this)">Prova e Local</button>
+    <button class="sidebar-item" onclick="showCategory('resultado', this)">Resultado e Recursos</button>
+    <button class="sidebar-item" onclick="showCategory('acesso', this)">Acesso e Senha</button>
+    <button class="sidebar-item" onclick="showCategory('documentos', this)">Documentos e Certificados</button>
+    <button class="sidebar-item" onclick="showCategory('duvidas', this)">Dúvidas Gerais</button>
+  </aside>
+
+  <!-- CONTENT -->
+  <section class="content">
+    <p class="content-title">Navegue pelo menu ao lado para selecionar o serviço desejado</p>
+
+    <!-- INSCRIÇÃO -->
+    <div id="cat-inscricao" class="category-panel active">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Inscrição','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Realizar Inscrição</div>
+            <div class="card-desc">Dúvidas ou problemas ao se inscrever em um concurso ou exame.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Alteração de Dados Cadastrais','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Alteração de Dados Cadastrais</div>
+            <div class="card-desc">Atualização de nome, CPF, endereço ou outros dados do cadastro.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Comprovante de Inscrição','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Comprovante de Inscrição</div>
+            <div class="card-desc">Não recebeu ou não consegue acessar o comprovante de inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('E-mail de Confirmação','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">E-mail de Confirmação</div>
+            <div class="card-desc">Não recebeu o e-mail de confirmação da inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Inscrição não Homologada','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Inscrição não Homologada</div>
+            <div class="card-desc">Inscrição pendente ou indeferida após o pagamento.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Erro no Cadastro','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Erro ao Realizar Cadastro</div>
+            <div class="card-desc">Problemas técnicos ao criar ou acessar o cadastro na plataforma.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PAGAMENTO -->
+    <div id="cat-pagamento" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('2ª Via do Boleto','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">2ª Via do Boleto</div>
+            <div class="card-desc">Solicitação de nova via do boleto bancário de inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Confirmação de Pagamento','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Confirmação de Pagamento</div>
+            <div class="card-desc">Pagamento realizado mas inscrição ainda não confirmada.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Erro ao Emitir Boleto','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Erro ao Emitir Boleto</div>
+            <div class="card-desc">Problemas técnicos ao gerar o boleto de pagamento.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Taxa de Isenção','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Taxa de Isenção</div>
+            <div class="card-desc">Solicitação, dúvidas ou recurso sobre isenção de taxa de inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Reembolso / Devolução','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Reembolso / Devolução</div>
+            <div class="card-desc">Solicitação de devolução de valor pago em inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Prazo de Pagamento','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Prazo de Pagamento</div>
+            <div class="card-desc">Dúvidas sobre datas e prazos para efetuar o pagamento.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PROVA E LOCAL -->
+    <div id="cat-prova" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Local de Prova','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Local de Prova</div>
+            <div class="card-desc">Dúvidas ou alteração do local de aplicação da prova.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Atendimento Especial / PCD','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Atendimento Especial / PCD</div>
+            <div class="card-desc">Solicitação de condições especiais para realização da prova.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Não Conseguiu Realizar a Prova','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Não Conseguiu Realizar a Prova</div>
+            <div class="card-desc">Relato de impedimento ou problema no dia de aplicação.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Heteroidentificação / Cotas','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Heteroidentificação / Cotas</div>
+            <div class="card-desc">Dúvidas ou recursos sobre processo de heteroidentificação e cotas.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Aplicativo da Prova','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Aplicativo da Prova</div>
+            <div class="card-desc">Problemas no download, instalação ou acesso ao app da prova.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- RESULTADO E RECURSOS -->
+    <div id="cat-resultado" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Resultado / Gabarito','resultado'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Resultado / Gabarito</div>
+            <div class="card-desc">Dúvidas sobre divulgação do gabarito ou resultado do concurso.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Interposição de Recurso','resultado'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Interposição de Recurso</div>
+            <div class="card-desc">Dúvidas ou problemas ao protocolar recurso de gabarito ou resultado.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Impugnação de Edital','resultado'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Impugnação de Edital</div>
+            <div class="card-desc">Protocolo de impugnação de itens do edital do concurso.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Ação Judicial / Liminar','resultado'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Ação Judicial / Liminar</div>
+            <div class="card-desc">Comunicação de decisão judicial ou liminar relacionada ao concurso.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ACESSO E SENHA -->
+    <div id="cat-acesso" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Reset de Senha','acesso'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Reset de Senha</div>
+            <div class="card-desc">Não consegue redefinir ou recuperar a senha de acesso.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('CPF não Encontrado','acesso'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">CPF não Encontrado</div>
+            <div class="card-desc">CPF não localizado no sistema ao tentar acessar a plataforma.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Erro de Login / Acesso','acesso'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Erro de Login / Acesso</div>
+            <div class="card-desc">Problemas técnicos ao tentar entrar na plataforma de concursos.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS E CERTIFICADOS -->
+    <div id="cat-documentos" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Certificado','documentos'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Certificado</div>
+            <div class="card-desc">Solicitação ou dúvidas sobre emissão de certificado de aprovação.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Informe de Rendimentos','documentos'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Informe de Rendimentos</div>
+            <div class="card-desc">Solicitação de comprovante ou informe de rendimentos da FGV.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Comprovante / Declaração','documentos'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Comprovante / Declaração</div>
+            <div class="card-desc">Emissão de comprovantes ou declarações relacionadas ao concurso.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- DÚVIDAS GERAIS -->
+    <div id="cat-duvidas" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Dúvidas sobre Edital','duvidas'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Dúvidas sobre Edital</div>
+            <div class="card-desc">Perguntas sobre regras, requisitos e informações do edital.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Outras Dúvidas','duvidas'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Outras Solicitações</div>
+            <div class="card-desc">Assuntos não contemplados nas categorias acima.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">Abrir Chamado</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Concurso / Exame <span class="required">*</span></label>
+        <select class="form-control" id="modal-concurso">
+          <option value="">Selecione o concurso ou exame</option>
+          <option>CFC – Conselho Federal de Contabilidade</option>
+          <option>CPNU – Concurso Público Nacional Unificado</option>
+          <option>ENARE – Exame Nacional de Residência</option>
+          <option>ENCCEJA</option>
+          <option>ENAC – Exame Nacional dos Cartórios</option>
+          <option>PND – Prova Nacional Docente</option>
+          <option>REVALIDA</option>
+          <option>SAEB</option>
+          <option>SUSEP</option>
+          <option>TJCE – Tribunal de Justiça do Ceará</option>
+          <option>TJES – Tribunal de Justiça do Espírito Santo</option>
+          <option>TJMS – Tribunal de Justiça do Mato Grosso do Sul</option>
+          <option>TJPA – Tribunal de Justiça do Pará</option>
+          <option>TJSC – Tribunal de Justiça de Santa Catarina</option>
+          <option>TJTO – Tribunal de Justiça de Tocantins</option>
+          <option>TRF1 – Tribunal Regional Federal 1ª Região</option>
+          <option>TRF3 – Tribunal Regional Federal 3ª Região</option>
+          <option>TRF5 – Tribunal Regional Federal 5ª Região</option>
+          <option>TRF6 – Tribunal Regional Federal 6ª Região</option>
+          <option>Vestibular FGV</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Assunto <span class="required">*</span></label>
+        <select class="form-control" id="modal-assunto"></select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Descrição <span class="required">*</span></label>
+        <textarea class="form-control" id="modal-descricao" placeholder="Descreva seu problema ou dúvida com o máximo de detalhes possível..."></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Anexo</label>
+        <input type="file" class="form-control" id="modal-anexo" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+        <div style="font-size:11.5px; color: var(--fgv-text-muted); margin-top:4px;">Formatos aceitos: PDF, imagem ou documento. Tamanho máximo: 10 MB.</div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitModal()">Enviar Solicitação</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Copyright © 2025 FGV – Todos os Direitos Reservados.<br>
+  <a href="#">Política de Privacidade</a></p>
+</footer>
+
+<script>
+const assuntosPorCategoria = {
+  inscricao: ['Realizar inscrição','Alterar dados cadastrais','Comprovante de inscrição','E-mail de confirmação','Inscrição não homologada','Período / Prazo de inscrição','Erro ao realizar cadastro'],
+  pagamento: ['2ª via do boleto','Confirmação de pagamento','Erro ao emitir boleto','Taxa de isenção','Reembolso / Devolução','Prazo de pagamento','Pagamento não identificado'],
+  prova: ['Local de prova','Atendimento especial / PCD','Não conseguiu realizar a prova','Heteroidentificação / Cotas','Aplicativo da prova'],
+  resultado: ['Resultado / Gabarito','Interposição de recurso','Impugnação de edital','Recurso indeferido','Ação judicial / Liminar'],
+  acesso: ['Reset de senha','CPF não encontrado','Erro de login / Acesso'],
+  documentos: ['Certificado','Informe de rendimentos','Comprovante / Declaração'],
+  duvidas: ['Dúvidas sobre edital','Outras solicitações'],
+};
+
+function showCategory(cat, btn) {
+  document.querySelectorAll('.category-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('cat-' + cat).classList.add('active');
+  btn.classList.add('active');
+}
+
+function openModal(titulo, categoria) {
+  document.getElementById('modal-title').textContent = titulo;
+  const sel = document.getElementById('modal-assunto');
+  sel.innerHTML = '';
+  const assuntos = assuntosPorCategoria[categoria] || [];
+  assuntos.forEach(a => {
+    const opt = document.createElement('option');
+    opt.textContent = a;
+    opt.selected = (a.toLowerCase().includes(titulo.toLowerCase().split('/')[0].trim().toLowerCase()));
+    sel.appendChild(opt);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-descricao').value = '';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function submitModal() {
+  const concurso = document.getElementById('modal-concurso').value;
+  const assunto = document.getElementById('modal-assunto').value;
+  const desc = document.getElementById('modal-descricao').value.trim();
+  if (!concurso) { alert('Por favor, selecione o concurso ou exame.'); return; }
+  if (!desc) { alert('Por favor, descreva o seu problema.'); return; }
+  closeModal();
+  setTimeout(() => alert('✅ Solicitação enviada com sucesso!\n\nVocê receberá um e-mail com o número do chamado em breve.'), 150);
+}
+
+// Search filter
+document.querySelector('.search-bar input').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.service-card').forEach(card => {
+    const txt = card.textContent.toLowerCase();
+    card.style.display = (!q || txt.includes(q)) ? '' : 'none';
+  });
+});
+</script>
+</body>
+</html>
