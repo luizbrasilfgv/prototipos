@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Serviços FGV – Suporte a Concursos e Exames</title>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --fgv-blue: #003876;
+    --fgv-blue-mid: #004fa3;
+    --fgv-blue-light: #0063cc;
+    --fgv-orange: #e8671b;
+    --fgv-gray: #f5f6f7;
+    --fgv-border: #dfe1e6;
+    --fgv-text: #172b4d;
+    --fgv-text-muted: #6b778c;
+    --fgv-white: #ffffff;
+    --sidebar-width: 220px;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--fgv-text);
+    background: var(--fgv-gray);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--fgv-blue);
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .topbar-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
+  }
+  .topbar-breadcrumb a { color: rgba(255,255,255,0.75); text-decoration: none; }
+  .topbar-breadcrumb a:hover { color: #fff; }
+  .topbar-breadcrumb span { color: rgba(255,255,255,0.5); }
+
+  .topbar-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-logo svg { height: 22px; }
+
+  .topbar-logo-text {
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: rgba(255,255,255,0.8);
+  }
+  .topbar-actions svg { cursor: pointer; }
+  .topbar-actions svg:hover { color: #fff; }
+
+  .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--fgv-orange);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background:
+      linear-gradient(135deg, #001f4d 0%, #003876 40%, #004fa3 70%, #00336b 100%);
+    padding: 40px 20px 44px;
+    text-align: center;
+    color: white;
+  }
+
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  .search-bar {
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .search-bar input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    color: var(--fgv-text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .search-bar svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--fgv-text-muted);
+  }
+
+  /* ── BODY LAYOUT ── */
+  .page-body {
+    display: flex;
+    flex: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 28px 20px;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+  }
+
+  .sidebar-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--fgv-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    padding-left: 12px;
+  }
+
+  .sidebar-item {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--fgv-text);
+    transition: background 0.15s;
+    user-select: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .sidebar-item:hover { background: #e4e6ea; }
+  .sidebar-item.active {
+    background: var(--fgv-blue);
+    color: white;
+    font-weight: 600;
+  }
+
+  /* ── CONTENT ── */
+  .content { flex: 1; }
+
+  .content-title {
+    font-size: 15px;
+    color: var(--fgv-text);
+    margin-bottom: 20px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .service-card {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 18px;
+    background: white;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .service-card:hover {
+    background: #f0f4ff;
+    box-shadow: 0 2px 8px rgba(0,56,118,0.15);
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fgv-blue);
+    opacity: 0.75;
+  }
+  .card-icon svg { width: 28px; height: 28px; stroke-width: 1.5; }
+
+  .card-text {}
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fgv-text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--fgv-text-muted);
+    line-height: 1.45;
+  }
+
+  /* hidden category panels */
+  .category-panel { display: none; }
+  .category-panel.active { display: block; }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 4px;
+    width: 560px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+
+  .modal-header {
+    background: var(--fgv-blue);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h2 { font-size: 16px; font-weight: 600; }
+  .modal-close {
+    background: none; border: none; color: white; cursor: pointer; font-size: 20px; line-height: 1;
+  }
+
+  .modal-body { padding: 24px 20px; }
+
+  .form-row { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--fgv-text);
+    margin-bottom: 5px;
+  }
+  .form-label .required { color: #de350b; margin-left: 2px; }
+
+  .form-control {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid var(--fgv-border);
+    border-radius: 3px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--fgv-text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-control:focus { border-color: var(--fgv-blue-light); }
+  select.form-control { background-color: white; cursor: pointer; }
+  textarea.form-control { resize: vertical; min-height: 90px; }
+
+  .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--fgv-border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 8px 20px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    transition: background 0.15s;
+  }
+  .btn-primary { background: var(--fgv-blue); color: white; }
+  .btn-primary:hover { background: var(--fgv-blue-mid); }
+  .btn-secondary { background: var(--fgv-gray); color: var(--fgv-text); border: 1px solid var(--fgv-border); }
+  .btn-secondary:hover { background: #e4e6ea; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--fgv-blue);
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    margin-top: auto;
+  }
+  footer a { color: white; font-weight: 600; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ── AUTOCOMPLETE ── */
+  .autocomplete-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    background: #e8f0fe;
+    border: 1px solid #c0d4f5;
+    border-radius: 3px;
+    padding: 8px 10px;
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: #1a3a6e;
+    line-height: 1.45;
+  }
+  .autocomplete-hint svg { color: #004fa3; margin-top: 1px; flex-shrink: 0; }
+
+  .autocomplete-wrap { position: relative; }
+
+  .autocomplete-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .autocomplete-search-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--fgv-text-muted);
+    pointer-events: none;
+  }
+  .autocomplete-input {
+    padding-left: 34px !important;
+    padding-right: 30px !important;
+  }
+  .autocomplete-input.selected {
+    border-color: #0063cc;
+    background: #f0f6ff;
+    font-weight: 600;
+  }
+  .autocomplete-clear {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--fgv-text-muted);
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    display: none;
+  }
+  .autocomplete-clear:hover { color: var(--fgv-text); }
+
+  .autocomplete-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0; right: 0;
+    background: white;
+    border: 2px solid var(--fgv-blue-light);
+    border-radius: 3px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+  .autocomplete-dropdown.open { display: block; }
+
+  .ac-item {
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 13.5px;
+    line-height: 1.3;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .ac-item:last-child { border-bottom: none; }
+  .ac-item:hover, .ac-item.focused { background: #e8f0fe; }
+  .ac-item mark {
+    background: none;
+    font-weight: 700;
+    color: var(--fgv-blue);
+  }
+  .ac-empty {
+    padding: 12px;
+    font-size: 13px;
+    color: var(--fgv-text-muted);
+    text-align: center;
+  }
+  .ac-separator {
+    border-top: 1px dashed #ddd;
+    margin: 2px 0;
+  }
+  .ac-item-outros {
+    color: var(--fgv-text-muted);
+    font-style: italic;
+    font-size: 13px;
+  }
+  .ac-item-outros:hover, .ac-item-outros.focused {
+    background: #fff8f0;
+    color: var(--fgv-orange);
+  }
+  .ac-count {
+    padding: 5px 12px;
+    font-size: 11px;
+    color: var(--fgv-text-muted);
+    background: #fafafa;
+    border-bottom: 1px solid #eee;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <nav class="topbar-breadcrumb">
+    <a href="#">Portal de Serviços FGV</a>
+    <span>›</span>
+    <a href="#">Exames e Concursos</a>
+    <span>›</span>
+    <span>Suporte ao Candidato</span>
+  </nav>
+
+  <div class="topbar-logo">
+    <!-- FGV Logo SVG simplificado -->
+    <svg viewBox="0 0 60 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="0" y="18" font-family="Arial" font-weight="900" font-size="20" fill="white" letter-spacing="1">FGV</text>
+    </svg>
+  </div>
+
+  <div class="topbar-actions">
+    <!-- Search icon -->
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <!-- Settings icon -->
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <div class="avatar">EC</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Bem-vindo(a) ao Portal de Suporte – FGV Exames e Concursos</h1>
+  <div class="search-bar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Como podemos ajudar?">
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Categorias</div>
+    <button class="sidebar-item active" onclick="showCategory('inscricao', this)">Inscrição</button>
+    <button class="sidebar-item" onclick="showCategory('pagamento', this)">Pagamento e Boleto</button>
+    <button class="sidebar-item" onclick="showCategory('prova', this)">Prova e Local</button>
+    <button class="sidebar-item" onclick="showCategory('resultado', this)">Resultado e Recursos</button>
+    <button class="sidebar-item" onclick="showCategory('acesso', this)">Acesso e Senha</button>
+    <button class="sidebar-item" onclick="showCategory('documentos', this)">Documentos e Certificados</button>
+    <button class="sidebar-item" onclick="showCategory('duvidas', this)">Dúvidas Gerais</button>
+  </aside>
+
+  <!-- CONTENT -->
+  <section class="content">
+    <p class="content-title">Navegue pelo menu ao lado para selecionar o serviço desejado</p>
+
+    <!-- INSCRIÇÃO -->
+    <div id="cat-inscricao" class="category-panel active">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Inscrição','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Realizar Inscrição</div>
+            <div class="card-desc">Dúvidas ou problemas ao se inscrever em um concurso ou exame.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Alteração de Dados Cadastrais','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Alteração de Dados Cadastrais</div>
+            <div class="card-desc">Atualização de nome, CPF, endereço ou outros dados do cadastro.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Comprovante de Inscrição','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Comprovante de Inscrição</div>
+            <div class="card-desc">Não recebeu ou não consegue acessar o comprovante de inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('E-mail de Confirmação','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">E-mail de Confirmação</div>
+            <div class="card-desc">Não recebeu o e-mail de confirmação da inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Inscrição não Homologada','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Inscrição não Homologada</div>
+            <div class="card-desc">Inscrição pendente ou indeferida após o pagamento.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Erro no Cadastro','inscricao'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Erro ao Realizar Cadastro</div>
+            <div class="card-desc">Problemas técnicos ao criar ou acessar o cadastro na plataforma.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PAGAMENTO -->
+    <div id="cat-pagamento" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('2ª Via do Boleto','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">2ª Via do Boleto</div>
+            <div class="card-desc">Solicitação de nova via do boleto bancário de inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Confirmação de Pagamento','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Confirmação de Pagamento</div>
+            <div class="card-desc">Pagamento realizado mas inscrição ainda não confirmada.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Erro ao Emitir Boleto','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Erro ao Emitir Boleto</div>
+            <div class="card-desc">Problemas técnicos ao gerar o boleto de pagamento.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Taxa de Isenção','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Taxa de Isenção</div>
+            <div class="card-desc">Solicitação, dúvidas ou recurso sobre isenção de taxa de inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Reembolso / Devolução','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Reembolso / Devolução</div>
+            <div class="card-desc">Solicitação de devolução de valor pago em inscrição.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Prazo de Pagamento','pagamento'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Prazo de Pagamento</div>
+            <div class="card-desc">Dúvidas sobre datas e prazos para efetuar o pagamento.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PROVA E LOCAL -->
+    <div id="cat-prova" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Local de Prova','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Local de Prova</div>
+            <div class="card-desc">Dúvidas ou alteração do local de aplicação da prova.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Atendimento Especial / PCD','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Atendimento Especial / PCD</div>
+            <div class="card-desc">Solicitação de condições especiais para realização da prova.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Não Conseguiu Realizar a Prova','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Não Conseguiu Realizar a Prova</div>
+            <div class="card-desc">Relato de impedimento ou problema no dia de aplicação.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Heteroidentificação / Cotas','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Heteroidentificação / Cotas</div>
+            <div class="card-desc">Dúvidas ou recursos sobre processo de heteroidentificação e cotas.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Aplicativo da Prova','prova'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Aplicativo da Prova</div>
+            <div class="card-desc">Problemas no download, instalação ou acesso ao app da prova.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- RESULTADO E RECURSOS -->
+    <div id="cat-resultado" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Resultado / Gabarito','resultado'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Resultado / Gabarito</div>
+            <div class="card-desc">Dúvidas sobre divulgação do gabarito ou resultado do concurso.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Interposição de Recurso','resultado'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Interposição de Recurso</div>
+            <div class="card-desc">Dúvidas ou problemas ao protocolar recurso de gabarito ou resultado.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Impugnação de Edital','resultado'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Impugnação de Edital</div>
+            <div class="card-desc">Protocolo de impugnação de itens do edital do concurso.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Ação Judicial / Liminar','resultado'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Ação Judicial / Liminar</div>
+            <div class="card-desc">Comunicação de decisão judicial ou liminar relacionada ao concurso.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ACESSO E SENHA -->
+    <div id="cat-acesso" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Reset de Senha','acesso'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Reset de Senha</div>
+            <div class="card-desc">Não consegue redefinir ou recuperar a senha de acesso.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('CPF não Encontrado','acesso'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">CPF não Encontrado</div>
+            <div class="card-desc">CPF não localizado no sistema ao tentar acessar a plataforma.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Erro de Login / Acesso','acesso'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Erro de Login / Acesso</div>
+            <div class="card-desc">Problemas técnicos ao tentar entrar na plataforma de concursos.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS E CERTIFICADOS -->
+    <div id="cat-documentos" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Certificado','documentos'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Certificado</div>
+            <div class="card-desc">Solicitação ou dúvidas sobre emissão de certificado de aprovação.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Informe de Rendimentos','documentos'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Informe de Rendimentos</div>
+            <div class="card-desc">Solicitação de comprovante ou informe de rendimentos da FGV.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Comprovante / Declaração','documentos'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Comprovante / Declaração</div>
+            <div class="card-desc">Emissão de comprovantes ou declarações relacionadas ao concurso.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- DÚVIDAS GERAIS -->
+    <div id="cat-duvidas" class="category-panel">
+      <div class="cards-grid">
+        <a class="service-card" href="#" onclick="openModal('Dúvidas sobre Edital','duvidas'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Dúvidas sobre Edital</div>
+            <div class="card-desc">Perguntas sobre regras, requisitos e informações do edital.</div>
+          </div>
+        </a>
+        <a class="service-card" href="#" onclick="openModal('Outras Dúvidas','duvidas'); return false;">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Outras Solicitações</div>
+            <div class="card-desc">Assuntos não contemplados nas categorias acima.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">Abrir Chamado</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Concurso / Exame <span class="required">*</span></label>
+        <div class="autocomplete-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Digite o <strong>nome ou sigla</strong> do concurso e selecione na lista. Use exatamente o nome que aparece no seu <strong>comprovante de inscrição ou edital</strong>. — <strong>Apenas concursos ativos</strong> são exibidos. Se o seu concurso não aparecer ou já estiver encerrado, selecione <strong>Outros</strong>.</span>
+        </div>
+        <div class="autocomplete-wrap" id="autocomplete-wrap">
+          <div class="autocomplete-input-wrap">
+            <svg class="autocomplete-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="modal-concurso-input" class="form-control autocomplete-input"
+              placeholder="Ex.: TRF1, ENARE, CFC, Tribunal…"
+              autocomplete="off" spellcheck="false" />
+            <button class="autocomplete-clear" id="ac-clear" type="button" title="Limpar seleção">×</button>
+          </div>
+          <div class="autocomplete-dropdown" id="ac-dropdown"></div>
+        </div>
+        <input type="hidden" id="modal-concurso" value="" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Assunto <span class="required">*</span></label>
+        <select class="form-control" id="modal-assunto"></select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Descrição <span class="required">*</span></label>
+        <textarea class="form-control" id="modal-descricao" placeholder="Descreva seu problema ou dúvida com o máximo de detalhes possível..."></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Anexo</label>
+        <input type="file" class="form-control" id="modal-anexo" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+        <div style="font-size:11.5px; color: var(--fgv-text-muted); margin-top:4px;">Formatos aceitos: PDF, imagem ou documento. Tamanho máximo: 10 MB.</div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitModal()">Enviar Solicitação</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Copyright © 2025 FGV – Todos os Direitos Reservados.<br>
+  <a href="#">Política de Privacidade</a></p>
+</footer>
+
+<script>
+const assuntosPorCategoria = {
+  inscricao: ['Realizar inscrição','Alterar dados cadastrais','Comprovante de inscrição','E-mail de confirmação','Inscrição não homologada','Período / Prazo de inscrição','Erro ao realizar cadastro'],
+  pagamento: ['2ª via do boleto','Confirmação de pagamento','Erro ao emitir boleto','Taxa de isenção','Reembolso / Devolução','Prazo de pagamento','Pagamento não identificado'],
+  prova: ['Local de prova','Atendimento especial / PCD','Não conseguiu realizar a prova','Heteroidentificação / Cotas','Aplicativo da prova'],
+  resultado: ['Resultado / Gabarito','Interposição de recurso','Impugnação de edital','Recurso indeferido','Ação judicial / Liminar'],
+  acesso: ['Reset de senha','CPF não encontrado','Erro de login / Acesso'],
+  documentos: ['Certificado','Informe de rendimentos','Comprovante / Declaração'],
+  duvidas: ['Dúvidas sobre edital','Outras solicitações'],
+};
+
+function showCategory(cat, btn) {
+  document.querySelectorAll('.category-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('cat-' + cat).classList.add('active');
+  btn.classList.add('active');
+}
+
+function openModal(titulo, categoria) {
+  document.getElementById('modal-title').textContent = titulo;
+  const sel = document.getElementById('modal-assunto');
+  sel.innerHTML = '';
+  const assuntos = assuntosPorCategoria[categoria] || [];
+  assuntos.forEach(a => {
+    const opt = document.createElement('option');
+    opt.textContent = a;
+    opt.selected = (a.toLowerCase().includes(titulo.toLowerCase().split('/')[0].trim().toLowerCase()));
+    sel.appendChild(opt);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+  // Resetar campo autocomplete
+  clearConcurso();
+  setTimeout(initAutocomplete, 50);
+  document.getElementById('modal-descricao').value = '';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function submitModal() {
+  const concurso = document.getElementById('modal-concurso').value;
+  const assunto = document.getElementById('modal-assunto').value;
+  const desc = document.getElementById('modal-descricao').value.trim();
+  const inputConcurso = document.getElementById('modal-concurso-input');
+  if (!concurso) {
+    if (inputConcurso && inputConcurso.value.trim()) {
+      alert('⚠️ Selecione o concurso na lista que aparece ao digitar.\n\nNão é possível enviar com texto livre — o concurso precisa ser escolhido a partir dos resultados da busca.');
+    } else {
+      alert('Por favor, informe o concurso ou exame.');
+    }
+    if (inputConcurso) inputConcurso.focus();
+    return;
+  }
+  if (!desc) { alert('Por favor, descreva o seu problema.'); return; }
+  closeModal();
+  setTimeout(() => alert('✅ Solicitação enviada com sucesso!\n\nVocê receberá um e-mail com o número do chamado em breve.'), 150);
+}
+
+
+// ── AUTOCOMPLETE DE CONCURSO ──
+const CONCURSOS = [
+  "CFC – Conselho Federal de Contabilidade",
+  "CPNU – Concurso Público Nacional Unificado",
+  "ENARE – Exame Nacional de Residência",
+  "ENCCEJA – Exame Nacional para Certificação de Competências",
+  "ENAC – Exame Nacional dos Cartórios",
+  "ENADE – Exame Nacional de Desempenho dos Estudantes",
+  "ENEM – Exame Nacional do Ensino Médio",
+  "PND – Prova Nacional Docente",
+  "REVALIDA – Revalidação de Diploma Médico",
+  "SAEB – Sistema de Avaliação da Educação Básica",
+  "SUSEP – Superintendência de Seguros Privados",
+  "AGU – Advocacia-Geral da União",
+  "ANAC – Agência Nacional de Aviação Civil",
+  "ANATEL – Agência Nacional de Telecomunicações",
+  "ANCINE – Agência Nacional do Cinema",
+  "ANM – Agência Nacional de Mineração",
+  "ANP – Agência Nacional do Petróleo",
+  "ANS – Agência Nacional de Saúde Suplementar",
+  "ANTAQ – Agência Nacional de Transportes Aquaviários",
+  "ANTT – Agência Nacional de Transportes Terrestres",
+  "ANVISA – Agência Nacional de Vigilância Sanitária",
+  "BACEN – Banco Central do Brasil",
+  "BNDES – Banco Nacional de Desenvolvimento Econômico e Social",
+  "CADE – Conselho Administrativo de Defesa Econômica",
+  "CAPES – Coordenação de Aperfeiçoamento de Pessoal de Nível Superior",
+  "CGU – Controladoria-Geral da União",
+  "CNJ – Conselho Nacional de Justiça",
+  "CNMP – Conselho Nacional do Ministério Público",
+  "COFECI – Conselho Federal de Corretores de Imóveis",
+  "COFEN – Conselho Federal de Enfermagem",
+  "CONFEF – Conselho Federal de Educação Física",
+  "CONFEA – Conselho Federal de Engenharia e Agronomia",
+  "CFF – Conselho Federal de Farmácia",
+  "CFM – Conselho Federal de Medicina",
+  "CFN – Conselho Federal de Nutrição",
+  "CFO – Conselho Federal de Odontologia",
+  "CFP – Conselho Federal de Psicologia",
+  "CREA-RJ – Conselho Regional de Engenharia e Agronomia RJ",
+  "CREA-SP – Conselho Regional de Engenharia e Agronomia SP",
+  "CRF-RJ – Conselho Regional de Farmácia RJ",
+  "CRF-SP – Conselho Regional de Farmácia SP",
+  "CRM-RJ – Conselho Regional de Medicina RJ",
+  "CRM-SP – Conselho Regional de Medicina SP",
+  "CRP-RJ – Conselho Regional de Psicologia RJ",
+  "CRP-SP – Conselho Regional de Psicologia SP",
+  "DATAPREV – Empresa de Tecnologia e Informações da Previdência",
+  "DPF – Delegado da Polícia Federal",
+  "DPU – Defensoria Pública da União",
+  "EBSERH – Empresa Brasileira de Serviços Hospitalares",
+  "EMGEPRON – Empresa Gerencial de Projetos Navais",
+  "ENAP – Escola Nacional de Administração Pública",
+  "ESAF – Escola de Administração Fazendária",
+  "FUNAI – Fundação Nacional dos Povos Indígenas",
+  "FUNASA – Fundação Nacional de Saúde",
+  "IBGE – Instituto Brasileiro de Geografia e Estatística",
+  "IBAMA – Instituto Brasileiro do Meio Ambiente",
+  "ICMBio – Instituto Chico Mendes de Conservação da Biodiversidade",
+  "INCRA – Instituto Nacional de Colonização e Reforma Agrária",
+  "INEP – Instituto Nacional de Estudos e Pesquisas Educacionais",
+  "INPI – Instituto Nacional da Propriedade Industrial",
+  "INSS – Instituto Nacional do Seguro Social",
+  "IPEA – Instituto de Pesquisa Econômica Aplicada",
+  "IRB – Instituto de Resseguros do Brasil",
+  "IRES – Instituto de Resseguros",
+  "MEC – Ministério da Educação",
+  "MPOG – Ministério do Planejamento e Orçamento e Gestão",
+  "MPF – Ministério Público Federal",
+  "MPT – Ministério Público do Trabalho",
+  "MTUR – Ministério do Turismo",
+  "OAB – Exame da Ordem dos Advogados do Brasil",
+  "PETROBRAS – Petróleo Brasileiro S.A.",
+  "PREVIC – Superintendência Nacional de Previdência Complementar",
+  "PRF – Polícia Rodoviária Federal",
+  "PF – Polícia Federal",
+  "PGFN – Procuradoria-Geral da Fazenda Nacional",
+  "RECEITA FEDERAL – Auditor-Fiscal da Receita Federal",
+  "RECEITA FEDERAL – Analista-Tributário",
+  "SEAD – Secretaria Especial de Desburocratização",
+  "SEAP – Secretaria de Administração Penitenciária",
+  "SEFAZ-AC – Secretaria de Fazenda do Acre",
+  "SEFAZ-AL – Secretaria de Fazenda de Alagoas",
+  "SEFAZ-AM – Secretaria de Fazenda do Amazonas",
+  "SEFAZ-AP – Secretaria de Fazenda do Amapá",
+  "SEFAZ-BA – Secretaria da Fazenda da Bahia",
+  "SEFAZ-CE – Secretaria da Fazenda do Ceará",
+  "SEFAZ-DF – Secretaria de Fazenda do Distrito Federal",
+  "SEFAZ-ES – Secretaria de Fazenda do Espírito Santo",
+  "SEFAZ-GO – Secretaria de Fazenda de Goiás",
+  "SEFAZ-MA – Secretaria de Fazenda do Maranhão",
+  "SEFAZ-MG – Secretaria de Fazenda de Minas Gerais",
+  "SEFAZ-MS – Secretaria de Fazenda do Mato Grosso do Sul",
+  "SEFAZ-MT – Secretaria de Fazenda do Mato Grosso",
+  "SEFAZ-PA – Secretaria de Fazenda do Pará",
+  "SEFAZ-PB – Secretaria de Fazenda da Paraíba",
+  "SEFAZ-PE – Secretaria de Fazenda de Pernambuco",
+  "SEFAZ-PI – Secretaria de Fazenda do Piauí",
+  "SEFAZ-PR – Secretaria de Fazenda do Paraná",
+  "SEFAZ-RJ – Secretaria de Fazenda do Rio de Janeiro",
+  "SEFAZ-RN – Secretaria de Fazenda do Rio Grande do Norte",
+  "SEFAZ-RO – Secretaria de Fazenda de Rondônia",
+  "SEFAZ-RR – Secretaria de Fazenda de Roraima",
+  "SEFAZ-RS – Secretaria de Fazenda do Rio Grande do Sul",
+  "SEFAZ-SC – Secretaria de Fazenda de Santa Catarina",
+  "SEFAZ-SE – Secretaria de Fazenda de Sergipe",
+  "SEFAZ-SP – Secretaria da Fazenda de São Paulo",
+  "SEFAZ-TO – Secretaria de Fazenda do Tocantins",
+  "STF – Supremo Tribunal Federal",
+  "STJ – Superior Tribunal de Justiça",
+  "STM – Superior Tribunal Militar",
+  "TSE – Tribunal Superior Eleitoral",
+  "TST – Tribunal Superior do Trabalho",
+  "TCU – Tribunal de Contas da União",
+  "TJAC – Tribunal de Justiça do Acre",
+  "TJAL – Tribunal de Justiça de Alagoas",
+  "TJAM – Tribunal de Justiça do Amazonas",
+  "TJAP – Tribunal de Justiça do Amapá",
+  "TJBA – Tribunal de Justiça da Bahia",
+  "TJCE – Tribunal de Justiça do Ceará",
+  "TJDF – Tribunal de Justiça do Distrito Federal",
+  "TJES – Tribunal de Justiça do Espírito Santo",
+  "TJGO – Tribunal de Justiça de Goiás",
+  "TJMA – Tribunal de Justiça do Maranhão",
+  "TJMG – Tribunal de Justiça de Minas Gerais",
+  "TJMS – Tribunal de Justiça do Mato Grosso do Sul",
+  "TJMT – Tribunal de Justiça do Mato Grosso",
+  "TJPA – Tribunal de Justiça do Pará",
+  "TJPB – Tribunal de Justiça da Paraíba",
+  "TJPE – Tribunal de Justiça de Pernambuco",
+  "TJPI – Tribunal de Justiça do Piauí",
+  "TJPR – Tribunal de Justiça do Paraná",
+  "TJRJ – Tribunal de Justiça do Rio de Janeiro",
+  "TJRN – Tribunal de Justiça do Rio Grande do Norte",
+  "TJRO – Tribunal de Justiça de Rondônia",
+  "TJRR – Tribunal de Justiça de Roraima",
+  "TJRS – Tribunal de Justiça do Rio Grande do Sul",
+  "TJSC – Tribunal de Justiça de Santa Catarina",
+  "TJSE – Tribunal de Justiça de Sergipe",
+  "TJSP – Tribunal de Justiça de São Paulo",
+  "TJTO – Tribunal de Justiça de Tocantins",
+  "TRE-AC – Tribunal Regional Eleitoral do Acre",
+  "TRE-AL – Tribunal Regional Eleitoral de Alagoas",
+  "TRE-AM – Tribunal Regional Eleitoral do Amazonas",
+  "TRE-AP – Tribunal Regional Eleitoral do Amapá",
+  "TRE-BA – Tribunal Regional Eleitoral da Bahia",
+  "TRE-CE – Tribunal Regional Eleitoral do Ceará",
+  "TRE-DF – Tribunal Regional Eleitoral do Distrito Federal",
+  "TRE-ES – Tribunal Regional Eleitoral do Espírito Santo",
+  "TRE-GO – Tribunal Regional Eleitoral de Goiás",
+  "TRE-MA – Tribunal Regional Eleitoral do Maranhão",
+  "TRE-MG – Tribunal Regional Eleitoral de Minas Gerais",
+  "TRE-MS – Tribunal Regional Eleitoral do Mato Grosso do Sul",
+  "TRE-MT – Tribunal Regional Eleitoral do Mato Grosso",
+  "TRE-PA – Tribunal Regional Eleitoral do Pará",
+  "TRE-PB – Tribunal Regional Eleitoral da Paraíba",
+  "TRE-PE – Tribunal Regional Eleitoral de Pernambuco",
+  "TRE-PI – Tribunal Regional Eleitoral do Piauí",
+  "TRE-PR – Tribunal Regional Eleitoral do Paraná",
+  "TRE-RJ – Tribunal Regional Eleitoral do Rio de Janeiro",
+  "TRE-RN – Tribunal Regional Eleitoral do Rio Grande do Norte",
+  "TRE-RO – Tribunal Regional Eleitoral de Rondônia",
+  "TRE-RR – Tribunal Regional Eleitoral de Roraima",
+  "TRE-RS – Tribunal Regional Eleitoral do Rio Grande do Sul",
+  "TRE-SC – Tribunal Regional Eleitoral de Santa Catarina",
+  "TRE-SE – Tribunal Regional Eleitoral de Sergipe",
+  "TRE-SP – Tribunal Regional Eleitoral de São Paulo",
+  "TRE-TO – Tribunal Regional Eleitoral de Tocantins",
+  "TRF1 – Tribunal Regional Federal 1ª Região",
+  "TRF2 – Tribunal Regional Federal 2ª Região",
+  "TRF3 – Tribunal Regional Federal 3ª Região",
+  "TRF4 – Tribunal Regional Federal 4ª Região",
+  "TRF5 – Tribunal Regional Federal 5ª Região",
+  "TRF6 – Tribunal Regional Federal 6ª Região",
+  "TRT1 – Tribunal Regional do Trabalho 1ª Região",
+  "TRT2 – Tribunal Regional do Trabalho 2ª Região",
+  "TRT3 – Tribunal Regional do Trabalho 3ª Região",
+  "TRT4 – Tribunal Regional do Trabalho 4ª Região",
+  "TRT5 – Tribunal Regional do Trabalho 5ª Região",
+  "TRT6 – Tribunal Regional do Trabalho 6ª Região",
+  "TRT7 – Tribunal Regional do Trabalho 7ª Região",
+  "TRT8 – Tribunal Regional do Trabalho 8ª Região",
+  "TRT9 – Tribunal Regional do Trabalho 9ª Região",
+  "TRT10 – Tribunal Regional do Trabalho 10ª Região",
+  "TRT11 – Tribunal Regional do Trabalho 11ª Região",
+  "TRT12 – Tribunal Regional do Trabalho 12ª Região",
+  "TRT13 – Tribunal Regional do Trabalho 13ª Região",
+  "TRT14 – Tribunal Regional do Trabalho 14ª Região",
+  "TRT15 – Tribunal Regional do Trabalho 15ª Região",
+  "TRT16 – Tribunal Regional do Trabalho 16ª Região",
+  "TRT17 – Tribunal Regional do Trabalho 17ª Região",
+  "TRT18 – Tribunal Regional do Trabalho 18ª Região",
+  "TRT19 – Tribunal Regional do Trabalho 19ª Região",
+  "TRT20 – Tribunal Regional do Trabalho 20ª Região",
+  "TRT21 – Tribunal Regional do Trabalho 21ª Região",
+  "TRT22 – Tribunal Regional do Trabalho 22ª Região",
+  "TRT23 – Tribunal Regional do Trabalho 23ª Região",
+  "TRT24 – Tribunal Regional do Trabalho 24ª Região",
+  "Vestibular FGV – Rio de Janeiro",
+  "Vestibular FGV – São Paulo",
+  "Vestibular FGV – Brasília",
+  "FGV Direito Rio – Processo Seletivo",
+  "FGV Direito SP – Processo Seletivo",
+  "FGV EAESP – Processo Seletivo MBA",
+  "FGV EBAPE – Processo Seletivo",
+  "FGV EPGE – Processo Seletivo",
+  "Outros – Concurso não listado ou encerrado",
+];
+
+let acFocusIndex = -1;
+
+function normalizar(str) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function highlight(text, query) {
+  const norm = normalizar(text);
+  const normQ = normalizar(query);
+  if (!normQ) return text;
+  const idx = norm.indexOf(normQ);
+  if (idx === -1) return text;
+  return text.slice(0, idx) + '<mark>' + text.slice(idx, idx + query.length) + '</mark>' + text.slice(idx + query.length);
+}
+
+function renderDropdown(query) {
+  const dd = document.getElementById('ac-dropdown');
+  const q = normalizar(query.trim());
+  if (!q) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
+
+  // Filtra: prioriza começo da sigla, depois qualquer match
+  const results = CONCURSOS.filter(c => normalizar(c).includes(q));
+  results.sort((a, b) => {
+    const na = normalizar(a), nb = normalizar(b);
+    const aStart = na.startsWith(q) ? 0 : 1;
+    const bStart = nb.startsWith(q) ? 0 : 1;
+    return aStart - bStart;
+  });
+
+  dd.innerHTML = '';
+  acFocusIndex = -1;
+
+  if (results.length === 0) {
+    dd.innerHTML = '<div class="ac-empty">Nenhum concurso encontrado para "' + query.trim() + '".</div>';
+    const outros = document.createElement('div');
+    outros.className = 'ac-item ac-item-outros';
+    outros.innerHTML = '<strong>Outros – Concurso não listado ou encerrado</strong>';
+    outros.dataset.value = 'Outros – Concurso não listado ou encerrado';
+    outros.addEventListener('mousedown', (e) => { e.preventDefault(); selectConcurso('Outros – Concurso não listado ou encerrado'); });
+    dd.appendChild(outros);
+    dd.classList.add('open');
+    return;
+  }
+
+  const count = document.createElement('div');
+  count.className = 'ac-count';
+  count.textContent = results.length === 1 ? '1 resultado' : results.length + ' resultados — clique para selecionar';
+  dd.appendChild(count);
+
+  const MAX = 30;
+  results.slice(0, MAX).forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'ac-item';
+    div.innerHTML = highlight(item, query.trim());
+    div.dataset.value = item;
+    div.addEventListener('mousedown', (e) => { e.preventDefault(); selectConcurso(item); });
+    dd.appendChild(div);
+  });
+
+  if (results.length > MAX) {
+    const more = document.createElement('div');
+    more.className = 'ac-empty';
+    more.textContent = '+ ' + (results.length - MAX) + ' outros — continue digitando para refinar.';
+    dd.appendChild(more);
+  }
+
+  // "Outros" fixo ao final, separado
+  const sep = document.createElement('div');
+  sep.className = 'ac-separator';
+  dd.appendChild(sep);
+  const outrosItem = document.createElement('div');
+  outrosItem.className = 'ac-item ac-item-outros';
+  outrosItem.innerHTML = 'Outros – Concurso não listado ou encerrado';
+  outrosItem.dataset.value = 'Outros – Concurso não listado ou encerrado';
+  outrosItem.addEventListener('mousedown', (e) => { e.preventDefault(); selectConcurso('Outros – Concurso não listado ou encerrado'); });
+  dd.appendChild(outrosItem);
+
+  dd.classList.add('open');
+}
+
+function selectConcurso(value) {
+  document.getElementById('modal-concurso-input').value = value;
+  document.getElementById('modal-concurso-input').classList.add('selected');
+  document.getElementById('modal-concurso').value = value;
+  document.getElementById('ac-dropdown').classList.remove('open');
+  document.getElementById('ac-clear').style.display = 'block';
+}
+
+function clearConcurso() {
+  document.getElementById('modal-concurso-input').value = '';
+  document.getElementById('modal-concurso-input').classList.remove('selected');
+  document.getElementById('modal-concurso').value = '';
+  document.getElementById('ac-dropdown').classList.remove('open');
+  document.getElementById('ac-clear').style.display = 'none';
+  document.getElementById('modal-concurso-input').focus();
+}
+
+function initAutocomplete() {
+  const input = document.getElementById('modal-concurso-input');
+  const dd = document.getElementById('ac-dropdown');
+  if (!input) return;
+
+  input.addEventListener('input', function() {
+    // Se usuário editou após seleção, limpa o valor oculto
+    document.getElementById('modal-concurso').value = '';
+    input.classList.remove('selected');
+    document.getElementById('ac-clear').style.display = this.value ? 'block' : 'none';
+    renderDropdown(this.value);
+  });
+
+  input.addEventListener('keydown', function(e) {
+    const items = dd.querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      acFocusIndex = Math.min(acFocusIndex + 1, items.length - 1);
+      items.forEach((el, i) => el.classList.toggle('focused', i === acFocusIndex));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      acFocusIndex = Math.max(acFocusIndex - 1, 0);
+      items.forEach((el, i) => el.classList.toggle('focused', i === acFocusIndex));
+    } else if (e.key === 'Enter') {
+      if (acFocusIndex >= 0 && items[acFocusIndex]) {
+        e.preventDefault();
+        selectConcurso(items[acFocusIndex].dataset.value);
+      }
+    } else if (e.key === 'Escape') {
+      dd.classList.remove('open');
+    }
+  });
+
+  input.addEventListener('blur', function() {
+    // Pequeno delay para permitir o click no item
+    setTimeout(() => dd.classList.remove('open'), 180);
+  });
+
+  input.addEventListener('focus', function() {
+    if (this.value && !document.getElementById('modal-concurso').value) {
+      renderDropdown(this.value);
+    }
+  });
+}
+
+// ── Search filter (portal)
+document.querySelector('.search-bar input').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.service-card').forEach(card => {
+    const txt = card.textContent.toLowerCase();
+    card.style.display = (!q || txt.includes(q)) ? '' : 'none';
+  });
+});
+
+</script>
+</body>
+</html>
