@@ -46,6 +46,40 @@
 
   .app { position: relative; z-index: 1; }
 
+  /* === LOGIN SCREEN === */
+  .login-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
+  .login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 48px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.12);max-width:380px;width:100%;}
+  .login-icon{font-size:48px;margin-bottom:16px;}
+  .login-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px;}
+  .login-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+  .login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px 16px;font-size:15px;color:var(--text);outline:none;text-align:center;letter-spacing:3px;margin-bottom:14px;transition:border-color .2s;font-family:var(--font);}
+  .login-input:focus{border-color:var(--accent);}
+  .login-error{font-size:12px;color:var(--accent2);margin-bottom:10px;min-height:18px;}
+  .login-btn{width:100%;background:var(--accent);color:#000;font-weight:800;font-size:15px;padding:14px;border-radius:10px;border:0;cursor:pointer;transition:background .2s;font-family:var(--font);}
+  .login-btn:hover{background:#c07010;}
+
+  /* === ROUND CHIPS === */
+  .round-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .round-bar-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-weight:700;white-space:nowrap;}
+  #round-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+  .round-chip{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all .2s;white-space:nowrap;}
+  .round-chip:hover{border-color:var(--accent);color:var(--text);}
+  .round-chip.active{background:var(--accent);color:#000;border-color:var(--accent);}
+  .round-chip.overall{background:rgba(201,134,15,.08);border-color:rgba(201,134,15,.3);color:var(--gold);}
+  .round-chip.overall.active{background:var(--gold);color:#000;border-color:var(--gold);}
+
+  /* === MEAS TYPE TOGGLE === */
+  .meas-type-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px;}
+  .meas-type-btn{flex:1;padding:10px;font-size:13px;font-weight:700;cursor:pointer;border:0;background:var(--surface2);color:var(--muted);transition:all .2s;font-family:var(--font);}
+  .meas-type-btn.active.official{background:rgba(26,158,92,.15);color:#1a7a4a;}
+  .meas-type-btn.active.control{background:rgba(212,132,26,.12);color:#a06010;}
+  .month-select-wrap{background:rgba(26,158,92,.06);border:1px solid rgba(26,158,92,.2);border-radius:8px;padding:12px 14px;margin-bottom:14px;}
+  .month-select-wrap label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#1a7a4a;font-weight:700;display:block;margin-bottom:8px;}
+  .month-select{width:100%;background:var(--surface);border:1px solid rgba(26,158,92,.3);border-radius:7px;padding:9px 11px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;}
+
+  .meas-row.is-official{border-color:rgba(26,158,92,.35) !important;background:rgba(26,158,92,.04) !important;}
+  .meas-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(26,158,92,.12);color:#1a7a4a;white-space:nowrap;}
+
   /* === HEADER === */
   header {
     padding: 32px 40px 24px;
@@ -735,7 +769,7 @@
 
   .meas-row {
     display: grid;
-    grid-template-columns: 70px 58px 54px 50px;
+    grid-template-columns: 72px 58px 50px auto 1fr;
     gap: 6px;
     align-items: center;
     padding: 7px 8px;
@@ -1420,7 +1454,7 @@
   .ranking-compact-header,
   .ranking-compact-row {
     display: grid;
-    grid-template-columns: 42px minmax(180px, 1.5fr) 92px 112px 94px 88px 112px 92px;
+    grid-template-columns: 42px minmax(180px, 1.5fr) 68px 92px 112px 94px 88px 112px 92px;
     gap: 10px;
     align-items: center;
   }
@@ -1589,10 +1623,83 @@
     display: block !important;
   }
 
+
+  /* === EXPAND PANEL (inline in ranking) === */
+  .ranking-compact-item { position: relative; border-bottom: 1px solid var(--border); }
+  .ranking-compact-item:last-child { border-bottom: 0; }
+  .ranking-compact-item.open .ranking-compact-row { background: rgba(212,132,26,0.055); }
+  .ranking-compact-row { cursor: pointer; }
+  .expand-panel {
+    display: none;
+    padding: 0 14px 14px 56px;
+    background: linear-gradient(180deg, rgba(212,132,26,0.04), transparent 80%);
+  }
+  .ranking-compact-item.open .expand-panel { display: block; }
+  .expand-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(220px, 0.7fr);
+    gap: 14px;
+    align-items: start;
+    margin-top: 10px;
+  }
+  .expand-meas-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  .expand-meas-row {
+    display: grid;
+    grid-template-columns: 72px 58px 50px auto 1fr;
+    gap: 5px;
+    align-items: center;
+    padding: 7px 9px;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .expand-meas-row.is-official { border-color: rgba(26,158,92,0.35); background: rgba(26,158,92,0.04); }
+  .expand-meas-row.out-of-range { opacity: 0.55; }
+  .expand-note {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .expand-note strong { color: var(--text); }
+  .expand-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .add-meas-btn {
+    width: 100%; padding: 7px;
+    background: var(--surface); border: 1px dashed var(--border);
+    border-radius: 8px; color: var(--muted); font-size: 12px;
+    cursor: pointer; transition: all 0.2s; font-family: var(--font);
+  }
+  .add-meas-btn:hover { color: var(--accent); border-color: rgba(212,132,26,0.4); background: rgba(212,132,26,0.05); }
+
+  @media (max-width: 768px) {
+    .expand-grid { grid-template-columns: 1fr; }
+    .expand-panel { padding-left: 14px; }
+  }
 </style>
 </head>
 <body>
-<div class="app">
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-icon">&#9878;</div>
+    <div class="login-title">Battle of the Scale</div>
+    <div class="login-sub">Competicao de Perda de Peso &middot; Acesso restrito</div>
+    <input class="login-input" id="login-input" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="off">
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
 
   <!-- HEADER -->
   <header>
@@ -1627,7 +1734,6 @@
   <!-- TABS -->
   <div class="tabs">
     <button class="tab active" onclick="switchTab('ranking', this)">&#127942; Ranking</button>
-    <button class="tab" onclick="switchTab('participants', this)">&#128101; Participantes</button>
     <button class="tab" onclick="switchTab('timeline', this)">&#128200; Evolucao</button>
   </div>
 
@@ -1636,12 +1742,19 @@
 
     <!-- RANKING VIEW -->
     <div class="view active" id="view-ranking">
-      <div class="ranking-compact-head" id="ranking-stats"></div>
+      <!-- Round selector -->
+      <div class="round-bar">
+        <span class="round-bar-label">Rodada:</span>
+        <div id="round-chips"></div>
+      </div>
+
+            <div class="ranking-compact-head" id="ranking-stats"></div>
 
       <div class="ranking-compact-table">
         <div class="ranking-compact-header" id="ranking-header">
           <span>#</span>
           <button class="ranking-sort-btn" onclick="setRankingSort('name')" data-sort-key="name">Participante <span class="sort-mark" data-sort-mark="name"></span></button>
+          <span>Altura</span>
           <button class="ranking-sort-btn" onclick="setRankingSort('initial')" data-sort-key="initial">Inicial <span class="sort-mark" data-sort-mark="initial"></span></button>
           <button class="ranking-sort-btn" onclick="setRankingSort('compared')" data-sort-key="compared">Comparado <span class="sort-mark" data-sort-mark="compared"></span></button>
           <button class="ranking-sort-btn" onclick="setRankingSort('loss')" data-sort-key="loss">Perda <span class="sort-mark" data-sort-mark="loss"></span></button>
@@ -1651,29 +1764,6 @@
         </div>
         <div class="ranking-compact-body" id="ranking-body"></div>
       </div>
-    </div>
-
-    <!-- PARTICIPANTS VIEW -->
-    <div class="view" id="view-participants">
-      <div class="participants-toolbar">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <span style="font-size:14px;color:var(--muted)"><span id="p-count">0</span> participantes</span>
-          <div style="position:relative">
-            <input id="p-search" type="search" placeholder="Buscar participante…" oninput="renderParticipants()"
-              style="height:36px;padding:0 12px 0 32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;outline:none;font-family:var(--font);width:220px;">
-            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:14px">&#128269;</span>
-          </div>
-          <select id="p-sort" onchange="renderParticipants()"
-            style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;outline:none;font-family:var(--font)">
-            <option value="name">Ordenar por nome</option>
-            <option value="pct">Maior % de perda</option>
-            <option value="peso">Maior peso inicial</option>
-            <option value="imc">Maior IMC atual</option>
-          </select>
-        </div>
-        <button class="btn btn-primary" onclick="openAddParticipant()">+ Novo Participante</button>
-      </div>
-      <div class="participants-grid" id="participants-grid"></div>
     </div>
 
     <!-- TIMELINE VIEW -->
@@ -1741,14 +1831,25 @@
     <div class="modal-body">
       <input type="hidden" id="edit-m-pid">
       <input type="hidden" id="edit-m-id">
-      <div class="form-group">
-        <label class="form-label">Data da Pesagem</label>
-        <input class="form-input" id="m-data" type="date">
+      <div class="meas-type-toggle" id="meas-type-toggle">
+        <button class="meas-type-btn control active" id="btn-type-control" onclick="setMeasType('control')">&#128203; Controle interno</button>
+        <button class="meas-type-btn official" id="btn-type-official" onclick="setMeasType('official')">&#127941; Pesagem oficial</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Peso (kg)</label>
-        <input class="form-input" id="m-peso" type="number" placeholder="80.0" min="30" max="300" step="0.1">
+      <div class="month-select-wrap" id="month-select-wrap" style="display:none">
+        <label>Mes de referencia desta pesagem oficial</label>
+        <select class="month-select" id="m-month-ref"></select>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data da Pesagem</label>
+          <input class="form-input" id="m-data" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Peso (kg)</label>
+          <input class="form-input" id="m-peso" type="number" placeholder="80.0" min="30" max="300" step="0.1" oninput="updateMeasIMC()">
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);margin-bottom:4px" id="meas-imc-preview">IMC: --</div>
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeModal('modal-meas')">Cancelar</button>
         <button class="btn btn-primary" onclick="saveMeasurement()">Salvar</button>
@@ -1808,26 +1909,63 @@ const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
 let state = {
   deadline: '2026-06-04',
-  participants: []
+  participants: [],
+  meta: {}
 };
 
 let confirmCallback = null;
 let rankingSort = { key: 'pct', dir: 'desc' };
 const ALL_TIMELINE_ID = '__all__';
 let selectedTimeline = [ALL_TIMELINE_ID];
+let selectedRound = 'overall';
+let currentMeasType = 'control';
+
+const MONTHS_PT = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const PWD_READ  = 'magrinho';
+const PWD_ADMIN = 'gordao';
+let _readAuthed = false;
+let _adminAuthed = false;
+
+// =========================================================
+// LOGIN
+// =========================================================
+function doLogin() {
+  const val = document.getElementById('login-input').value;
+  const err = document.getElementById('login-error');
+  if (val === PWD_ADMIN) {
+    _readAuthed = true; _adminAuthed = true;
+    document.getElementById('auth-status').innerHTML = `&#128275; Admin`;
+    document.getElementById('auth-status').style.cssText = 'cursor:pointer;background:rgba(26,158,92,.08);border-color:rgba(26,158,92,.22);color:#1a7a4a;';
+    showApp();
+  } else if (val === PWD_READ) {
+    _readAuthed = true; _adminAuthed = false;
+    showApp();
+  } else {
+    err.textContent = 'Senha incorreta.';
+    document.getElementById('login-input').value = '';
+    setTimeout(() => { err.textContent = ''; }, 2500);
+  }
+}
+document.getElementById('login-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  loadState();
+}
 
 // =========================================================
 // SEED DATA (planilha)
 // =========================================================
 const SEED = [
-  { name: `Fabricio Oliveira`, altura: 173, measurements: [{ id: uid(), date: '2026-05-04', peso: 104.5 }], dataFinal: '2026-06-04' },
-  { name: `Edson Correia`,     altura: 182, measurements: [{ id: uid(), date: '2026-05-04', peso: 101.5 }], dataFinal: '2026-06-04' },
-  { name: `Leonardo`,          altura: 172, measurements: [{ id: uid(), date: '2026-05-04', peso: 102.7 }], dataFinal: '2026-06-04' },
-  { name: `Andre Magalhaes`,   altura: 172, measurements: [{ id: uid(), date: '2026-05-04', peso: 81.1  }], dataFinal: '2026-06-04' },
-  { name: `Andre Vieira`,      altura: 178, measurements: [{ id: uid(), date: '2026-05-04', peso: 105.2 }], dataFinal: '2026-06-04' },
-  { name: `Ademir`,            altura: 191, measurements: [{ id: uid(), date: '2026-05-04', peso: 115.8 }], dataFinal: '2026-06-04' },
-  { name: `Elias`,             altura: 175, measurements: [{ id: uid(), date: '2026-05-04', peso: 93.5  }], dataFinal: '2026-06-04' },
-  { name: `Brasil`,            altura: 165, measurements: [{ id: uid(), date: '2026-05-04', peso: 93.1  }], dataFinal: '2026-06-04' },
+  { name: `Fabricio Oliveira`, altura: 173, dataFinal: '2026-06-04', measurements: [{ id: 's1', date: '2026-05-04', peso: 104.5, type: 'official', monthRef: '2026-05' }] },
+  { name: `Edson Correia`,     altura: 182, dataFinal: '2026-06-04', measurements: [{ id: 's2', date: '2026-05-04', peso: 101.5, type: 'official', monthRef: '2026-05' }] },
+  { name: `Leonardo`,          altura: 172, dataFinal: '2026-06-04', measurements: [{ id: 's3', date: '2026-05-04', peso: 102.7, type: 'official', monthRef: '2026-05' }] },
+  { name: `Andre Magalhaes`,   altura: 172, dataFinal: '2026-06-04', measurements: [{ id: 's4', date: '2026-05-04', peso: 81.1,  type: 'official', monthRef: '2026-05' }] },
+  { name: `Andre Vieira`,      altura: 178, dataFinal: '2026-06-04', measurements: [{ id: 's5', date: '2026-05-04', peso: 105.2, type: 'official', monthRef: '2026-05' }] },
+  { name: `Ademir`,            altura: 191, dataFinal: '2026-06-04', measurements: [{ id: 's6', date: '2026-05-04', peso: 115.8, type: 'official', monthRef: '2026-05' }] },
+  { name: `Elias`,             altura: 175, dataFinal: '2026-06-04', measurements: [{ id: 's7', date: '2026-05-04', peso: 93.5,  type: 'official', monthRef: '2026-05' }] },
+  { name: `Brasil`,            altura: 165, dataFinal: '2026-06-04', measurements: [{ id: 's8', date: '2026-05-04', peso: 93.1,  type: 'official', monthRef: '2026-05' }] },
 ];
 
 // =========================================================
@@ -1926,21 +2064,83 @@ function normalizeState(input) {
   if (!input || !Array.isArray(input.participants)) return null;
   const copy = JSON.parse(JSON.stringify(input));
   copy.deadline = copy.deadline || '2026-06-04';
-  copy.participants = copy.participants.map(p => ({
-    id: p.id || uid(),
-    name: p.name || p.nome || `Participante`,
-    altura: Number(p.altura) || 170,
-    dataFinal: p.dataFinal || copy.deadline,
-    measurements: Array.isArray(p.measurements) ? p.measurements.map(m => ({
-      id: m.id || uid(),
-      date: m.date || m.data || new Date().toISOString().slice(0, 10),
-      peso: Number(m.peso) || 0
-    })).filter(m => m.peso > 0) : []
-  })).filter(p => p.measurements.length > 0);
+  copy.participants = copy.participants.map(p => {
+    const meas = Array.isArray(p.measurements) ? p.measurements.map((m, i) => {
+      const pesoVal = Number(m.peso || m.weightKg) || 0;
+      const type = m.type || (i === 0 ? 'official' : 'control');
+      const monthRef = m.monthRef || (type === 'official' ? (m.date || '').slice(0,7) || null : null);
+      return { id: m.id || uid(), date: m.date || new Date().toISOString().slice(0,10), peso: pesoVal, type, monthRef };
+    }).filter(m => m.peso > 0) : [];
+    return {
+      id: p.id || uid(),
+      name: p.name || p.nome || 'Participante',
+      altura: Number(p.altura || p.heightCm) || 170,
+      dataFinal: p.dataFinal || p.targetDate || copy.deadline,
+      measurements: meas
+    };
+  }).filter(p => p.measurements.length > 0);
   copy.meta = copy.meta || {};
-  copy.meta.updatedAt = copy.meta.updatedAt || '';
-  copy.meta.updatedBy = copy.meta.updatedBy || '';
   return copy;
+}
+
+// =========================================================
+// MEASUREMENT HELPERS
+// =========================================================
+function sortedMeas(p) {
+  return [...p.measurements].sort((a,b) => a.date.localeCompare(b.date));
+}
+function officialMeas(p) {
+  return sortedMeas(p).filter(m => m.type === 'official');
+}
+function officialForMonth(p, monthRef) {
+  return officialMeas(p).find(m => m.monthRef === monthRef) || null;
+}
+function allOfficialMonths() {
+  const set = new Set();
+  state.participants.forEach(p => officialMeas(p).forEach(m => { if (m.monthRef) set.add(m.monthRef); }));
+  return [...set].sort();
+}
+function roundMetrics(p, round) {
+  const officials = officialMeas(p);
+  if (!officials.length) return null;
+  let fromMeas, toMeas;
+  if (round === 'overall') {
+    fromMeas = officials[0];
+    toMeas   = officials[officials.length - 1];
+  } else {
+    const months = allOfficialMonths();
+    const idx = months.indexOf(round);
+    if (idx < 0) return null;
+    toMeas = officialForMonth(p, round);
+    if (!toMeas) return null;
+    fromMeas = idx === 0 ? toMeas : (officialForMonth(p, months[idx-1]) || officials[0]);
+  }
+  if (!fromMeas || !toMeas) return null;
+  const lossKg  = fromMeas.id === toMeas.id ? null : fromMeas.peso - toMeas.peso;
+  const lossPct = lossKg !== null ? (lossKg / fromMeas.peso) * 100 : null;
+  return { fromMeas, toMeas, lossKg, lossPct, imc: calcIMC(toMeas.peso, p.altura) };
+}
+function fmtMonthRef(ym) {
+  if (!ym) return '--';
+  const [y,m] = ym.split('-');
+  return `${MONTHS_PT[parseInt(m)-1]} ${y}`;
+}
+
+// =========================================================
+// ROUND CHIPS
+// =========================================================
+function buildRoundChips() {
+  const months = allOfficialMonths();
+  const wrap = document.getElementById('round-chips');
+  if (!wrap) return;
+  wrap.innerHTML =
+    `<div class="round-chip overall ${selectedRound==='overall'?'active':''}" onclick="selectRound('overall')">&#127942; Geral</div>` +
+    months.map(m => `<div class="round-chip ${selectedRound===m?'active':''}" onclick="selectRound('${m}')">${fmtMonthRef(m)}</div>`).join('');
+}
+function selectRound(r) {
+  selectedRound = r;
+  buildRoundChips();
+  renderRanking();
 }
 
 function stateTimestamp(s) {
@@ -2008,29 +2208,26 @@ async function loadState() {
 
 function renderAll() {
   renderVersionInfo();
+  buildRoundChips();
   renderRanking();
-  renderParticipants();
   renderTimeline();
 }
 
 // =========================================================
 // AUTENTICACAO
 // =========================================================
-const ADMIN_HASH = '8e8659e4b0b30b4b3f5b7c2a9d1e6f3c2b4a5d8e9f0a1b2c3d4e5f6a7b8c9d0'; // gordao (sha256 simplificado)
-const ADMIN_PWD  = 'gordao'; // verificacao direta — arquivo local, sem servidor
-let _authed = false;
 
-function isAuthed() { return _authed; }
+function isAuthed() { return _adminAuthed; }
 
 function checkAuth(onSuccess) {
-  if (_authed) { onSuccess(); return; }
+  if (_adminAuthed) { onSuccess(); return; }
   const pwd = prompt('Senha de administrador:');
-  if (pwd === null) return; // cancelou
-  if (pwd === ADMIN_PWD) {
-    _authed = true;
-    toast('Acesso liberado!', 'success');
-    // atualiza UI para mostrar modo admin
-    document.getElementById('auth-status').innerHTML = `<span style="color:var(--green)">&#128275; Admin</span>`;
+  if (pwd === null) return;
+  if (pwd === PWD_ADMIN) {
+    _adminAuthed = true;
+    toast('Acesso admin liberado!', 'success');
+    document.getElementById('auth-status').innerHTML = `&#128275; Admin`;
+    document.getElementById('auth-status').style.cssText = 'cursor:pointer;background:rgba(26,158,92,.08);border-color:rgba(26,158,92,.22);color:#1a7a4a;';
     onSuccess();
   } else {
     toast('Senha incorreta', 'error');
@@ -2038,7 +2235,7 @@ function checkAuth(onSuccess) {
 }
 
 async function saveState() {
-  if (!_authed) {
+  if (!_adminAuthed) {
     checkAuth(() => saveState());
     return;
   }
@@ -2086,9 +2283,8 @@ function switchTab(name, el) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   el.classList.add('active');
   document.getElementById(`view-${name}`).classList.add('active');
-  if (name === 'ranking')      renderRanking();
-  if (name === 'participants') renderParticipants();
-  if (name === 'timeline')     renderTimeline();
+  if (name === 'ranking')  renderRanking();
+  if (name === 'timeline') renderTimeline();
 }
 
 // =========================================================
@@ -2207,7 +2403,6 @@ function saveParticipant() {
 
   saveState();
   closeModal('modal-participant');
-  renderParticipants();
   renderRanking();
 }
 
@@ -2223,8 +2418,7 @@ function deleteParticipant(id) {
     () => {
       state.participants = state.participants.filter(x => x.id !== id);
       saveState();
-      renderParticipants();
-      renderRanking();
+          renderRanking();
       toast('Participante removido', 'success');
     }
   );
@@ -2233,12 +2427,50 @@ function deleteParticipant(id) {
 // =========================================================
 // MEASUREMENTS
 // =========================================================
+// =========================================================
+// MEASUREMENT TYPE
+// =========================================================
+function setMeasType(type) {
+  currentMeasType = type;
+  document.getElementById('btn-type-control').className = 'meas-type-btn control' + (type==='control'?' active':'');
+  document.getElementById('btn-type-official').className = 'meas-type-btn official' + (type==='official'?' active':'');
+  document.getElementById('month-select-wrap').style.display = type === 'official' ? 'block' : 'none';
+}
+
+function buildMonthRefSelect(current) {
+  const sel = document.getElementById('m-month-ref');
+  if (!sel) return;
+  const base = new Date();
+  const opts = [];
+  for (let i = -2; i <= 12; i++) {
+    const d = new Date(base.getFullYear(), base.getMonth() + i, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    opts.push({ ym, label: fmtMonthRef(ym) });
+  }
+  sel.innerHTML = opts.map(o => `<option value="${o.ym}"${o.ym===current?' selected':''}>${o.label}</option>`).join('');
+}
+
+function updateMeasIMC() {
+  const pid  = document.getElementById('edit-m-pid').value;
+  const p    = state.participants.find(x => x.id === pid);
+  const peso = parseFloat(document.getElementById('m-peso').value);
+  const el   = document.getElementById('meas-imc-preview');
+  if (el && p && peso > 0) {
+    const imc = calcIMC(peso, p.altura);
+    el.textContent = `IMC: ${imc.toFixed(1)} — ${imcClass(imc)}`;
+  } else if (el) { el.textContent = 'IMC: --'; }
+}
+
 function openAddMeasurement(pid) {
   document.getElementById('modal-m-title').textContent = 'Nova Pesagem';
   document.getElementById('edit-m-pid').value = pid;
   document.getElementById('edit-m-id').value = '';
   document.getElementById('m-data').value = new Date().toISOString().slice(0, 10);
   document.getElementById('m-peso').value = '';
+  const mip = document.getElementById('meas-imc-preview');
+  if (mip) mip.textContent = 'IMC: --';
+  setMeasType('control');
+  buildMonthRefSelect(new Date().toISOString().slice(0,7));
   openModal('modal-meas');
 }
 
@@ -2250,38 +2482,45 @@ function openEditMeasurement(pid, mid) {
   document.getElementById('edit-m-id').value = mid;
   document.getElementById('m-data').value = m.date;
   document.getElementById('m-peso').value = m.peso;
+  setMeasType(m.type || 'control');
+  buildMonthRefSelect(m.monthRef || new Date().toISOString().slice(0,7));
+  updateMeasIMC();
   openModal('modal-meas');
 }
 
 function saveMeasurement() {
   if (!isAuthed()) { checkAuth(() => saveMeasurement()); return; }
-  const pid  = document.getElementById('edit-m-pid').value;
-  const mid  = document.getElementById('edit-m-id').value;
-  const data = document.getElementById('m-data').value;
-  const peso = parseFloat(document.getElementById('m-peso').value);
+  const pid      = document.getElementById('edit-m-pid').value;
+  const mid      = document.getElementById('edit-m-id').value;
+  const data     = document.getElementById('m-data').value;
+  const peso     = parseFloat(document.getElementById('m-peso').value);
+  const type     = currentMeasType;
+  const monthRef = type === 'official' ? document.getElementById('m-month-ref').value : null;
 
-  if (!data) { toast('Informe a data', 'error'); return; }
-  if (!peso || peso < 30) { toast('Peso invalido', 'error'); return; }
+  if (!data)           { toast('Informe a data', 'error'); return; }
+  if (!peso || peso<30){ toast('Peso invalido', 'error'); return; }
 
   const p = state.participants.find(x => x.id === pid);
   const duplicateDate = p.measurements.some(x => x.date === data && x.id !== mid);
-  if (duplicateDate) {
-    toast('Ja existe uma pesagem nessa data para este participante', 'error');
-    return;
+  if (duplicateDate) { toast('Ja existe uma pesagem nessa data', 'error'); return; }
+
+  if (type === 'official' && monthRef) {
+    const dupMonth = p.measurements.some(m => m.type === 'official' && m.monthRef === monthRef && m.id !== mid);
+    if (dupMonth) { toast(`Ja existe pesagem oficial para ${fmtMonthRef(monthRef)}`, 'error'); return; }
   }
+
   if (mid) {
     const m = p.measurements.find(x => x.id === mid);
-    m.date = data;
-    m.peso = peso;
+    m.date = data; m.peso = peso; m.type = type; m.monthRef = monthRef;
     toast('Pesagem atualizada!', 'success');
   } else {
-    p.measurements.push({ id: uid(), date: data, peso });
+    p.measurements.push({ id: uid(), date: data, peso, type, monthRef });
     toast('Pesagem registrada!', 'success');
   }
 
   saveState();
   closeModal('modal-meas');
-  renderParticipants();
+  buildRoundChips();
   renderRanking();
   renderTimeline();
 }
@@ -2299,8 +2538,7 @@ function deleteMeasurement(pid, mid) {
     () => {
       p.measurements = p.measurements.filter(x => x.id !== mid);
       saveState();
-      renderParticipants();
-      renderRanking();
+          renderRanking();
       renderTimeline();
       toast('Pesagem removida', 'success');
     }
@@ -2417,37 +2655,43 @@ function renderRanking() {
   const deadline = state.deadline;
   document.getElementById('deadline-display').textContent = fmtDate(deadline);
   updateRankingSortMarks();
+  buildRoundChips();
 
-  // Ranking: primeira pesagem x ultima pesagem valida ate o prazo efetivo.
   const ranked = state.participants.map(p => {
-    const first = firstMeasurement(p);
-    const last = lastMeasurementForRanking(p);
-    const realLast = lastMeasurement(p);
-    const pesoInicial = first ? first.peso : null;
-    const pesoAtual = last ? last.peso : null;
-    const imc = pesoAtual && p.altura ? calcIMC(pesoAtual, p.altura) : null;
-    const perdaKg = (pesoInicial && pesoAtual && first.id !== last.id) ? pesoInicial - pesoAtual : null;
-    const perdaPct = perdaKg !== null ? (perdaKg / pesoInicial) * 100 : null;
-    const fechado = hasMeasurementOnOrAfterDeadline(p);
-    const ignoredAfterDeadline = realLast && last && realLast.date > last.date;
-    return { p, first, last, realLast, pesoInicial, pesoAtual, imc, perdaKg, perdaPct, fechado, ignoredAfterDeadline };
+    const rm = roundMetrics(p, selectedRound);
+    const allOff = officialMeas(p);
+    return {
+      p,
+      pesoInicial: rm?.fromMeas?.peso ?? null,
+      pesoAtual:   rm?.toMeas?.peso ?? null,
+      fromDate:    rm?.fromMeas?.date ?? null,
+      toDate:      rm?.toMeas?.date ?? null,
+      imc:         rm?.imc ?? null,
+      perdaKg:     rm?.lossKg ?? null,
+      perdaPct:    rm?.lossPct ?? null,
+      hasOfficial: allOff.length > 0,
+      rm
+    };
   }).sort(compareRankingRows);
 
   const hasResults = ranked.filter(r => r.perdaPct !== null);
   const winner = hasResults[0];
-  const closedCount = ranked.filter(r => r.fechado).length;
   const daysLeft = deadline
     ? Math.max(0, Math.round((new Date(deadline + 'T00:00:00') - new Date()) / 86400000))
     : '--';
+  const totalLoss = hasResults.reduce((s,r) => s + Math.max(0, r.perdaKg||0), 0);
+  const roundLabel = selectedRound === 'overall'
+    ? 'Ranking Geral · contra pesagem inicial'
+    : `Rodada ${fmtMonthRef(selectedRound)} · contra mes anterior`;
 
   document.getElementById('ranking-stats').innerHTML = `
     <div class="ranking-summary-main">
       <div class="ranking-summary-title">${winner ? 'Lider: ' + winner.p.name : 'Ranking ainda sem lider'}</div>
-      <div class="ranking-summary-sub">Criterio: percentual de perda entre a primeira pesagem e a ultima pesagem valida ate o prazo.</div>
+      <div class="ranking-summary-sub">${roundLabel}</div>
     </div>
     <div class="ranking-summary-kpi"><label>Melhor %</label><strong class="gold">${winner ? fmtPct(winner.perdaPct) : '--'}</strong></div>
     <div class="ranking-summary-kpi"><label>Participantes</label><strong>${state.participants.length}</strong></div>
-    <div class="ranking-summary-kpi"><label>Fechados</label><strong class="good">${closedCount}</strong></div>
+    <div class="ranking-summary-kpi"><label>Perda total</label><strong class="good">${totalLoss > 0 ? totalLoss.toFixed(1)+' kg' : '--'}</strong></div>
     <div class="ranking-summary-kpi"><label>Dias</label><strong>${daysLeft}</strong></div>
   `;
 
@@ -2456,12 +2700,13 @@ function renderRanking() {
     return;
   }
 
-  document.getElementById('ranking-body').innerHTML = ranked.map((r, i) => {
-    const { p, pesoInicial, pesoAtual, imc, perdaKg, perdaPct, last, fechado, ignoredAfterDeadline } = r;
-    const pos = perdaPct !== null ? i + 1 : '--';
-    const posClass = i === 0 && perdaPct !== null ? 'gold' : '';
-    const prazo = fmtDate(effectiveDeadline(p));
-    const dataComparada = last ? fmtDate(last.date) : '--';
+  let pos = 0;
+  document.getElementById('ranking-body').innerHTML = ranked.map((r) => {
+    const { p, pesoInicial, pesoAtual, fromDate, toDate, imc, perdaKg, perdaPct, hasOfficial } = r;
+    if (perdaPct !== null) pos++;
+    const posLabel = perdaPct !== null ? pos : '--';
+    const isWinner = pos === 1 && perdaPct !== null;
+    const prazo = fmtDate(p.dataFinal || state.deadline);
 
     let pctCell = `<span class="ranking-mini-pct pct-neutral">--</span>`;
     if (perdaPct !== null) {
@@ -2478,27 +2723,30 @@ function renderRanking() {
       ? `${imcTooltipWrap(`<span class="imc-badge ${imcBadgeClass(imc)}">${imc.toFixed(1)}</span>`)}<span class="ranking-muted">${imcClass(imc)}</span>`
       : `<span class="ranking-muted">--</span>`;
 
-    const statusClass = fechado ? 'closed' : (ignoredAfterDeadline ? 'warn' : '');
-    const statusText = fechado ? 'Fechado' : 'Parcial';
-    const obs = ignoredAfterDeadline ? `<span class="ranking-muted">pos-prazo ignorada</span>` : `<span class="ranking-muted">prazo ${prazo}</span>`;
+    const statusPill = hasOfficial
+      ? `<span class="ranking-status-pill closed">&#10003; Oficial</span><span class="ranking-muted">prazo ${prazo}</span>`
+      : `<span class="ranking-status-pill warn">Parcial</span><span class="ranking-muted">prazo ${prazo}</span>`;
 
-    return `<div class="ranking-compact-row ${i === 0 && perdaPct !== null ? 'winner' : ''}">
-      <div class="ranking-mini-pos ${posClass}">${pos}</div>
-      <div class="ranking-mini-name">
-        <span class="ranking-mini-avatar">${initials(p.name)}</span>
-        <span class="ranking-mini-person"><strong>${p.name}</strong><small>${p.measurements.length} pesagens</small></span>
+    return `<div class="ranking-compact-item ${isWinner ? 'winner' : ''}" id="ritem-${p.id}">
+      <div class="ranking-compact-row" onclick="toggleExpand('${p.id}')">
+        <div class="ranking-mini-pos ${isWinner ? 'gold' : ''}">${posLabel}</div>
+        <div class="ranking-mini-name">
+          <span class="ranking-mini-avatar">${initials(p.name)}</span>
+          <span class="ranking-mini-person"><strong>${p.name}</strong><small>${p.measurements.length} pesagem(ns)</small></span>
+        </div>
+        <div><span class="ranking-mini-val">${p.altura} cm</span></div>
+        <div><span class="ranking-mini-val">${pesoInicial ? pesoInicial + ' kg' : '--'}</span><span class="ranking-muted">${fromDate ? fmtDate(fromDate) : ''}</span></div>
+        <div><span class="ranking-mini-val">${pesoAtual && toDate !== fromDate ? pesoAtual + ' kg' : '--'}</span><span class="ranking-muted">${toDate && toDate !== fromDate ? fmtDate(toDate) : ''}</span></div>
+        <div>${perdaKgTxt}</div>
+        <div>${pctCell}</div>
+        <div>${imcHTML}</div>
+        <div>${statusPill}</div>
       </div>
-      <div><span class="ranking-mini-val">${pesoInicial ? pesoInicial + ' kg' : '--'}</span></div>
-      <div><span class="ranking-mini-val">${pesoAtual ? pesoAtual + ' kg' : '--'}</span><span class="ranking-muted">${dataComparada}</span></div>
-      <div>${perdaKgTxt}</div>
-      <div>${pctCell}</div>
-      <div>${imcHTML}</div>
-      <div><span class="ranking-status-pill ${statusClass}">${statusText}</span>${obs}</div>
+      <div class="expand-panel" id="expand-${p.id}"></div>
     </div>`;
   }).join('');
   bindFloatingImcTooltips();
 }
-
 // =========================================================
 // RENDER PARTICIPANTS
 // =========================================================
@@ -2558,10 +2806,12 @@ function renderParticipants() {
       }
 
       const ignored = deadline && m.date > deadline ? ` title="Fora do prazo do ranking" style="opacity:.55"` : '';
-      return `<div class="meas-row"${ignored}>
+      const isOff = m.type === 'official';
+      return `<div class="meas-row ${isOff?'is-official':''}"${ignored}>
         <span class="meas-date">${fmtDate(m.date)}</span>
         <span class="meas-peso">${m.peso} kg</span>
         ${deltaEl}
+        ${isOff ? `<span class="meas-badge">${fmtMonthRef(m.monthRef)}</span>` : '<span></span>'}
         <div class="meas-actions">
           <button class="icon-btn edit" onclick="event.stopPropagation(); openEditMeasurement('${p.id}','${m.id}')" title="Editar">&#9998;</button>
           <button class="icon-btn del" onclick="event.stopPropagation(); deleteMeasurement('${p.id}','${m.id}')" title="Remover">&#x2715;</button>
@@ -2642,6 +2892,80 @@ function renderParticipants() {
     ${rowsHtml}
   </div>`;
   bindFloatingImcTooltips();
+}
+
+// =========================================================
+// EXPAND PANEL
+// =========================================================
+function toggleExpand(pid) {
+  const item  = document.getElementById(`ritem-${pid}`);
+  const panel = document.getElementById(`expand-${pid}`);
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.ranking-compact-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    panel.innerHTML = renderExpandPanel(state.participants.find(p => p.id === pid));
+    bindFloatingImcTooltips();
+  }
+}
+
+function renderExpandPanel(p) {
+  if (!p) return '';
+  const sorted   = sortedMeas(p);
+  const officials = officialMeas(p);
+  const deadline = p.dataFinal || state.deadline;
+  const first    = officials[0] || sorted[0];
+  const lastOff  = officials[officials.length - 1];
+  const overall  = roundMetrics(p, 'overall');
+  const roundM   = selectedRound !== 'overall' ? roundMetrics(p, selectedRound) : null;
+  const imc      = lastOff ? calcIMC(lastOff.peso, p.altura) : null;
+
+  const measRows = sorted.map((m, mi) => {
+    const prev  = mi > 0 ? sorted[mi-1] : null;
+    const delta = prev ? m.peso - prev.peso : null;
+    let deltaEl = delta !== null
+      ? `<span class="meas-delta ${delta<0?'delta-pos':delta>0?'delta-neg':'delta-zero'}">${delta<0?'':'+'}${delta.toFixed(1)}</span>`
+      : `<span class="meas-delta delta-zero">inicial</span>`;
+    const isOff    = m.type === 'official';
+    const outRange = deadline && m.date > deadline;
+    return `<div class="expand-meas-row ${isOff?'is-official':''} ${outRange?'out-of-range':''}" title="${outRange?'Fora do prazo':''}">
+      <span class="meas-date">${fmtDate(m.date)}</span>
+      <span class="meas-peso">${m.peso} kg</span>
+      ${deltaEl}
+      ${isOff ? `<span class="meas-badge">${fmtMonthRef(m.monthRef)}</span>` : '<span></span>'}
+      <div class="meas-actions">
+        <button class="icon-btn edit" onclick="event.stopPropagation();openEditMeasurement('${p.id}','${m.id}')" title="Editar">&#9998;</button>
+        <button class="icon-btn del" onclick="event.stopPropagation();deleteMeasurement('${p.id}','${m.id}')" title="Remover">&#x2715;</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const imcStr = imc ? `${imc.toFixed(1)} — ${imcClass(imc)}` : '--';
+  let pctHTML = '<span style="color:var(--muted)">Sem resultado ainda</span>';
+  if (overall?.lossPct !== null && overall?.lossPct !== undefined) {
+    const cls = overall.lossPct > 0 ? 'pct-positive' : 'pct-negative';
+    pctHTML = `<span class="${cls}" style="font-weight:800">${overall.lossPct>0?'-':'+'}${fmtPct(Math.abs(overall.lossPct))}</span>`;
+  }
+
+  return `<div class="expand-grid">
+    <div>
+      <div class="expand-meas-list">${measRows}</div>
+      <button class="add-meas-btn" onclick="event.stopPropagation();openAddMeasurement('${p.id}')">+ Adicionar pesagem</button>
+    </div>
+    <div class="expand-note">
+      <strong>${p.name}</strong><br>
+      Altura: ${p.altura} cm &nbsp;·&nbsp; IMC: ${imcStr}<br>
+      ${first ? `Entrada: ${fmtDate(first.date)} com ${first.peso} kg` : ''}<br>
+      ${lastOff && lastOff.id !== first?.id ? `Ultima oficial: ${fmtDate(lastOff.date)} com ${lastOff.peso} kg<br>` : ''}
+      Resultado geral: ${pctHTML}
+      ${roundM?.lossPct !== null && roundM?.lossPct !== undefined ? `<br>Rodada ${fmtMonthRef(selectedRound)}: <strong class="${roundM.lossPct>0?'pct-positive':'pct-negative'}" style="font-weight:800">${roundM.lossPct>0?'-':'+'}${fmtPct(Math.abs(roundM.lossPct))}</strong>` : ''}
+      <div class="expand-actions">
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAddMeasurement('${p.id}')">+ Pesagem</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditParticipant('${p.id}')">&#9998; Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteParticipant('${p.id}')">&#x2715; Excluir</button>
+      </div>
+    </div>
+  </div>`;
 }
 
 // =========================================================
@@ -3013,7 +3337,6 @@ function exportOfficialHtml() {
   persistStateWithoutTouch();
   renderVersionInfo();
   renderRanking();
-  renderParticipants();
   renderTimeline();
 
   const serialized = safeSerializeForScript(officialState);
