@@ -1,0 +1,3094 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battle of the Scale</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface2: #f0f1f4;
+    --border: #e0e2ea;
+    --accent: #d4841a;
+    --accent2: #d94339;
+    --green: #1a9e5c;
+    --text: #1a1a2e;
+    --muted: #7a7a9a;
+    --gold: #c9860f;
+    --silver: #7a8499;
+    --bronze: #9a5e1a;
+    --radius: 12px;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === BACKGROUND MESH === */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(212,132,26,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(217,67,57,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; }
+
+  /* === HEADER === */
+  header {
+    padding: 32px 40px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: var(--surface);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-icon {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 8px 24px rgba(245,166,35,0.3);
+  }
+
+  .brand-text h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .brand-text p {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .deadline-badge {
+    background: rgba(217,67,57,0.08);
+    border: 1px solid rgba(217,67,57,0.2);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #b02020;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .deadline-badge span { font-weight: 700; }
+
+  .official-version-badge {
+    background: rgba(26,158,92,0.08);
+    border-color: rgba(26,158,92,0.22);
+    color: #1a7a4a;
+  }
+
+  /* === TABS === */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .tab {
+    padding: 16px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    outline: none;
+    letter-spacing: 0.3px;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* === MAIN CONTENT === */
+  main { padding: 32px 40px; }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* === RANKING VIEW === */
+  .ranking-header {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .stat-card.gold::before { background: linear-gradient(90deg, var(--gold), transparent); }
+  .stat-card.participants::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .stat-card.days::before { background: linear-gradient(90deg, var(--green), transparent); }
+
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+  .stat-value.gold-color { color: var(--gold); }
+  .stat-value.red-color { color: var(--accent2); }
+  .stat-value.green-color { color: var(--green); }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* === PODIUM === */
+  .podium-section { margin-bottom: 40px; }
+  .section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .podium {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 16px;
+    min-height: 180px;
+    margin-bottom: 32px;
+  }
+
+  .podium-card {
+    flex: 1;
+    max-width: 220px;
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: center;
+    border: 1px solid;
+    position: relative;
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+  }
+
+  .podium-card.pos-1 {
+    border-color: rgba(212,132,26,0.4);
+    background: linear-gradient(180deg, rgba(212,132,26,0.08) 0%, rgba(212,132,26,0.02) 100%);
+    box-shadow: 0 4px 24px rgba(212,132,26,0.12);
+    padding-top: 28px;
+    animation-delay: 0.1s;
+  }
+  .podium-card.pos-2 {
+    border-color: rgba(122,132,153,0.3);
+    background: rgba(122,132,153,0.05);
+    animation-delay: 0.2s;
+  }
+  .podium-card.pos-3 {
+    border-color: rgba(154,94,26,0.3);
+    background: rgba(154,94,26,0.04);
+    animation-delay: 0.3s;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .podium-medal {
+    font-size: 32px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .podium-name {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .podium-pct {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    display: block;
+    margin: 8px 0 4px;
+  }
+
+  .pos-1 .podium-pct { color: var(--gold); }
+  .pos-2 .podium-pct { color: var(--silver); }
+  .pos-3 .podium-pct { color: var(--bronze); }
+
+  .podium-detail { font-size: 11px; color: var(--muted); }
+  .podium-pos { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* === RANKING TABLE === */
+  .ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ranking-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    padding: 0 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ranking-table th.right, .ranking-table td.right { text-align: right; }
+  .ranking-table th.center, .ranking-table td.center { text-align: center; }
+
+  .ranking-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(42,42,62,0.5);
+    vertical-align: middle;
+  }
+
+  .ranking-table tr:hover td { background: rgba(0,0,0,0.02); }
+
+
+  /* === RANKING CARDS (sem rolagem horizontal escondida) === */
+  .ranking-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .ranking-row-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 58px minmax(180px, 1.5fr) repeat(5, minmax(110px, 1fr));
+    gap: 14px;
+    align-items: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .ranking-row-card.winner {
+    border-color: rgba(212,132,26,0.45);
+    box-shadow: 0 6px 22px rgba(212,132,26,0.10);
+  }
+
+  .ranking-cell-label {
+    display: block;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    white-space: nowrap;
+  }
+
+  .ranking-cell-value {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .ranking-status {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  @media (max-width: 1100px) {
+    .ranking-row-card {
+      grid-template-columns: 52px 1fr 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .ranking-row-card {
+      grid-template-columns: 1fr 1fr;
+    }
+    .ranking-row-card .rank-pos { grid-column: 1 / -1; }
+  }
+
+  .rank-pos {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--muted);
+    width: 40px;
+  }
+
+  .rank-name { font-weight: 600; }
+  .rank-imc { }
+
+  .imc-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .imc-normal { background: rgba(26,158,92,0.12); color: #1a7a4a; }
+  .imc-sobrepeso { background: rgba(212,132,26,0.12); color: #a06010; }
+  .imc-obeso { background: rgba(217,67,57,0.12); color: #b02020; }
+  .imc-abaixo { background: rgba(122,132,153,0.12); color: var(--silver); }
+
+  /* === IMC TOOLTIP === */
+  .imc-wrap {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+  }
+
+  .imc-wrap .imc-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a2e;
+    color: #e8e8f0;
+    border-radius: 12px;
+    padding: 16px 18px;
+    width: 360px;
+    max-width: min(360px, calc(100vw - 32px));
+    font-size: 12px;
+    line-height: 1.45;
+    z-index: 500;
+    box-shadow: 0 10px 34px rgba(0,0,0,0.22);
+    border: 1px solid rgba(255,255,255,0.08);
+    pointer-events: none;
+    white-space: normal;
+  }
+
+  .imc-wrap .imc-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1a1a2e;
+  }
+
+  .imc-wrap:hover .imc-tooltip,
+  .imc-wrap:focus-within .imc-tooltip {
+    display: block;
+  }
+
+  .imc-tooltip-title {
+    font-weight: 800;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a8b2c8;
+    margin-bottom: 10px;
+  }
+
+  .imc-tooltip-formula {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    color: #f4b35a;
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .imc-tooltip-formula small {
+    display: block;
+    color: #a8b2c8;
+    font-family: var(--font);
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  .imc-tooltip-table { width: 100%; border-collapse: collapse; }
+  .imc-tooltip-table tr td {
+    padding: 5px 6px;
+    font-size: 11px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .imc-tooltip-table tr:last-child td { border-bottom: none; }
+  .imc-tooltip-table td:first-child { color: #d8dbea; font-weight: 600; }
+  .imc-tooltip-table td:last-child { text-align: right; color: #a8b2c8; font-weight: 700; white-space: nowrap; }
+  .imc-row-normal td:first-child { color: #6ee7a8; }
+  .imc-row-sobrepeso td:first-child { color: #f4b35a; }
+  .imc-row-obesidade td:first-child { color: #ff8a84; }
+  .imc-tooltip-note {
+    margin-top: 10px;
+    padding-top: 9px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 10px;
+    color: #8f97b3;
+    line-height: 1.35;
+  }
+
+  .pct-cell {
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  .pct-positive { color: var(--green); }
+  .pct-negative { color: var(--accent2); }
+  .pct-neutral { color: var(--muted); }
+
+  .progress-bar-wrap {
+    width: 100px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--green);
+    transition: width 0.6s ease;
+  }
+
+  .no-data-cell { color: var(--muted); font-style: italic; font-size: 13px; }
+
+  /* === PARTICIPANTS VIEW === */
+  .participants-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: all 0.2s;
+    font-family: var(--font);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: #e09010; box-shadow: 0 4px 16px rgba(245,166,35,0.3); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--accent2);
+    border: 1px solid rgba(232,83,74,0.3);
+  }
+  .btn-danger:hover { background: rgba(232,83,74,0.1); }
+
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  .participants-grid {
+    display: block;
+  }
+
+  .participants-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .participants-table-head,
+  .participant-line-summary {
+    display: grid;
+    grid-template-columns: minmax(190px, 1.8fr) 64px 72px 72px 78px 78px 72px 88px 118px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .participants-table-head {
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 10px;
+    line-height: 1.2;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 800;
+  }
+
+  .participant-line {
+    border-bottom: 1px solid var(--border);
+  }
+  .participant-line:last-child { border-bottom: none; }
+
+  .participant-line details { display: block; }
+  .participant-line summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .participant-line summary::-webkit-details-marker { display: none; }
+
+  .participant-line-summary {
+    padding: 12px 14px;
+    min-height: 56px;
+    font-size: 12px;
+    transition: background 0.15s;
+  }
+  .participant-line-summary:hover { background: rgba(0,0,0,0.025); }
+  .participant-line details[open] .participant-line-summary { background: rgba(212,132,26,0.055); }
+
+  .participant-name-cell {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .participant-name-main {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .participant-subline {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    color: #000;
+    flex-shrink: 0;
+  }
+
+  .line-cell-label { display: none; }
+  .line-cell-value { font-weight: 750; color: var(--text); }
+  .line-cell-muted { color: var(--muted); font-size: 11px; }
+
+  .pct-pill,
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .pct-pill.good { color: var(--green); background: rgba(26,158,92,0.10); }
+  .pct-pill.bad { color: var(--accent2); background: rgba(217,67,57,0.10); }
+  .pct-pill.neutral { color: var(--muted); background: var(--surface2); border: 1px solid var(--border); }
+
+  .participant-line-actions {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+  }
+
+  .participant-line-actions .btn {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .participant-line-actions .btn-icon-only {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .line-expand-hint {
+    color: var(--muted);
+    font-size: 10px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .participant-line details[open] .line-expand-hint { display: none; }
+
+  .participant-detail-panel {
+    padding: 0 14px 14px 50px;
+    background: linear-gradient(180deg, rgba(212,132,26,0.055), transparent 70%);
+  }
+
+  .participant-detail-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(220px, 0.7fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .measurements-section { margin-top: 0; }
+
+  .measurements-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .measurements-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 6px;
+  }
+
+  .meas-row {
+    display: grid;
+    grid-template-columns: 70px 58px 54px 50px;
+    gap: 6px;
+    align-items: center;
+    padding: 7px 8px;
+    background: var(--surface);
+    border-radius: 8px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .meas-date { color: var(--muted); font-size: 11px; }
+  .meas-peso { font-weight: 800; }
+  .meas-delta {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: 999px;
+    text-align: center;
+  }
+  .delta-pos { background: rgba(26,158,92,0.12); color: #1a7a4a; }
+  .delta-neg { background: rgba(217,67,57,0.12); color: #b02020; }
+  .delta-zero { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  .meas-actions { display: flex; gap: 2px; justify-content: flex-end; }
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+    font-family: var(--font);
+  }
+  .icon-btn:hover.edit { color: var(--accent); background: rgba(212,132,26,0.08); }
+  .icon-btn:hover.del { color: var(--accent2); background: rgba(217,67,57,0.08); }
+
+  .add-meas-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font);
+  }
+  .add-meas-btn:hover { color: var(--accent); border-color: rgba(245,166,35,0.4); background: rgba(245,166,35,0.05); }
+
+  .compact-note {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .card-header,
+  .card-name,
+  .card-actions,
+  .card-body,
+  .card-stats,
+  .mini-stat { }
+
+  /* === MODAL === */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.2s;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .overlay.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    padding: 24px 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.2s;
+    font-family: var(--font);
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body { padding: 0 28px 28px; }
+
+  .form-group { margin-bottom: 18px; }
+
+  .form-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: var(--font);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--accent); background: var(--surface); }
+  .form-input::placeholder { color: var(--muted); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  /* === TIMELINE VIEW === */
+  .timeline-wrap { }
+
+  .participant-select-wrap {
+    margin-bottom: 24px;
+  }
+
+  .chart-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    min-height: 300px;
+  }
+
+  .chart-container { position: relative; }
+
+  /* SVG chart */
+  svg.weight-chart {
+    width: 100%;
+    overflow: visible;
+  }
+
+  .chart-empty {
+    text-align: center;
+    padding: 60px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* === TOAST === */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: toastIn 0.3s ease forwards;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    color: var(--text);
+  }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .toast.success { border-color: rgba(61,214,140,0.3); }
+  .toast.error { border-color: rgba(232,83,74,0.3); }
+
+  /* === CONFIRM DIALOG === */
+  .confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .confirm-overlay.open { opacity: 1; pointer-events: all; }
+
+  .confirm-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    transform: scale(0.95);
+    transition: transform 0.2s;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .confirm-overlay.open .confirm-box { transform: scale(1); }
+
+  .confirm-icon { font-size: 36px; margin-bottom: 12px; }
+  .confirm-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .confirm-msg { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .confirm-btns { display: flex; gap: 10px; justify-content: center; }
+
+  /* === PARTICIPANT SELECTOR === */
+  .p-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .p-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .p-chip:hover { border-color: var(--accent); color: var(--text); }
+  .p-chip.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  .timeline-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .timeline-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .timeline-name .pct-badge {
+    margin-left: auto;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .mini-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 80px;
+    margin-bottom: 12px;
+  }
+
+  .bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.5s ease;
+    position: relative;
+  }
+
+  .bar-label { font-size: 10px; color: var(--muted); text-align: center; white-space: nowrap; }
+  .bar-val { font-size: 11px; font-weight: 700; text-align: center; }
+
+
+
+  .timeline-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .timeline-help {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .line-chart-wrap {
+    width: 100%;
+    overflow: visible;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.42));
+    border-radius: 10px;
+    padding: 12px;
+    position: relative;
+  }
+
+  .line-chart-svg {
+    display: block;
+    width: 100%;
+    height: 260px;
+  }
+
+  .axis-label {
+    font-size: 10px;
+    fill: #7a7a9a;
+    font-weight: 600;
+  }
+
+  .chart-line {
+    fill: none;
+    stroke: var(--accent2);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .chart-point {
+    fill: var(--surface);
+    stroke: var(--accent2);
+    stroke-width: 3;
+  }
+
+  .chart-grid-line {
+    stroke: rgba(122,122,154,.20);
+    stroke-width: 1;
+  }
+
+  .combo-imc-bar {
+    fill: rgba(212,132,26,.58);
+    stroke: rgba(212,132,26,.88);
+    stroke-width: 1;
+  }
+
+  .combo-imc-bar:hover,
+  .imc-bar:hover {
+    opacity: 1;
+    filter: brightness(0.98);
+  }
+
+  .chart-axis-right {
+    fill: var(--accent2);
+  }
+
+  .chart-axis-left {
+    fill: var(--accent);
+  }
+
+  .chart-tooltip-floating {
+    position: absolute;
+    z-index: 40;
+    min-width: 210px;
+    max-width: 280px;
+    background: #1a1a2e;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 36px rgba(0,0,0,.22);
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    pointer-events: none;
+    display: none;
+  }
+
+  .chart-tooltip-floating strong {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #fff;
+  }
+
+  .chart-tooltip-floating .tip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-top: 5px;
+    margin-top: 5px;
+  }
+
+  .chart-tooltip-floating .tip-label { color: #b9bdd4; }
+  .chart-tooltip-floating .tip-value { font-weight: 800; color: #fff; text-align: right; }
+
+  .all-bars-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .all-bars-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .all-bars-title strong {
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .all-bars-title span {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .all-bar-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 180px) 1fr 70px;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(224,226,234,.65);
+  }
+
+  .all-bar-row:last-child { border-bottom: 0; }
+
+  .all-bar-name {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .all-bar-track {
+    height: 9px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .all-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--green);
+    min-width: 3px;
+  }
+
+  .all-bar-value {
+    font-size: 12px;
+    font-weight: 900;
+    text-align: right;
+    color: var(--green);
+  }
+
+  .all-bar-value.bad, .all-bar-fill.bad { color: var(--accent2); background: var(--accent2); }
+
+  .imc-all-chart-wrap { padding: 14px 14px 10px; }
+  .imc-all-chart-svg { height: 430px; }
+  .imc-bar { opacity: .92; cursor: default; }
+  .bar-value-label {
+    font-size: 10px;
+    fill: var(--text);
+    font-weight: 800;
+  }
+  .axis-line { stroke: rgba(122,122,154,.35); }
+  .axis-title-y {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+  .imc-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .imc-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .imc-legend-item span {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  /* empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: var(--muted);
+  }
+  .empty-state .big-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state p { font-size: 15px; margin-bottom: 20px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    header { padding: 20px; }
+    main { padding: 20px; }
+    .tabs { padding: 0 20px; overflow-x: auto; }
+    .ranking-header { grid-template-columns: 1fr 1fr; }
+    .podium { flex-wrap: wrap; align-items: stretch; }
+    .podium-card { max-width: none; }
+    .participants-table-head { display: none; }
+    .participant-line-summary {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
+      align-items: start;
+    }
+    .participant-name-cell { grid-column: 1 / -1; }
+    .participant-line-actions { grid-column: 1 / -1; justify-content: flex-start; }
+    .line-cell-label { display: block; font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+    .participant-detail-panel { padding: 0 14px 14px; }
+    .participant-detail-grid { grid-template-columns: 1fr; }
+    .measurements-list { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  /* === RANKING MINIMALISTA === */
+  .ranking-compact-head {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    display: grid;
+    grid-template-columns: 1.4fr repeat(4, auto);
+    gap: 14px;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .ranking-summary-main { min-width: 0; }
+  .ranking-summary-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ranking-summary-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .ranking-summary-kpi {
+    border-left: 1px solid var(--border);
+    padding-left: 14px;
+    min-width: 78px;
+  }
+  .ranking-summary-kpi label {
+    display: block;
+    font-size: 9px;
+    line-height: 1;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+  .ranking-summary-kpi strong {
+    display: block;
+    font-size: 15px;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .ranking-summary-kpi strong.good { color: var(--green); }
+  .ranking-summary-kpi strong.gold { color: var(--gold); }
+
+  .ranking-compact-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: visible;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .ranking-compact-body,
+  .ranking-compact-row {
+    overflow: visible;
+  }
+
+  .ranking-compact-row {
+    position: relative;
+  }
+
+  .ranking-compact-row .imc-wrap .imc-tooltip {
+    top: calc(100% + 10px);
+    bottom: auto;
+    left: auto;
+    right: -8px;
+    transform: none;
+    z-index: 5000;
+  }
+
+  .ranking-compact-row .imc-wrap .imc-tooltip::after {
+    top: auto;
+    bottom: 100%;
+    left: auto;
+    right: 28px;
+    transform: none;
+    border: 6px solid transparent;
+    border-bottom-color: #1a1a2e;
+  }
+
+  .ranking-compact-header,
+  .ranking-compact-row {
+    display: grid;
+    grid-template-columns: 42px minmax(180px, 1.5fr) 92px 112px 94px 88px 112px 92px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .ranking-compact-header {
+    padding: 9px 12px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 800;
+  }
+
+  .ranking-compact-row {
+    min-height: 48px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .ranking-compact-row:last-child { border-bottom: 0; }
+  .ranking-compact-row:hover { background: rgba(0,0,0,0.018); }
+  .ranking-compact-row.winner {
+    background: linear-gradient(90deg, rgba(212,132,26,0.08), transparent 42%);
+  }
+
+  .ranking-mini-pos {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--muted);
+  }
+  .ranking-mini-pos.gold { color: var(--gold); }
+  .ranking-mini-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .ranking-mini-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 900; color: #000;
+    flex-shrink: 0;
+  }
+  .ranking-mini-person { min-width: 0; }
+  .ranking-mini-person strong {
+    display: block;
+    font-size: 12px;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ranking-mini-person small,
+  .ranking-muted {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ranking-mini-val {
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .ranking-mini-pct {
+    font-size: 13px;
+    font-weight: 900;
+  }
+  .ranking-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--surface2);
+    white-space: nowrap;
+  }
+  .ranking-status-pill.closed {
+    color: #1a7a4a;
+    background: rgba(26,158,92,0.1);
+    border-color: rgba(26,158,92,0.2);
+  }
+  .ranking-status-pill.warn {
+    color: #a06010;
+    background: rgba(212,132,26,0.1);
+    border-color: rgba(212,132,26,0.2);
+  }
+
+  @media (max-width: 980px) {
+    .ranking-compact-head { grid-template-columns: 1fr 1fr; }
+    .ranking-summary-kpi { border-left: 0; padding-left: 0; }
+    .ranking-compact-header { display: none; }
+    .ranking-compact-row {
+      grid-template-columns: 34px 1fr 1fr 1fr;
+      align-items: start;
+      min-height: unset;
+      row-gap: 8px;
+    }
+    .ranking-compact-row > div:nth-child(n+5) { grid-column: auto; }
+  }
+
+  @media (max-width: 640px) {
+    .ranking-compact-head { grid-template-columns: 1fr; }
+    .ranking-compact-row { grid-template-columns: 34px 1fr; }
+  }
+
+
+  .ranking-sort-btn {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .ranking-sort-btn:hover {
+    color: var(--accent);
+  }
+  .sort-mark {
+    min-width: 10px;
+    font-size: 10px;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  /* Tooltip flutuante: evita corte dentro de tabelas, details e containers. */
+  .imc-wrap .imc-tooltip {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    width: 380px;
+    max-width: calc(100vw - 24px);
+    display: none !important;
+    z-index: 99999 !important;
+  }
+  .imc-wrap .imc-tooltip::after {
+    display: none !important;
+  }
+  .imc-wrap:hover .imc-tooltip,
+  .imc-wrap:focus-within .imc-tooltip {
+    display: none !important;
+  }
+  .imc-wrap .imc-tooltip.floating-visible {
+    display: block !important;
+  }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">&#9878;</div>
+      <div class="brand-text">
+        <h1>Battle of the Scale</h1>
+        <p>Competicao de Perda de Peso</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="deadline-badge">
+        &#x23F0; Encerramento: <span id="deadline-display">--/--/----</span>
+      </div>
+      <div class="deadline-badge official-version-badge">
+        &#128190; Versao: <span id="version-display">local</span>
+      </div>
+      <div class="deadline-badge" id="sync-status" style="min-width:160px;cursor:pointer" onclick="loadState()" title="Clique para recarregar dados">
+        <span style="color:#7a7a9a">&#9679; Carregando...</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="openDeadlineModal()">&#9998; Prazo</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportCsv()">&#x2B07; CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportBackup()">Backup JSON</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('backup-file').click()">Importar JSON</button>
+      <input id="backup-file" type="file" accept="application/json" style="display:none" onchange="importBackup(event)">
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('ranking', this)">&#127942; Ranking</button>
+    <button class="tab" onclick="switchTab('participants', this)">&#128101; Participantes</button>
+    <button class="tab" onclick="switchTab('timeline', this)">&#128200; Evolucao</button>
+  </div>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- RANKING VIEW -->
+    <div class="view active" id="view-ranking">
+      <div class="ranking-compact-head" id="ranking-stats"></div>
+
+      <div class="ranking-compact-table">
+        <div class="ranking-compact-header" id="ranking-header">
+          <span>#</span>
+          <button class="ranking-sort-btn" onclick="setRankingSort('name')" data-sort-key="name">Participante <span class="sort-mark" data-sort-mark="name"></span></button>
+          <button class="ranking-sort-btn" onclick="setRankingSort('initial')" data-sort-key="initial">Inicial <span class="sort-mark" data-sort-mark="initial"></span></button>
+          <button class="ranking-sort-btn" onclick="setRankingSort('compared')" data-sort-key="compared">Comparado <span class="sort-mark" data-sort-mark="compared"></span></button>
+          <button class="ranking-sort-btn" onclick="setRankingSort('loss')" data-sort-key="loss">Perda <span class="sort-mark" data-sort-mark="loss"></span></button>
+          <button class="ranking-sort-btn" onclick="setRankingSort('pct')" data-sort-key="pct">% <span class="sort-mark" data-sort-mark="pct"></span></button>
+          <button class="ranking-sort-btn" onclick="setRankingSort('imc')" data-sort-key="imc">IMC <span class="sort-mark" data-sort-mark="imc"></span></button>
+          <span>Status</span>
+        </div>
+        <div class="ranking-compact-body" id="ranking-body"></div>
+      </div>
+    </div>
+
+    <!-- PARTICIPANTS VIEW -->
+    <div class="view" id="view-participants">
+      <div class="participants-toolbar">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="font-size:14px;color:var(--muted)"><span id="p-count">0</span> participantes</span>
+          <div style="position:relative">
+            <input id="p-search" type="search" placeholder="Buscar participante…" oninput="renderParticipants()"
+              style="height:36px;padding:0 12px 0 32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;outline:none;font-family:var(--font);width:220px;">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:14px">&#128269;</span>
+          </div>
+          <select id="p-sort" onchange="renderParticipants()"
+            style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;outline:none;font-family:var(--font)">
+            <option value="name">Ordenar por nome</option>
+            <option value="pct">Maior % de perda</option>
+            <option value="peso">Maior peso inicial</option>
+            <option value="imc">Maior IMC atual</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="openAddParticipant()">+ Novo Participante</button>
+      </div>
+      <div class="participants-grid" id="participants-grid"></div>
+    </div>
+
+    <!-- TIMELINE VIEW -->
+    <div class="view" id="view-timeline">
+      <p class="section-title" style="margin-bottom:16px">Filtrar Participantes</p>
+      <div class="p-selector" id="p-selector"></div>
+      <div id="timeline-cards"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<!-- Add/Edit Participant -->
+<div class="overlay" id="modal-participant">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-p-title">Novo Participante</div>
+      <button class="modal-close" onclick="closeModal('modal-participant')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-p-id">
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input class="form-input" id="f-name" placeholder="Nome completo" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Altura (cm)</label>
+          <input class="form-input" id="f-altura" type="number" placeholder="170" min="100" max="250" step="0.1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data de Entrada</label>
+          <input class="form-input" id="f-data-entrada" type="date">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Peso Inicial (kg)</label>
+          <input class="form-input" id="f-peso" type="number" placeholder="80.0" min="30" max="300" step="0.1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data Final (pessoal)</label>
+          <input class="form-input" id="f-data-final" type="date" placeholder="Data de medição final">
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:14px;font-size:13px;color:var(--muted)">
+        <strong style="color:var(--text)">IMC calculado:</strong> <span id="imc-preview" style="color:var(--accent);font-weight:700;font-size:16px">--</span> &nbsp; <span id="imc-class-preview"></span>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-participant')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveParticipant()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Measurement -->
+<div class="overlay" id="modal-meas">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-m-title">Nova Pesagem</div>
+      <button class="modal-close" onclick="closeModal('modal-meas')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-m-pid">
+      <input type="hidden" id="edit-m-id">
+      <div class="form-group">
+        <label class="form-label">Data da Pesagem</label>
+        <input class="form-input" id="m-data" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Peso (kg)</label>
+        <input class="form-input" id="m-peso" type="number" placeholder="80.0" min="30" max="300" step="0.1">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-meas')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveMeasurement()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Deadline Modal -->
+<div class="overlay" id="modal-deadline">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <div class="modal-title">Data de Encerramento</div>
+      <button class="modal-close" onclick="closeModal('modal-deadline')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Data Final da Competicao</label>
+        <input class="form-input" id="f-deadline" type="date">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-deadline')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveDeadline()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">&#9888;&#65039;</div>
+    <div class="confirm-title" id="confirm-title">Tem certeza?</div>
+    <div class="confirm-msg" id="confirm-msg">Esta acao nao pode ser desfeita.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" onclick="confirmCancel()">Cancelar</button>
+      <button class="btn btn-danger" id="confirm-ok-btn" onclick="confirmOk()">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// =========================================================
+// STATE
+// =========================================================
+const STORAGE_KEY = 'battle_scale_v2';
+const EMBEDDED_STATE = /*OFFICIAL_DATA_START*/ null /*OFFICIAL_DATA_END*/;
+
+// ── JSONBin.io ──────────────────────────────────────────
+const JSONBIN_BIN_ID  = '69fcbe1dadc21f119a69852e';
+const JSONBIN_API_KEY = '$2a$10$40YJyDbx2qjgu7U8t69n9e5Hh981rItZ6FoKG76pr1UwYpUhQ/rzu';
+const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+// ────────────────────────────────────────────────────────
+
+let state = {
+  deadline: '2026-06-04',
+  participants: []
+};
+
+let confirmCallback = null;
+let rankingSort = { key: 'pct', dir: 'desc' };
+const ALL_TIMELINE_ID = '__all__';
+let selectedTimeline = [ALL_TIMELINE_ID];
+
+// =========================================================
+// SEED DATA (planilha)
+// =========================================================
+const SEED = [
+  { name: `Fabricio Oliveira`, altura: 173, measurements: [{ id: uid(), date: '2026-05-04', peso: 104.5 }], dataFinal: '2026-06-04' },
+  { name: `Edson Correia`,     altura: 182, measurements: [{ id: uid(), date: '2026-05-04', peso: 101.5 }], dataFinal: '2026-06-04' },
+  { name: `Leonardo`,          altura: 172, measurements: [{ id: uid(), date: '2026-05-04', peso: 102.7 }], dataFinal: '2026-06-04' },
+  { name: `Andre Magalhaes`,   altura: 172, measurements: [{ id: uid(), date: '2026-05-04', peso: 81.1  }], dataFinal: '2026-06-04' },
+  { name: `Andre Vieira`,      altura: 178, measurements: [{ id: uid(), date: '2026-05-04', peso: 105.2 }], dataFinal: '2026-06-04' },
+  { name: `Ademir`,            altura: 191, measurements: [{ id: uid(), date: '2026-05-04', peso: 115.8 }], dataFinal: '2026-06-04' },
+  { name: `Elias`,             altura: 175, measurements: [{ id: uid(), date: '2026-05-04', peso: 93.5  }], dataFinal: '2026-06-04' },
+  { name: `Brasil`,            altura: 165, measurements: [{ id: uid(), date: '2026-05-04', peso: 93.1  }], dataFinal: '2026-06-04' },
+];
+
+// =========================================================
+// UTILS
+// =========================================================
+function uid() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+function calcIMC(peso, altura) {
+  const h = altura / 100;
+  return peso / (h * h);
+}
+
+function imcClass(imc) {
+  if (imc < 18.5) return `Abaixo do peso`;
+  if (imc < 25)   return `Normal`;
+  if (imc < 30)   return `Sobrepeso`;
+  if (imc < 35)   return `Obesidade grau I`;
+  if (imc < 40)   return `Obesidade grau II`;
+  return `Obesidade grau III`;
+}
+
+function imcBadgeClass(imc) {
+  if (imc < 18.5) return 'imc-abaixo';
+  if (imc < 25)   return 'imc-normal';
+  if (imc < 30)   return 'imc-sobrepeso';
+  return 'imc-obeso';
+}
+
+function fmtDate(iso) {
+  if (!iso) return '--';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function fmtDateTime(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return `nao publicada`;
+  return d.toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function fmtPct(v) {
+  return v.toFixed(2).replace('.', ',') + '%';
+}
+
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function firstMeasurement(p) {
+  if (!p.measurements || p.measurements.length === 0) return null;
+  return [...p.measurements].sort((a, b) => a.date.localeCompare(b.date))[0];
+}
+
+function lastMeasurement(p) {
+  if (!p.measurements || p.measurements.length === 0) return null;
+  return [...p.measurements].sort((a, b) => b.date.localeCompare(a.date))[0];
+}
+
+function effectiveDeadline(p) {
+  return p.dataFinal || state.deadline || '';
+}
+
+function lastMeasurementForRanking(p) {
+  if (!p.measurements || p.measurements.length === 0) return null;
+  const limit = effectiveDeadline(p);
+  const sorted = [...p.measurements].sort((a, b) => b.date.localeCompare(a.date));
+  if (!limit) return sorted[0];
+  return sorted.find(m => m.date <= limit) || sorted[sorted.length - 1];
+}
+
+function hasMeasurementOnOrAfterDeadline(p) {
+  const limit = effectiveDeadline(p);
+  if (!limit || !p.measurements) return false;
+  return p.measurements.some(m => m.date >= limit);
+}
+
+function calcPctLoss(p) {
+  const first = firstMeasurement(p);
+  const last  = lastMeasurementForRanking(p);
+  if (!first || !last || first.id === last.id) return null;
+  return ((first.peso - last.peso) / first.peso) * 100;
+}
+
+// =========================================================
+// STORAGE
+// =========================================================
+function normalizeState(input) {
+  if (!input || !Array.isArray(input.participants)) return null;
+  const copy = JSON.parse(JSON.stringify(input));
+  copy.deadline = copy.deadline || '2026-06-04';
+  copy.participants = copy.participants.map(p => ({
+    id: p.id || uid(),
+    name: p.name || p.nome || `Participante`,
+    altura: Number(p.altura) || 170,
+    dataFinal: p.dataFinal || copy.deadline,
+    measurements: Array.isArray(p.measurements) ? p.measurements.map(m => ({
+      id: m.id || uid(),
+      date: m.date || m.data || new Date().toISOString().slice(0, 10),
+      peso: Number(m.peso) || 0
+    })).filter(m => m.peso > 0) : []
+  })).filter(p => p.measurements.length > 0);
+  copy.meta = copy.meta || {};
+  copy.meta.updatedAt = copy.meta.updatedAt || '';
+  copy.meta.updatedBy = copy.meta.updatedBy || '';
+  return copy;
+}
+
+function stateTimestamp(s) {
+  const t = s && s.meta && s.meta.updatedAt ? Date.parse(s.meta.updatedAt) : 0;
+  return Number.isFinite(t) ? t : 0;
+}
+
+function persistStateWithoutTouch() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function setSyncStatus(status, msg) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const cfg = {
+    syncing:  { color: '#a06010', icon: '&#x21BB;', text: msg || 'Sincronizando...' },
+    ok:       { color: '#1a7a4a', icon: '&#10003;',  text: msg || 'Sincronizado'     },
+    error:    { color: '#b02020', icon: '&#10007;',  text: msg || 'Erro de sync'      },
+    offline:  { color: '#7a7a9a', icon: '&#9679;',   text: msg || 'Offline'           },
+  };
+  const c = cfg[status] || cfg.offline;
+  el.innerHTML = `<span style="color:${c.color}">${c.icon} ${c.text}</span>`;
+}
+
+async function loadState() {
+  // 1. Carrega localStorage como fallback imediato
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const local = normalizeState(JSON.parse(raw));
+      if (local) { state = local; renderAll(); }
+    }
+  } catch(e) {}
+
+  // 2. Busca do JSONBin (fonte de verdade compartilhada)
+  setSyncStatus('syncing', 'Carregando...');
+  try {
+    const res = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Access-Key': JSONBIN_API_KEY }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const remote = normalizeState(json.record);
+    if (remote) {
+      // usa remoto se mais recente que o local
+      if (!state || stateTimestamp(remote) >= stateTimestamp(state)) {
+        state = remote;
+        persistStateWithoutTouch();
+        renderAll();
+      }
+    }
+    setSyncStatus('ok', 'Sincronizado');
+  } catch(e) {
+    console.warn('JSONBin load error:', e);
+    setSyncStatus('error', 'Sem conexao — dados locais');
+    // seed se nao tiver nada
+    if (!state.participants || state.participants.length === 0) {
+      state.participants = SEED.map(s => ({ id: uid(), ...s }));
+      state.meta = { updatedAt: new Date().toISOString(), updatedBy: 'Sistema' };
+      persistStateWithoutTouch();
+      renderAll();
+    }
+  }
+}
+
+function renderAll() {
+  renderVersionInfo();
+  renderRanking();
+  renderParticipants();
+  renderTimeline();
+}
+
+async function saveState() {
+  state.meta = state.meta || {};
+  state.meta.updatedAt = new Date().toISOString();
+  state.meta.updatedBy = state.meta.updatedBy || 'Administrador';
+  persistStateWithoutTouch();
+  renderVersionInfo();
+
+  setSyncStatus('syncing', 'Salvando...');
+  try {
+    const res = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Access-Key': JSONBIN_API_KEY
+      },
+      body: JSON.stringify(state)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    setSyncStatus('ok', 'Salvo para todos');
+  } catch(e) {
+    console.warn('JSONBin save error:', e);
+    setSyncStatus('error', 'Salvo local, sem sync');
+    toast('Salvo localmente — sem conexao com servidor', 'error');
+  }
+}
+
+function renderVersionInfo() {
+  const el = document.getElementById('version-display');
+  if (!el) return;
+  const updatedAt = state && state.meta && state.meta.updatedAt ? fmtDateTime(state.meta.updatedAt) : `nao publicada`;
+  const updatedBy = state && state.meta && state.meta.updatedBy ? state.meta.updatedBy : `local`;
+  el.textContent = `${updatedAt} · ${updatedBy}`;
+}
+
+// =========================================================
+// TABS
+// =========================================================
+// =========================================================
+// TABS
+// =========================================================
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(`view-${name}`).classList.add('active');
+  if (name === 'ranking')      renderRanking();
+  if (name === 'participants') renderParticipants();
+  if (name === 'timeline')     renderTimeline();
+}
+
+// =========================================================
+// MODALS
+// =========================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function openDeadlineModal() {
+  document.getElementById('f-deadline').value = state.deadline || '';
+  openModal('modal-deadline');
+}
+
+function saveDeadline() {
+  const v = document.getElementById('f-deadline').value;
+  if (!v) return;
+  state.deadline = v;
+  saveState();
+  document.getElementById('deadline-display').textContent = fmtDate(v);
+  closeModal('modal-deadline');
+  toast('Prazo atualizado!', 'success');
+  renderRanking();
+}
+
+// =========================================================
+// IMC PREVIEW
+// =========================================================
+function updateIMCPreview() {
+  const peso   = parseFloat(document.getElementById('f-peso').value);
+  const altura = parseFloat(document.getElementById('f-altura').value);
+  const el     = document.getElementById('imc-preview');
+  const elC    = document.getElementById('imc-class-preview');
+  if (peso > 0 && altura > 0) {
+    const imc = calcIMC(peso, altura);
+    el.textContent = imc.toFixed(1);
+    elC.textContent = imcClass(imc);
+    elC.className = 'imc-badge ' + imcBadgeClass(imc);
+  } else {
+    el.textContent = '--';
+    elC.textContent = '';
+  }
+}
+
+// =========================================================
+// ADD / EDIT PARTICIPANT
+// =========================================================
+function openAddParticipant() {
+  document.getElementById('modal-p-title').textContent = 'Novo Participante';
+  document.getElementById('edit-p-id').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-altura').value = '';
+  document.getElementById('f-peso').value = '';
+  document.getElementById('f-data-entrada').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('f-data-final').value = state.deadline || '';
+  document.getElementById('imc-preview').textContent = '--';
+  document.getElementById('imc-class-preview').textContent = '';
+  openModal('modal-participant');
+}
+
+function openEditParticipant(id) {
+  const p = state.participants.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modal-p-title').textContent = 'Editar Participante';
+  document.getElementById('edit-p-id').value = p.id;
+  document.getElementById('f-name').value = p.name;
+  document.getElementById('f-altura').value = p.altura;
+  const first = firstMeasurement(p);
+  document.getElementById('f-peso').value = first ? first.peso : '';
+  document.getElementById('f-data-entrada').value = first ? first.date : '';
+  document.getElementById('f-data-final').value = p.dataFinal || state.deadline || '';
+  updateIMCPreview();
+  openModal('modal-participant');
+}
+
+function saveParticipant() {
+  const id     = document.getElementById('edit-p-id').value;
+  const name   = document.getElementById('f-name').value.trim();
+  const altura = parseFloat(document.getElementById('f-altura').value);
+  const peso   = parseFloat(document.getElementById('f-peso').value);
+  const dataE  = document.getElementById('f-data-entrada').value;
+  const dataF  = document.getElementById('f-data-final').value;
+
+  if (!name) { toast('Informe o nome', 'error'); return; }
+  if (!altura || altura < 100) { toast('Altura invalida', 'error'); return; }
+  if (!peso || peso < 30) { toast('Peso invalido', 'error'); return; }
+  if (!dataE) { toast('Informe a data de entrada', 'error'); return; }
+
+  if (id) {
+    // edit
+    const p = state.participants.find(x => x.id === id);
+    p.name = name;
+    p.altura = altura;
+    p.dataFinal = dataF;
+    // update first measurement's peso/date if changed
+    const first = firstMeasurement(p);
+    if (first) {
+      const duplicatedInitialDate = p.measurements.some(x => x.date === dataE && x.id !== first.id);
+      if (duplicatedInitialDate) { toast('Ja existe outra pesagem nesta data', 'error'); return; }
+      first.peso = peso;
+      first.date = dataE;
+    }
+    toast('Participante atualizado!', 'success');
+  } else {
+    // new
+    state.participants.push({
+      id: uid(),
+      name,
+      altura,
+      dataFinal: dataF,
+      measurements: [{ id: uid(), date: dataE, peso }]
+    });
+    toast('Participante adicionado!', 'success');
+  }
+
+  saveState();
+  closeModal('modal-participant');
+  renderParticipants();
+  renderRanking();
+}
+
+// =========================================================
+// DELETE PARTICIPANT
+// =========================================================
+function deleteParticipant(id) {
+  const p = state.participants.find(x => x.id === id);
+  showConfirm(
+    `Remover ${p.name}?`,
+    'Todos os dados e pesagens serao apagados.',
+    () => {
+      state.participants = state.participants.filter(x => x.id !== id);
+      saveState();
+      renderParticipants();
+      renderRanking();
+      toast('Participante removido', 'success');
+    }
+  );
+}
+
+// =========================================================
+// MEASUREMENTS
+// =========================================================
+function openAddMeasurement(pid) {
+  document.getElementById('modal-m-title').textContent = 'Nova Pesagem';
+  document.getElementById('edit-m-pid').value = pid;
+  document.getElementById('edit-m-id').value = '';
+  document.getElementById('m-data').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('m-peso').value = '';
+  openModal('modal-meas');
+}
+
+function openEditMeasurement(pid, mid) {
+  const p = state.participants.find(x => x.id === pid);
+  const m = p.measurements.find(x => x.id === mid);
+  document.getElementById('modal-m-title').textContent = 'Editar Pesagem';
+  document.getElementById('edit-m-pid').value = pid;
+  document.getElementById('edit-m-id').value = mid;
+  document.getElementById('m-data').value = m.date;
+  document.getElementById('m-peso').value = m.peso;
+  openModal('modal-meas');
+}
+
+function saveMeasurement() {
+  const pid  = document.getElementById('edit-m-pid').value;
+  const mid  = document.getElementById('edit-m-id').value;
+  const data = document.getElementById('m-data').value;
+  const peso = parseFloat(document.getElementById('m-peso').value);
+
+  if (!data) { toast('Informe a data', 'error'); return; }
+  if (!peso || peso < 30) { toast('Peso invalido', 'error'); return; }
+
+  const p = state.participants.find(x => x.id === pid);
+  const duplicateDate = p.measurements.some(x => x.date === data && x.id !== mid);
+  if (duplicateDate) {
+    toast('Ja existe uma pesagem nessa data para este participante', 'error');
+    return;
+  }
+  if (mid) {
+    const m = p.measurements.find(x => x.id === mid);
+    m.date = data;
+    m.peso = peso;
+    toast('Pesagem atualizada!', 'success');
+  } else {
+    p.measurements.push({ id: uid(), date: data, peso });
+    toast('Pesagem registrada!', 'success');
+  }
+
+  saveState();
+  closeModal('modal-meas');
+  renderParticipants();
+  renderRanking();
+  renderTimeline();
+}
+
+function deleteMeasurement(pid, mid) {
+  const p = state.participants.find(x => x.id === pid);
+  if (p.measurements.length <= 1) {
+    toast('Nao e possivel remover a unica pesagem', 'error');
+    return;
+  }
+  showConfirm(
+    'Remover pesagem?',
+    'Esta pesagem sera apagada permanentemente.',
+    () => {
+      p.measurements = p.measurements.filter(x => x.id !== mid);
+      saveState();
+      renderParticipants();
+      renderRanking();
+      renderTimeline();
+      toast('Pesagem removida', 'success');
+    }
+  );
+}
+
+// =========================================================
+// CONFIRM DIALOG
+// =========================================================
+function showConfirm(title, msg, cb) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  confirmCallback = cb;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function confirmOk() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  if (confirmCallback) confirmCallback();
+  confirmCallback = null;
+}
+
+function confirmCancel() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  confirmCallback = null;
+}
+
+// =========================================================
+// TOAST
+// =========================================================
+function toast(msg, type = 'success') {
+  const icons = { success: '&#10003;', error: '&#10007;' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span style="color:${type==='success'?'var(--green)':'var(--accent2)'}">${icons[type]}</span> ${msg}`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// =========================================================
+// IMC TOOLTIP HELPER
+// =========================================================
+function imcTooltipWrap(badgeHTML) {
+  return `<span class="imc-wrap">
+    ${badgeHTML}
+    <span class="imc-tooltip">
+      <div class="imc-tooltip-title">Como o IMC e calculado</div>
+      <div class="imc-tooltip-formula">
+        IMC = peso (kg) ÷ [altura (m)]²
+        <small>altura em metros ao quadrado</small>
+      </div>
+      <table class="imc-tooltip-table">
+        <tr><td>Abaixo do peso</td><td>IMC &lt; 18,5</td></tr>
+        <tr class="imc-row-normal"><td>Normal</td><td>18,5 a 24,9</td></tr>
+        <tr class="imc-row-sobrepeso"><td>Sobrepeso</td><td>25,0 a 29,9</td></tr>
+        <tr class="imc-row-obesidade"><td>Obesidade grau I</td><td>30,0 a 34,9</td></tr>
+        <tr class="imc-row-obesidade"><td>Obesidade grau II</td><td>35,0 a 39,9</td></tr>
+        <tr class="imc-row-obesidade"><td>Obesidade grau III</td><td>IMC ≥ 40,0</td></tr>
+      </table>
+      <div class="imc-tooltip-note">Classificacao geral para adultos. O IMC e uma ferramenta de triagem e nao substitui avaliacao profissional.</div>
+    </span>
+  </span>`;
+}
+
+
+function rankingSortValue(row, key) {
+  if (key === 'name') return row.p.name || '';
+  if (key === 'initial') return row.pesoInicial;
+  if (key === 'compared') return row.pesoAtual;
+  if (key === 'loss') return row.perdaKg;
+  if (key === 'pct') return row.perdaPct;
+  if (key === 'imc') return row.imc;
+  return row.perdaPct;
+}
+
+function compareRankingRows(a, b) {
+  const key = rankingSort.key;
+  const dir = rankingSort.dir === 'asc' ? 1 : -1;
+  const av = rankingSortValue(a, key);
+  const bv = rankingSortValue(b, key);
+  const aEmpty = av === null || av === undefined || av === '' || Number.isNaN(av);
+  const bEmpty = bv === null || bv === undefined || bv === '' || Number.isNaN(bv);
+  if (aEmpty && bEmpty) return (a.p.name || '').localeCompare(b.p.name || '', 'pt-BR');
+  if (aEmpty) return 1;
+  if (bEmpty) return -1;
+  if (typeof av === 'string' || typeof bv === 'string') {
+    return String(av).localeCompare(String(bv), 'pt-BR', { sensitivity: 'base' }) * dir;
+  }
+  if (av === bv) return (a.p.name || '').localeCompare(b.p.name || '', 'pt-BR');
+  return (av > bv ? 1 : -1) * dir;
+}
+
+function setRankingSort(key) {
+  if (rankingSort.key === key) {
+    rankingSort.dir = rankingSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    rankingSort.key = key;
+    rankingSort.dir = key === 'name' ? 'asc' : 'desc';
+  }
+  renderRanking();
+}
+
+function updateRankingSortMarks() {
+  document.querySelectorAll('[data-sort-mark]').forEach(el => {
+    const key = el.getAttribute('data-sort-mark');
+    el.textContent = key === rankingSort.key ? (rankingSort.dir === 'asc' ? '▲' : '▼') : '';
+  });
+}
+
+// =========================================================
+// RENDER RANKING
+// =========================================================
+function renderRanking() {
+  const deadline = state.deadline;
+  document.getElementById('deadline-display').textContent = fmtDate(deadline);
+  updateRankingSortMarks();
+
+  // Ranking: primeira pesagem x ultima pesagem valida ate o prazo efetivo.
+  const ranked = state.participants.map(p => {
+    const first = firstMeasurement(p);
+    const last = lastMeasurementForRanking(p);
+    const realLast = lastMeasurement(p);
+    const pesoInicial = first ? first.peso : null;
+    const pesoAtual = last ? last.peso : null;
+    const imc = pesoAtual && p.altura ? calcIMC(pesoAtual, p.altura) : null;
+    const perdaKg = (pesoInicial && pesoAtual && first.id !== last.id) ? pesoInicial - pesoAtual : null;
+    const perdaPct = perdaKg !== null ? (perdaKg / pesoInicial) * 100 : null;
+    const fechado = hasMeasurementOnOrAfterDeadline(p);
+    const ignoredAfterDeadline = realLast && last && realLast.date > last.date;
+    return { p, first, last, realLast, pesoInicial, pesoAtual, imc, perdaKg, perdaPct, fechado, ignoredAfterDeadline };
+  }).sort(compareRankingRows);
+
+  const hasResults = ranked.filter(r => r.perdaPct !== null);
+  const winner = hasResults[0];
+  const closedCount = ranked.filter(r => r.fechado).length;
+  const daysLeft = deadline
+    ? Math.max(0, Math.round((new Date(deadline + 'T00:00:00') - new Date()) / 86400000))
+    : '--';
+
+  document.getElementById('ranking-stats').innerHTML = `
+    <div class="ranking-summary-main">
+      <div class="ranking-summary-title">${winner ? 'Lider: ' + winner.p.name : 'Ranking ainda sem lider'}</div>
+      <div class="ranking-summary-sub">Criterio: percentual de perda entre a primeira pesagem e a ultima pesagem valida ate o prazo.</div>
+    </div>
+    <div class="ranking-summary-kpi"><label>Melhor %</label><strong class="gold">${winner ? fmtPct(winner.perdaPct) : '--'}</strong></div>
+    <div class="ranking-summary-kpi"><label>Participantes</label><strong>${state.participants.length}</strong></div>
+    <div class="ranking-summary-kpi"><label>Fechados</label><strong class="good">${closedCount}</strong></div>
+    <div class="ranking-summary-kpi"><label>Dias</label><strong>${daysLeft}</strong></div>
+  `;
+
+  if (ranked.length === 0) {
+    document.getElementById('ranking-body').innerHTML = `<div class="empty-state"><div class="big-icon">&#9878;</div><p>Nenhum participante cadastrado.</p></div>`;
+    return;
+  }
+
+  document.getElementById('ranking-body').innerHTML = ranked.map((r, i) => {
+    const { p, pesoInicial, pesoAtual, imc, perdaKg, perdaPct, last, fechado, ignoredAfterDeadline } = r;
+    const pos = perdaPct !== null ? i + 1 : '--';
+    const posClass = i === 0 && perdaPct !== null ? 'gold' : '';
+    const prazo = fmtDate(effectiveDeadline(p));
+    const dataComparada = last ? fmtDate(last.date) : '--';
+
+    let pctCell = `<span class="ranking-mini-pct pct-neutral">--</span>`;
+    if (perdaPct !== null) {
+      const cls = perdaPct > 0 ? 'pct-positive' : perdaPct < 0 ? 'pct-negative' : 'pct-neutral';
+      const sign = perdaPct > 0 ? '-' : perdaPct < 0 ? '+' : '';
+      pctCell = `<span class="ranking-mini-pct ${cls}">${sign}${fmtPct(Math.abs(perdaPct))}</span>`;
+    }
+
+    const perdaKgTxt = perdaKg !== null
+      ? `<span class="ranking-mini-val" style="color:${perdaKg > 0 ? 'var(--green)' : 'var(--accent2)'}">${perdaKg > 0 ? '-' : '+'}${Math.abs(perdaKg).toFixed(1)} kg</span>`
+      : `<span class="ranking-muted">--</span>`;
+
+    const imcHTML = imc
+      ? `${imcTooltipWrap(`<span class="imc-badge ${imcBadgeClass(imc)}">${imc.toFixed(1)}</span>`)}<span class="ranking-muted">${imcClass(imc)}</span>`
+      : `<span class="ranking-muted">--</span>`;
+
+    const statusClass = fechado ? 'closed' : (ignoredAfterDeadline ? 'warn' : '');
+    const statusText = fechado ? 'Fechado' : 'Parcial';
+    const obs = ignoredAfterDeadline ? `<span class="ranking-muted">pos-prazo ignorada</span>` : `<span class="ranking-muted">prazo ${prazo}</span>`;
+
+    return `<div class="ranking-compact-row ${i === 0 && perdaPct !== null ? 'winner' : ''}">
+      <div class="ranking-mini-pos ${posClass}">${pos}</div>
+      <div class="ranking-mini-name">
+        <span class="ranking-mini-avatar">${initials(p.name)}</span>
+        <span class="ranking-mini-person"><strong>${p.name}</strong><small>${p.measurements.length} pesagens</small></span>
+      </div>
+      <div><span class="ranking-mini-val">${pesoInicial ? pesoInicial + ' kg' : '--'}</span></div>
+      <div><span class="ranking-mini-val">${pesoAtual ? pesoAtual + ' kg' : '--'}</span><span class="ranking-muted">${dataComparada}</span></div>
+      <div>${perdaKgTxt}</div>
+      <div>${pctCell}</div>
+      <div>${imcHTML}</div>
+      <div><span class="ranking-status-pill ${statusClass}">${statusText}</span>${obs}</div>
+    </div>`;
+  }).join('');
+  bindFloatingImcTooltips();
+}
+
+// =========================================================
+// RENDER PARTICIPANTS
+// =========================================================
+function renderParticipants() {
+  const q     = (document.getElementById('p-search')?.value || '').trim().toLowerCase();
+  const sort  = document.getElementById('p-sort')?.value || 'name';
+
+  let rows = state.participants.map(p => {
+    const sorted   = [...p.measurements].sort((a,b) => a.date.localeCompare(b.date));
+    const first    = sorted[0];
+    const last     = sorted[sorted.length - 1];
+    const rankLast = lastMeasurementForRanking(p);
+    const imc      = calcIMC(last.peso, p.altura);
+    const perdaPct = calcPctLoss(p);
+    const perdaKg  = first && rankLast && first.id !== rankLast.id ? first.peso - rankLast.peso : null;
+    return { p, sorted, first, last, rankLast, imc, perdaPct, perdaKg };
+  });
+
+  if (q) rows = rows.filter(r => r.p.name.toLowerCase().includes(q));
+
+  if (sort === 'pct')  rows.sort((a,b) => (b.perdaPct ?? -999) - (a.perdaPct ?? -999));
+  if (sort === 'peso') rows.sort((a,b) => (b.first?.peso ?? 0) - (a.first?.peso ?? 0));
+  if (sort === 'imc')  rows.sort((a,b) => (b.imc ?? 0) - (a.imc ?? 0));
+  if (sort === 'name') rows.sort((a,b) => a.p.name.localeCompare(b.p.name, 'pt-BR'));
+
+  document.getElementById('p-count').textContent = state.participants.length;
+
+  const grid = document.getElementById('participants-grid');
+
+  if (state.participants.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="big-icon">&#9878;</div>
+      <p>Nenhum participante ainda.<br>Clique em Novo Participante para comecar.</p>
+    </div>`;
+    return;
+  }
+
+  if (rows.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="big-icon">&#128269;</div><p>Nenhum resultado para "<strong>${q}</strong>".</p></div>`;
+    return;
+  }
+
+  const rowsHtml = rows.map(({ p, sorted, first, last, rankLast, imc, perdaPct, perdaKg }) => {
+    const deadline = effectiveDeadline(p);
+    const futureCount = deadline ? sorted.filter(m => m.date > deadline).length : 0;
+
+    const measRows = sorted.map((m, mi) => {
+      const prev = mi > 0 ? sorted[mi - 1] : null;
+      const delta = prev ? m.peso - prev.peso : null;
+      let deltaEl = '';
+      if (delta !== null) {
+        const cls = delta < 0 ? 'delta-pos' : delta > 0 ? 'delta-neg' : 'delta-zero';
+        const sign = delta < 0 ? '' : '+';
+        deltaEl = `<span class="meas-delta ${cls}">${sign}${delta.toFixed(1)}</span>`;
+      } else {
+        deltaEl = `<span class="meas-delta delta-zero">inicial</span>`;
+      }
+
+      const ignored = deadline && m.date > deadline ? ` title="Fora do prazo do ranking" style="opacity:.55"` : '';
+      return `<div class="meas-row"${ignored}>
+        <span class="meas-date">${fmtDate(m.date)}</span>
+        <span class="meas-peso">${m.peso} kg</span>
+        ${deltaEl}
+        <div class="meas-actions">
+          <button class="icon-btn edit" onclick="event.stopPropagation(); openEditMeasurement('${p.id}','${m.id}')" title="Editar">&#9998;</button>
+          <button class="icon-btn del" onclick="event.stopPropagation(); deleteMeasurement('${p.id}','${m.id}')" title="Remover">&#x2715;</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    let pctHTML = `<span class="pct-pill neutral">--</span>`;
+    if (perdaPct !== null) {
+      const cls = perdaPct > 0 ? 'good' : perdaPct < 0 ? 'bad' : 'neutral';
+      const prefix = perdaPct > 0 ? '-' : perdaPct < 0 ? '+' : '';
+      pctHTML = `<span class="pct-pill ${cls}">${prefix}${fmtPct(Math.abs(perdaPct))}</span>`;
+    }
+
+    const perdaHTML = perdaKg === null
+      ? `<span class="line-cell-muted">--</span>`
+      : `<span class="line-cell-value" style="color:${perdaKg > 0 ? 'var(--green)' : perdaKg < 0 ? 'var(--accent2)' : 'var(--muted)'}">${perdaKg > 0 ? '-' : perdaKg < 0 ? '+' : ''}${Math.abs(perdaKg).toFixed(1)} kg</span>`;
+
+    const imcHTML = imcTooltipWrap(`<span class="imc-badge ${imcBadgeClass(imc)}">${imc.toFixed(1)}</span>`);
+    const classHTML = imcTooltipWrap(`<span class="imc-badge ${imcBadgeClass(imc)}">${imcClass(imc)}</span>`);
+    const futureNote = futureCount > 0 ? `<br><span style="color:var(--accent2)">${futureCount} fora do prazo</span>` : '';
+
+    return `<div class="participant-line">
+      <details>
+        <summary class="participant-line-summary">
+          <div class="participant-name-cell">
+            <div class="avatar">${initials(p.name)}</div>
+            <div class="participant-name-main">${p.name}<span class="participant-subline">${sorted.length} pesagem(ns) · clique para abrir</span></div>
+          </div>
+          <div><span class="line-cell-label">Altura</span><span class="line-cell-value">${p.altura}</span><span class="line-cell-muted"> cm</span></div>
+          <div><span class="line-cell-label">Inicial</span><span class="line-cell-value">${first.peso}</span><span class="line-cell-muted"> kg</span></div>
+          <div><span class="line-cell-label">Atual</span><span class="line-cell-value">${last.peso}</span><span class="line-cell-muted"> kg</span></div>
+          <div><span class="line-cell-label">Perda</span>${perdaHTML}</div>
+          <div><span class="line-cell-label">% Perda</span>${pctHTML}</div>
+          <div><span class="line-cell-label">IMC</span>${imcHTML}</div>
+          <div><span class="line-cell-label">Prazo</span><span class="line-cell-value">${deadline ? fmtDate(deadline) : '--'}</span>${futureNote}</div>
+          <div class="participant-line-actions">
+            <button class="btn btn-primary btn-sm btn-icon-only" onclick="event.preventDefault(); event.stopPropagation(); openAddMeasurement('${p.id}')" title="Adicionar pesagem">+</button>
+            <button class="btn btn-ghost btn-sm btn-icon-only" onclick="event.preventDefault(); event.stopPropagation(); openEditParticipant('${p.id}')" title="Editar participante">&#9998;</button>
+            <button class="btn btn-danger btn-sm btn-icon-only" onclick="event.preventDefault(); event.stopPropagation(); deleteParticipant('${p.id}')" title="Excluir participante">&#x2715;</button>
+          </div>
+        </summary>
+        <div class="participant-detail-panel">
+          <div class="participant-detail-grid">
+            <div class="measurements-section">
+              <div class="measurements-label">
+                <span>Historico de pesagens</span>
+                <span>Ranking usa: ${rankLast ? fmtDate(rankLast.date) : '--'}${futureCount > 0 ? ' · ignora pos-prazo' : ''}</span>
+              </div>
+              <div class="measurements-list">${measRows}</div>
+              <button class="add-meas-btn" onclick="openAddMeasurement('${p.id}')">+ Adicionar nova pesagem</button>
+            </div>
+            <div class="compact-note">
+              <strong style="color:var(--text)">Resumo</strong><br>
+              Entrada: ${fmtDate(first.date)} com ${first.peso} kg.<br>
+              Ultima pesagem: ${fmtDate(last.date)} com ${last.peso} kg.<br>
+              IMC atual: ${imc.toFixed(1)} · ${classHTML}.<br>
+              ${perdaPct === null ? 'Ainda sem comparativo: registre uma segunda pesagem.' : `Resultado para ranking: ${pctHTML}.`}
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>`;
+  }).join('');
+
+  grid.innerHTML = `<div class="participants-table">
+    <div class="participants-table-head">
+      <div>Participante</div>
+      <div>Altura</div>
+      <div>Inicial</div>
+      <div>Atual</div>
+      <div>Perda</div>
+      <div>% Perda</div>
+      <div>IMC</div>
+      <div>Prazo</div>
+      <div style="text-align:right">Acoes</div>
+    </div>
+    ${rowsHtml}
+  </div>`;
+  bindFloatingImcTooltips();
+}
+
+// =========================================================
+// RENDER TIMELINE
+// =========================================================
+function renderTimeline() {
+  const selector = document.getElementById('p-selector');
+  const cards    = document.getElementById('timeline-cards');
+
+  if (!selectedTimeline.length) selectedTimeline = [ALL_TIMELINE_ID];
+  const allActive = selectedTimeline.includes(ALL_TIMELINE_ID);
+
+  const orderedParticipants = [...state.participants].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+
+  selector.innerHTML = `
+    <div class="p-chip ${allActive ? 'active' : ''}" onclick="toggleTimeline('${ALL_TIMELINE_ID}')">Todos</div>
+    ${orderedParticipants.map(p =>
+      `<div class="p-chip ${selectedTimeline.includes(p.id) ? 'active' : ''}" onclick="toggleTimeline('${p.id}')">${p.name.split(' ')[0]}</div>`
+    ).join('')}
+  `;
+
+  if (state.participants.length === 0) {
+    cards.innerHTML = `<div class="chart-empty" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:60px;text-align:center;color:var(--muted)">Cadastre participantes para ver a evolucao.</div>`;
+    return;
+  }
+
+  if (allActive) {
+    renderAllEvolution(cards);
+    return;
+  }
+
+  const selectedId = selectedTimeline[0];
+  const p = state.participants.find(item => item.id === selectedId);
+  if (!p) {
+    selectedTimeline = [ALL_TIMELINE_ID];
+    renderTimeline();
+    return;
+  }
+
+  cards.innerHTML = renderParticipantComboChart(p);
+}
+
+function chartTipHTML(title, rows) {
+  return `<strong>${title}</strong>${rows.map(row => `<div class="tip-row"><span class="tip-label">${row[0]}</span><span class="tip-value">${row[1]}</span></div>`).join('')}`;
+}
+
+function showChartTooltip(evt, html) {
+  const wrap = evt.currentTarget.closest('.line-chart-wrap');
+  if (!wrap) return;
+  let tip = wrap.querySelector('.chart-tooltip-floating');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.className = 'chart-tooltip-floating';
+    wrap.appendChild(tip);
+  }
+  tip.innerHTML = html;
+  tip.style.display = 'block';
+
+  const rect = wrap.getBoundingClientRect();
+  const tipW = tip.offsetWidth || 240;
+  const tipH = tip.offsetHeight || 120;
+  let x = evt.clientX - rect.left + 12;
+  let y = evt.clientY - rect.top + 12;
+
+  x = Math.max(8, Math.min(x, rect.width - tipW - 8));
+  y = Math.max(8, Math.min(y, rect.height - tipH - 8));
+
+  tip.style.left = x + 'px';
+  tip.style.top = y + 'px';
+}
+
+function hideChartTooltip(evt) {
+  const wrap = evt.currentTarget.closest('.line-chart-wrap');
+  const tip = wrap ? wrap.querySelector('.chart-tooltip-floating') : null;
+  if (tip) tip.style.display = 'none';
+}
+
+function renderAllEvolution(cards) {
+  const rows = state.participants.map(p => {
+    const first = firstMeasurement(p);
+    if (!first || !p.altura) return null;
+    const imcInicial = calcIMC(first.peso, p.altura);
+    return { p, first, imcInicial };
+  }).filter(Boolean).sort((a, b) => a.p.name.localeCompare(b.p.name, 'pt-BR'));
+
+  if (!rows.length) {
+    cards.innerHTML = `<div class="chart-empty" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:60px;text-align:center;color:var(--muted)">Cadastre participantes com peso, altura e data inicial para gerar o comparativo de IMC.</div>`;
+    return;
+  }
+
+  const maxIMC = Math.ceil((Math.max(...rows.map(r => r.imcInicial)) + 3) / 5) * 5;
+  const w = 980;
+  const h = 420;
+  const padL = 54;
+  const padR = 26;
+  const padT = 34;
+  const padB = 86;
+  const innerW = w - padL - padR;
+  const innerH = h - padT - padB;
+  const barGap = 18;
+  const barW = Math.max(34, Math.min(72, (innerW - barGap * (rows.length - 1)) / rows.length));
+  const totalW = rows.length * barW + (rows.length - 1) * barGap;
+  const startX = padL + Math.max(0, (innerW - totalW) / 2);
+  const palette = ['#d98413', '#2f6fed', '#1a9e5c', '#d94339', '#7b61ff', '#3b8ea5', '#9a5e1a', '#6b7280', '#c026d3', '#0f766e'];
+
+  const yTicks = [0, 10, 20, 30, 40].filter(v => v <= maxIMC);
+  if (!yTicks.includes(maxIMC)) yTicks.push(maxIMC);
+
+  const bars = rows.map((r, i) => {
+    const x = startX + i * (barW + barGap);
+    const barH = (r.imcInicial / maxIMC) * innerH;
+    const y = padT + innerH - barH;
+    const color = palette[i % palette.length];
+    return { r, x, y, barW, barH, color };
+  });
+
+  const legend = rows.map((r, i) => `<span class="imc-legend-item"><span style="background:${palette[i % palette.length]}"></span>${r.p.name}</span>`).join('');
+
+  cards.innerHTML = `<div class="all-bars-card">
+    <div class="all-bars-title">
+      <strong>IMC inicial por participante</strong>
+      <span>Ordenado alfabeticamente · Eixo Y: IMC · Data inicial no eixo X</span>
+    </div>
+    <div class="line-chart-wrap imc-all-chart-wrap">
+      <svg class="line-chart-svg imc-all-chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Grafico de barras com IMC inicial por participante">
+        <line class="chart-grid-line axis-line" x1="${padL}" y1="${padT + innerH}" x2="${w - padR}" y2="${padT + innerH}"></line>
+        <line class="chart-grid-line axis-line" x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + innerH}"></line>
+        ${yTicks.map(v => {
+          const y = padT + innerH - (v / maxIMC) * innerH;
+          return `<g><line class="chart-grid-line" x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}"></line><text class="axis-label" x="8" y="${(y + 4).toFixed(1)}">${v}</text></g>`;
+        }).join('')}
+        ${bars.map(b => {
+          const tip = chartTipHTML(b.r.p.name, [
+            ['Data inicial', fmtDate(b.r.first.date)],
+            ['Peso inicial', b.r.first.peso.toFixed(1) + ' kg'],
+            ['Altura', b.r.p.altura + ' cm'],
+            ['IMC inicial', b.r.imcInicial.toFixed(1)],
+            ['Classificacao', imcClass(b.r.imcInicial)]
+          ]).replace(/"/g, '&quot;');
+          return `<rect class="imc-bar" x="${b.x.toFixed(1)}" y="${b.y.toFixed(1)}" width="${b.barW.toFixed(1)}" height="${b.barH.toFixed(1)}" rx="6" style="fill:${b.color}" onmousemove="showChartTooltip(event, '${tip}')" onmouseleave="hideChartTooltip(event)"></rect>`;
+        }).join('')}
+        ${bars.map(b => `<text class="bar-value-label" x="${(b.x + b.barW / 2).toFixed(1)}" y="${Math.max(padT + 12, b.y - 8).toFixed(1)}" text-anchor="middle">${b.r.imcInicial.toFixed(1)}</text>`).join('')}
+        ${bars.map(b => `<text class="axis-label" x="${(b.x + b.barW / 2).toFixed(1)}" y="${h - 46}" text-anchor="middle">${fmtDate(b.r.first.date).slice(0,5)}</text>`).join('')}
+        ${bars.map(b => `<text class="axis-label" x="${(b.x + b.barW / 2).toFixed(1)}" y="${h - 28}" text-anchor="middle">${shortName(b.r.p.name, 10)}</text>`).join('')}
+        <text class="axis-label axis-title-y" x="14" y="18">IMC</text>
+      </svg>
+      <div class="chart-tooltip-floating"></div>
+    </div>
+    <div class="imc-legend">${legend}</div>
+    <div class="compact-note" style="margin-top:12px">Este grafico de Todos usa a primeira medicao de cada participante. Passe o mouse sobre uma barra para ver os detalhes.</div>
+  </div>`;
+}
+
+function shortName(name, maxLen) {
+  const first = String(name || '').trim().split(' ')[0] || '';
+  return first.length > maxLen ? first.slice(0, maxLen - 1) + '…' : first;
+}
+
+function renderParticipantComboChart(p) {
+  const sorted = [...p.measurements].sort((a, b) => a.date.localeCompare(b.date));
+  if (sorted.length === 0) return '';
+
+  const data = sorted.map(m => ({
+    m,
+    imc: calcIMC(m.peso, p.altura)
+  }));
+
+  const imcMax = Math.ceil((Math.max(...data.map(d => d.imc)) + 2) / 5) * 5;
+  const imcMin = Math.max(0, Math.floor((Math.min(...data.map(d => d.imc)) - 2) / 5) * 5);
+  const imcRange = imcMax - imcMin || 1;
+
+  const pesoMax = Math.ceil(Math.max(...data.map(d => d.m.peso)) + 2);
+  const pesoMin = Math.max(0, Math.floor(Math.min(...data.map(d => d.m.peso)) - 2));
+  const pesoRange = pesoMax - pesoMin || 1;
+
+  const w = 900;
+  const h = 330;
+  const padL = 54;
+  const padR = 58;
+  const padT = 30;
+  const padB = 58;
+  const innerW = w - padL - padR;
+  const innerH = h - padT - padB;
+  const barW = Math.max(26, Math.min(54, innerW / Math.max(4, data.length) * 0.45));
+
+  const points = data.map((d, i) => {
+    const x = data.length === 1 ? padL + innerW / 2 : padL + (i / (data.length - 1)) * innerW;
+    const imcY = padT + innerH - ((d.imc - imcMin) / imcRange) * innerH;
+    const pesoY = padT + innerH - ((d.m.peso - pesoMin) / pesoRange) * innerH;
+    return { ...d, x, imcY, pesoY };
+  });
+
+  const polyline = points.map(pt => `${pt.x.toFixed(1)},${pt.pesoY.toFixed(1)}`).join(' ');
+  const perdaPct = calcPctLoss(p);
+  const last = sorted[sorted.length - 1];
+  const lastIMC = calcIMC(last.peso, p.altura);
+  const pctBadgeHTML = perdaPct === null
+    ? `<span class="pct-badge" style="color:var(--muted);background:var(--surface2)">--</span>`
+    : `<span class="pct-badge" style="color:${perdaPct > 0 ? 'var(--green)' : 'var(--accent2)'};background:${perdaPct > 0 ? 'rgba(26,158,92,0.10)' : 'rgba(217,67,57,0.10)'}">${perdaPct > 0 ? '-' : '+'}${fmtPct(Math.abs(perdaPct))}</span>`;
+
+  const imcTicks = [imcMin, Math.round((imcMin + imcMax) / 2), imcMax].filter((v, i, arr) => arr.indexOf(v) === i);
+  const pesoTicks = [pesoMin, Math.round((pesoMin + pesoMax) / 2), pesoMax].filter((v, i, arr) => arr.indexOf(v) === i);
+
+  return `<div class="timeline-card">
+    <div class="timeline-name">
+      <div class="avatar">${initials(p.name)}</div>
+      ${p.name}
+      <span style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <span class="imc-badge ${imcBadgeClass(lastIMC)}">IMC ${lastIMC.toFixed(1)}</span>
+        ${pctBadgeHTML}
+      </span>
+    </div>
+    <div class="line-chart-wrap">
+      <svg class="line-chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Evolucao combinada de IMC e peso de ${p.name}">
+        <line class="chart-grid-line axis-line" x1="${padL}" y1="${padT + innerH}" x2="${w - padR}" y2="${padT + innerH}"></line>
+        <line class="chart-grid-line axis-line" x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + innerH}"></line>
+        <line class="chart-grid-line axis-line" x1="${w - padR}" y1="${padT}" x2="${w - padR}" y2="${padT + innerH}"></line>
+        ${imcTicks.map(v => {
+          const y = padT + innerH - ((v - imcMin) / imcRange) * innerH;
+          return `<g><line class="chart-grid-line" x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}"></line><text class="axis-label chart-axis-left" x="8" y="${(y + 4).toFixed(1)}">${v}</text></g>`;
+        }).join('')}
+        ${pesoTicks.map(v => {
+          const y = padT + innerH - ((v - pesoMin) / pesoRange) * innerH;
+          return `<text class="axis-label chart-axis-right" x="${w - 46}" y="${(y + 4).toFixed(1)}">${v}kg</text>`;
+        }).join('')}
+        ${points.map(pt => {
+          const barH = padT + innerH - pt.imcY;
+          const x = pt.x - barW / 2;
+          const tip = chartTipHTML(p.name, [
+            ['Data', fmtDate(pt.m.date)],
+            ['Peso', pt.m.peso.toFixed(1) + ' kg'],
+            ['IMC', pt.imc.toFixed(1)],
+            ['Classificacao', imcClass(pt.imc)]
+          ]).replace(/"/g, '&quot;');
+          return `<rect class="combo-imc-bar" x="${x.toFixed(1)}" y="${pt.imcY.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="5" onmousemove="showChartTooltip(event, '${tip}')" onmouseleave="hideChartTooltip(event)"></rect>`;
+        }).join('')}
+        <polyline class="chart-line" points="${polyline}"></polyline>
+        ${points.map(pt => {
+          const tip = chartTipHTML(p.name, [
+            ['Data', fmtDate(pt.m.date)],
+            ['Peso', pt.m.peso.toFixed(1) + ' kg'],
+            ['IMC', pt.imc.toFixed(1)],
+            ['Classificacao', imcClass(pt.imc)]
+          ]).replace(/"/g, '&quot;');
+          return `<circle class="chart-point" cx="${pt.x.toFixed(1)}" cy="${pt.pesoY.toFixed(1)}" r="5" onmousemove="showChartTooltip(event, '${tip}')" onmouseleave="hideChartTooltip(event)"></circle>`;
+        }).join('')}
+        ${points.map(pt => `<text class="axis-label" x="${pt.x.toFixed(1)}" y="${h - 24}" text-anchor="middle">${fmtDate(pt.m.date).slice(0,5)}</text>`).join('')}
+        <text class="axis-label chart-axis-left" x="8" y="18">IMC</text>
+        <text class="axis-label chart-axis-right" x="${w - 55}" y="18">Peso</text>
+      </svg>
+      <div class="chart-tooltip-floating"></div>
+    </div>
+    <div style="display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:10px;flex-wrap:wrap">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:rgba(212,132,26,.58);border:1px solid rgba(212,132,26,.88)"></span> Barras: <strong style="color:var(--text)">IMC</strong></span>
+      <span><span style="display:inline-block;width:18px;height:3px;border-radius:999px;background:var(--accent2);vertical-align:middle"></span> Linha: <strong style="color:var(--text)">Peso</strong></span>
+      <span>Inicial: <strong style="color:var(--text)">${sorted[0].peso} kg</strong></span>
+      <span>Atual: <strong style="color:var(--text)">${last.peso} kg</strong></span>
+      <span>Medicoes: <strong style="color:var(--text)">${sorted.length}</strong></span>
+      ${p.dataFinal ? `<span>Prazo: <strong style="color:var(--text)">${fmtDate(p.dataFinal)}</strong></span>` : ''}
+    </div>
+  </div>`;
+}
+
+function toggleTimeline(id) {
+  if (id === ALL_TIMELINE_ID) {
+    selectedTimeline = [ALL_TIMELINE_ID];
+    renderTimeline();
+    return;
+  }
+
+  // UX corrigida: apenas um participante aberto por vez.
+  selectedTimeline = [id];
+  renderTimeline();
+}
+
+
+
+// =========================================================
+// FLOATING IMC TOOLTIPS
+// =========================================================
+function positionFloatingTooltip(wrap, tip) {
+  tip.classList.add('floating-visible');
+  tip.style.visibility = 'hidden';
+  tip.style.left = '0px';
+  tip.style.top = '0px';
+
+  const margin = 12;
+  const rect = wrap.getBoundingClientRect();
+  const tipRect = tip.getBoundingClientRect();
+
+  let left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+  left = Math.max(margin, Math.min(left, window.innerWidth - tipRect.width - margin));
+
+  let top = rect.bottom + 10;
+  if (top + tipRect.height > window.innerHeight - margin) {
+    top = rect.top - tipRect.height - 10;
+  }
+  if (top < margin) top = margin;
+
+  tip.style.left = `${left}px`;
+  tip.style.top = `${top}px`;
+  tip.style.visibility = 'visible';
+}
+
+function bindFloatingImcTooltips() {
+  document.querySelectorAll('.imc-wrap').forEach(wrap => {
+    if (wrap.dataset.tooltipBound === '1') return;
+    wrap.dataset.tooltipBound = '1';
+    const tip = wrap.querySelector('.imc-tooltip');
+    if (!tip) return;
+
+    wrap.addEventListener('mouseenter', () => positionFloatingTooltip(wrap, tip));
+    wrap.addEventListener('focusin', () => positionFloatingTooltip(wrap, tip));
+    wrap.addEventListener('mouseleave', () => {
+      tip.classList.remove('floating-visible');
+      tip.style.visibility = '';
+    });
+    wrap.addEventListener('focusout', () => {
+      tip.classList.remove('floating-visible');
+      tip.style.visibility = '';
+    });
+  });
+}
+
+window.addEventListener('scroll', () => {
+  document.querySelectorAll('.imc-tooltip.floating-visible').forEach(tip => tip.classList.remove('floating-visible'));
+}, true);
+window.addEventListener('resize', () => {
+  document.querySelectorAll('.imc-tooltip.floating-visible').forEach(tip => tip.classList.remove('floating-visible'));
+});
+
+// =========================================================
+// LIVE IMC PREVIEW
+// =========================================================
+document.getElementById('f-peso').addEventListener('input', updateIMCPreview);
+document.getElementById('f-altura').addEventListener('input', updateIMCPreview);
+
+// Close overlay on background click
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => {
+    if (e.target === o) o.classList.remove('open');
+  });
+});
+
+
+// =========================================================
+// OFFICIAL HTML EXPORT
+// =========================================================
+function safeSerializeForScript(obj) {
+  return JSON.stringify(obj, null, 2)
+    .replace(/</g, '\u003C')
+    .replace(/>/g, '\u003E')
+    .replace(/&/g, '\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
+function exportOfficialHtml() {
+  const responsavelAtual = state && state.meta && state.meta.updatedBy ? state.meta.updatedBy : `Andre`;
+  const responsavel = prompt(`Responsavel por esta versao oficial:`, responsavelAtual) || responsavelAtual || `Andre`;
+
+  const officialState = JSON.parse(JSON.stringify(state));
+  officialState.meta = officialState.meta || {};
+  officialState.meta.updatedAt = new Date().toISOString();
+  officialState.meta.updatedBy = responsavel.trim() || `Andre`;
+  officialState.meta.exportedAs = `official-html`;
+
+  state = officialState;
+  persistStateWithoutTouch();
+  renderVersionInfo();
+  renderRanking();
+  renderParticipants();
+  renderTimeline();
+
+  const serialized = safeSerializeForScript(officialState);
+  const currentHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const nextHtml = currentHtml.replace(
+    /const EMBEDDED_STATE = \/\*OFFICIAL_DATA_START\*\/[\s\S]*?\/\*OFFICIAL_DATA_END\*\/;/,
+    `const EMBEDDED_STATE = /*OFFICIAL_DATA_START*/ ${serialized} /*OFFICIAL_DATA_END*/;`
+  );
+
+  if (nextHtml === currentHtml) {
+    toast('Nao foi possivel embutir os dados no HTML', 'error');
+    return;
+  }
+
+  const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
+  const blob = new Blob([nextHtml], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `competicao-peso-oficial-${stamp}.html`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('HTML oficial gerado com dados embutidos', 'success');
+}
+
+// =========================================================
+// EXPORT CSV
+// =========================================================
+function exportCsv() {
+  const esc = v => `"${String(v ?? '').replaceAll('"', '""')}"`;
+  const header = ['Nome', 'Altura cm', 'Prazo', 'Data medicao', 'Peso kg', 'IMC', 'Classificacao IMC', 'Peso inicial', 'Peso ranking', 'Perda kg', 'Perda %'];
+  const lines = [header.map(esc).join(';')];
+  state.participants.forEach(p => {
+    const first    = firstMeasurement(p);
+    const rankLast = lastMeasurementForRanking(p);
+    const wi       = first ? first.peso : null;
+    const wr       = rankLast ? rankLast.peso : null;
+    const lossKg   = wi && wr && first.id !== rankLast.id ? wi - wr : null;
+    const lossPct  = lossKg !== null ? (lossKg / wi) * 100 : null;
+    const sorted   = [...p.measurements].sort((a,b) => a.date.localeCompare(b.date));
+    sorted.forEach(m => {
+      const imc  = calcIMC(m.peso, p.altura);
+      lines.push([
+        p.name,
+        p.altura,
+        p.dataFinal || state.deadline || '',
+        m.date,
+        String(m.peso).replace('.', ','),
+        imc.toFixed(1).replace('.', ','),
+        imcClass(imc),
+        wi ? String(wi).replace('.', ',') : '',
+        wr ? String(wr).replace('.', ',') : '',
+        lossKg !== null ? lossKg.toFixed(1).replace('.', ',') : '',
+        lossPct !== null ? lossPct.toFixed(2).replace('.', ',') : ''
+      ].map(esc).join(';'));
+    });
+  });
+  const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'competicao-peso.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('CSV exportado!', 'success');
+}
+
+// =========================================================
+// BACKUP / IMPORT
+// =========================================================
+function exportBackup() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'backup-competicao-peso.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('Backup gerado', 'success');
+}
+
+function importBackup(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed || !Array.isArray(parsed.participants)) throw new Error('invalid');
+      state = parsed;
+      await saveState();
+      selectedTimeline = [ALL_TIMELINE_ID];
+      renderAll();
+      toast('Backup importado e sincronizado', 'success');
+    } catch (err) {
+      toast('Arquivo de backup invalido', 'error');
+    } finally {
+      event.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+// =========================================================
+// INIT
+// =========================================================
+loadState(); // async — busca JSONBin e chama renderAll() internamente
+</script>
+</body>
+</html>
