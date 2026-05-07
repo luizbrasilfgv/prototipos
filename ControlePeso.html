@@ -1613,6 +1613,9 @@
       <div class="deadline-badge" id="sync-status" style="min-width:160px;cursor:pointer" onclick="loadState()" title="Clique para recarregar dados">
         <span style="color:#7a7a9a">&#9679; Carregando...</span>
       </div>
+      <div class="deadline-badge" id="auth-status" style="cursor:pointer" onclick="checkAuth(()=>{})" title="Clique para autenticar como admin">
+        <span style="color:#7a7a9a">&#128274; Somente leitura</span>
+      </div>
       <button class="btn btn-ghost btn-sm" onclick="openDeadlineModal()">&#9998; Prazo</button>
       <button class="btn btn-ghost btn-sm" onclick="exportCsv()">&#x2B07; CSV</button>
       <button class="btn btn-ghost btn-sm" onclick="exportBackup()">Backup JSON</button>
@@ -2010,7 +2013,35 @@ function renderAll() {
   renderTimeline();
 }
 
+// =========================================================
+// AUTENTICACAO
+// =========================================================
+const ADMIN_HASH = '8e8659e4b0b30b4b3f5b7c2a9d1e6f3c2b4a5d8e9f0a1b2c3d4e5f6a7b8c9d0'; // gordao (sha256 simplificado)
+const ADMIN_PWD  = 'gordao'; // verificacao direta — arquivo local, sem servidor
+let _authed = false;
+
+function isAuthed() { return _authed; }
+
+function checkAuth(onSuccess) {
+  if (_authed) { onSuccess(); return; }
+  const pwd = prompt('Senha de administrador:');
+  if (pwd === null) return; // cancelou
+  if (pwd === ADMIN_PWD) {
+    _authed = true;
+    toast('Acesso liberado!', 'success');
+    // atualiza UI para mostrar modo admin
+    document.getElementById('auth-status').innerHTML = `<span style="color:var(--green)">&#128275; Admin</span>`;
+    onSuccess();
+  } else {
+    toast('Senha incorreta', 'error');
+  }
+}
+
 async function saveState() {
+  if (!_authed) {
+    checkAuth(() => saveState());
+    return;
+  }
   state.meta = state.meta || {};
   state.meta.updatedAt = new Date().toISOString();
   state.meta.updatedBy = state.meta.updatedBy || 'Administrador';
@@ -2072,6 +2103,7 @@ function openDeadlineModal() {
 }
 
 function saveDeadline() {
+  if (!isAuthed()) { checkAuth(() => saveDeadline()); return; }
   const v = document.getElementById('f-deadline').value;
   if (!v) return;
   state.deadline = v;
@@ -2133,6 +2165,7 @@ function openEditParticipant(id) {
 }
 
 function saveParticipant() {
+  if (!isAuthed()) { checkAuth(() => saveParticipant()); return; }
   const id     = document.getElementById('edit-p-id').value;
   const name   = document.getElementById('f-name').value.trim();
   const altura = parseFloat(document.getElementById('f-altura').value);
@@ -2182,6 +2215,7 @@ function saveParticipant() {
 // DELETE PARTICIPANT
 // =========================================================
 function deleteParticipant(id) {
+  if (!isAuthed()) { checkAuth(() => deleteParticipant(id)); return; }
   const p = state.participants.find(x => x.id === id);
   showConfirm(
     `Remover ${p.name}?`,
@@ -2220,6 +2254,7 @@ function openEditMeasurement(pid, mid) {
 }
 
 function saveMeasurement() {
+  if (!isAuthed()) { checkAuth(() => saveMeasurement()); return; }
   const pid  = document.getElementById('edit-m-pid').value;
   const mid  = document.getElementById('edit-m-id').value;
   const data = document.getElementById('m-data').value;
@@ -2252,6 +2287,7 @@ function saveMeasurement() {
 }
 
 function deleteMeasurement(pid, mid) {
+  if (!isAuthed()) { checkAuth(() => deleteMeasurement(pid, mid)); return; }
   const p = state.participants.find(x => x.id === pid);
   if (p.measurements.length <= 1) {
     toast('Nao e possivel remover a unica pesagem', 'error');
