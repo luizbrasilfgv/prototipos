@@ -315,6 +315,51 @@
   .podium-detail { font-size: 11px; color: var(--muted); }
   .podium-pos { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
+
+  /* === HOJE (controle) COLUMN === */
+  .hoje-col-header { color: #0055a5; }
+  .hoje-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    line-height: 1.3;
+  }
+  .hoje-peso {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .hoje-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #0055a5;
+    flex-shrink: 0;
+    display: inline-block;
+  }
+  .hoje-dot.official { background: var(--green); }
+  .hoje-delta {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 999px;
+    display: inline-block;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+  .hoje-pct {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .hoje-imc {
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .hoje-empty { color: var(--muted); font-size: 11px; }
+
   /* === RANKING TABLE === */
   .ranking-table {
     width: 100%;
@@ -1454,7 +1499,7 @@
   .ranking-compact-header,
   .ranking-compact-row {
     display: grid;
-    grid-template-columns: 42px minmax(180px, 1.5fr) 68px 92px 112px 94px 88px 112px 92px;
+    grid-template-columns: 42px minmax(180px, 1.5fr) 68px 92px 112px 94px 88px 112px 130px 92px;
     gap: 10px;
     align-items: center;
   }
@@ -1472,7 +1517,7 @@
 
   .ranking-compact-row {
     min-height: 48px;
-    padding: 8px 12px;
+    padding: 6px 12px;
     border-bottom: 1px solid var(--border);
     font-size: 12px;
   }
@@ -1760,6 +1805,7 @@
           <button class="ranking-sort-btn" onclick="setRankingSort('loss')" data-sort-key="loss">Perda <span class="sort-mark" data-sort-mark="loss"></span></button>
           <button class="ranking-sort-btn" onclick="setRankingSort('pct')" data-sort-key="pct">% <span class="sort-mark" data-sort-mark="pct"></span></button>
           <button class="ranking-sort-btn" onclick="setRankingSort('imc')" data-sort-key="imc">IMC <span class="sort-mark" data-sort-mark="imc"></span></button>
+          <span class="hoje-col-header">Hoje &#128203;</span>
           <span>Status</span>
         </div>
         <div class="ranking-compact-body" id="ranking-body"></div>
@@ -2708,6 +2754,35 @@ function renderRanking() {
     const isWinner = pos === 1 && perdaPct !== null;
     const prazo = fmtDate(p.dataFinal || state.deadline);
 
+    // === HOJE: last measurement regardless of type ===
+    const allSorted = [...p.measurements].sort((a,b) => a.date.localeCompare(b.date));
+    const lastMeas  = allSorted[allSorted.length - 1];
+    const lastOfficial = officialMeas(p).slice(-1)[0] || null;
+    // "hoje" is meaningful only if lastMeas is more recent than lastOfficial OR is a control type
+    const hojeRef  = lastOfficial ? lastOfficial.peso : (pesoInicial || null);
+    const hojeIsNew = lastMeas && lastOfficial && (lastMeas.id !== lastOfficial.id || lastMeas.type === 'control');
+    const hojeIsOnlyOfficial = lastMeas && lastMeas.type === 'official';
+
+    let hojeCell = `<span class="hoje-empty">--</span>`;
+    if (lastMeas && hojeRef !== null) {
+      const delta = lastMeas.peso - hojeRef;
+      const pct   = (delta / hojeRef) * 100;
+      const hojeImc = calcIMC(lastMeas.peso, p.altura);
+      const deltaColor = delta < 0 ? 'var(--green)' : delta > 0 ? 'var(--accent2)' : 'var(--muted)';
+      const deltaBg    = delta < 0 ? 'rgba(26,158,92,0.12)' : delta > 0 ? 'rgba(217,67,57,0.12)' : 'var(--surface2)';
+      const dotClass   = lastMeas.type === 'official' ? 'official' : '';
+      const sign       = delta < 0 ? '' : '+';
+      hojeCell = `<div class="hoje-cell">
+        <span class="hoje-peso">
+          <span class="hoje-dot ${dotClass}"></span>
+          ${lastMeas.peso} kg
+        </span>
+        <span class="hoje-delta" style="color:${deltaColor};background:${deltaBg}">${sign}${delta.toFixed(1)} kg · ${sign}${fmtPct(Math.abs(pct))}</span>
+        <span class="hoje-imc">${hojeImc.toFixed(1)} · ${imcClass(hojeImc)}</span>
+        <span class="hoje-pct" style="color:var(--muted);font-size:9px">${fmtDate(lastMeas.date)} ${lastMeas.type === 'official' ? '&#9679;oficial' : '&#128203;controle'}</span>
+      </div>`;
+    }
+
     let pctCell = `<span class="ranking-mini-pct pct-neutral">--</span>`;
     if (perdaPct !== null) {
       const cls = perdaPct > 0 ? 'pct-positive' : perdaPct < 0 ? 'pct-negative' : 'pct-neutral';
@@ -2740,6 +2815,7 @@ function renderRanking() {
         <div>${perdaKgTxt}</div>
         <div>${pctCell}</div>
         <div>${imcHTML}</div>
+        <div>${hojeCell}</div>
         <div>${statusPill}</div>
       </div>
       <div class="expand-panel" id="expand-${p.id}"></div>
