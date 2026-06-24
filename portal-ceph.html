@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Protótipo — Portal CEPH</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+  --navy:#003a79; --blue:#008bc9; --dark:#002d4d; --canvas:#edf2fa; --card:#fff;
+  --ink:#172b4d; --muted:#7a8a9e; --line:rgba(0,58,121,.13); --tint:#f2f6fc;
+  --shadow:0 4px 18px rgba(0,20,60,.09); --r:16px; --r-sm:10px; --hint:#fff8d6; --hint-line:#f0e2a0;
+  --gray-band:#f4f5f7;
+  --j-input-bg:#fafbfc; --j-input-border:#dfe1e6; --j-focus:#0052cc; --j-label:#172b4d; --j-radio-border:#c1c7d0; --j-text:#172b4d;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',Arial,sans-serif;background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.6;}
+a{color:inherit;text-decoration:none;}
+
+/* ========== TOPBAR ========== */
+.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:#003a79;color:#fff;padding:.6rem 1.5rem;font-size:.72rem;}
+.crumbs{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-weight:500;}
+.crumbs a{opacity:.9;}
+.crumbs a:hover{opacity:1;text-decoration:underline;}
+.crumbs .sep{opacity:.45;font-size:.8em;}
+.crumbs .cur{font-weight:600;opacity:1;}
+.logo{display:flex;align-items:center;gap:.5rem;justify-self:center;}
+.logo svg{width:34px;height:20px;}
+.logo span{font-weight:800;font-size:1.05rem;letter-spacing:.04em;}
+.topicons{display:flex;align-items:center;gap:1.1rem;justify-self:end;}
+.topicons .ti{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;opacity:.92;cursor:pointer;}
+.topicons .av{position:relative;width:30px;height:30px;border-radius:50%;background:#0b66a8;display:flex;align-items:center;justify-content:center;font-size:.64rem;font-weight:700;}
+.topicons .av .bdg{position:absolute;top:-3px;right:-3px;background:#e23b3b;color:#fff;font-size:.55rem;font-weight:700;border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;}
+
+/* ========== BANNER ========== */
+.banner{position:relative;height:128px;background:linear-gradient(105deg,#002d4d 0%,#0a4f8c 55%,#0a6bb0 100%);color:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.banner .shape{position:absolute;border-radius:46% 54% 60% 40%;background:rgba(255,255,255,.045);}
+.banner .s1{width:360px;height:360px;left:8%;top:-150px;}
+.banner .s2{width:300px;height:300px;right:6%;top:-90px;border-radius:50%;}
+.banner .s3{width:220px;height:220px;right:24%;bottom:-150px;background:rgba(255,255,255,.035);}
+.banner h1{position:relative;font-size:1.5rem;font-weight:800;letter-spacing:-.01em;text-align:center;padding:0 1rem;}
+.banner .edit{position:absolute;top:14px;right:22px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.banner .edit svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2;}
+
+/* ========== CATÁLOGO ========== */
+.catalog{background:var(--gray-band);padding:2.4rem 1.5rem 3rem;min-height:60vh;}
+.catalog-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px 1fr;gap:1.5rem;}
+.cat-side{display:flex;flex-direction:column;gap:.1rem;}
+.cat-side .cs-item{padding:.7rem 1rem;font-size:.84rem;font-weight:600;color:var(--ink);cursor:pointer;border-radius:3px;}
+.cat-side .cs-item.active{background:#111;color:#fff;}
+.cat-side .cs-item:not(.active):hover{color:var(--blue);}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.6rem 1.4rem;align-content:start;}
+@media(max-width:900px){.catalog-inner{grid-template-columns:1fr;}}
+@media(max-width:600px){.cat-grid{grid-template-columns:1fr;}}
+.rt-item{display:flex;gap:.85rem;cursor:pointer;align-items:flex-start;}
+.rt-item .rt-ico{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+.rt-item .rt-ico svg{width:30px;height:30px;fill:none;stroke:#222;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;}
+.rt-item .rt-t{font-size:.92rem;font-weight:600;color:#1a2b44;line-height:1.25;}
+.rt-item:hover .rt-t{color:var(--blue);text-decoration:underline;}
+.rt-item .rt-d{font-size:.78rem;color:#5a6b80;margin-top:.3rem;line-height:1.5;}
+
+/* ========== PAGE FOOTER ========== */
+.page-footer{background:#003a79;color:#cfe0f0;text-align:center;padding:1.6rem 1rem;font-size:.78rem;line-height:1.8;}
+.page-footer b{color:#fff;display:block;font-weight:700;}
+.page-footer .small{display:block;font-size:.68rem;opacity:.7;margin-top:.4rem;}
+
+/* ========== MODAL ========== */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,25,55,.55);z-index:50;align-items:flex-start;justify-content:center;padding:2.5rem 1rem;overflow-y:auto;}
+.overlay.on{display:flex;}
+.modal{background:#fff;border-radius:6px;width:100%;max-width:720px;box-shadow:0 24px 70px rgba(0,20,60,.35);display:flex;flex-direction:column;max-height:calc(100vh - 5rem);animation:pop .25s ease both;}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.99);}to{opacity:1;transform:none;}}
+.modal-head{display:flex;align-items:center;gap:.85rem;padding:1.1rem 1.5rem;border-bottom:1px solid #ebecf0;}
+.modal-head .mh-ico svg{width:34px;height:34px;fill:none;stroke:#42526e;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.modal-head .mh-t{flex:1;min-width:0;}
+.modal-head h3{font-size:1.12rem;font-weight:700;color:var(--ink);line-height:1.2;}
+.modal-head .mh-sub{font-size:.74rem;color:var(--muted);margin-top:1px;}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--muted);width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.modal-close:hover{background:#f4f5f7;}
+.modal-close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;}
+.modal-body{padding:1.4rem 1.5rem;overflow-y:auto;}
+.modal-body-inner{max-width:520px;margin:0 auto;}
+.req-note{font-size:.78rem;color:#6b778c;margin-bottom:1.3rem;}
+.req-note b{color:#172b4d;}
+.modal-foot{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1.5rem;border-top:1px solid #ebecf0;background:#fff;border-radius:0 0 6px 6px;}
+.foot-help{font-size:.78rem;color:#0052cc;cursor:pointer;}
+.foot-actions{display:flex;gap:.4rem;align-items:center;}
+
+/* ===== campos estilo Jira ===== */
+.jfield{margin-bottom:1.3rem;}
+.jfield.hidden{display:none;}
+.jlabel{display:block;font-size:.79rem;font-weight:700;color:var(--j-label);margin-bottom:.45rem;}
+.req{color:#de350b;font-weight:700;}
+.jhelp{font-size:.74rem;color:#6b778c;margin-top:.4rem;line-height:1.5;}
+.jdiv{height:1px;background:#dfe1e6;margin:1.5rem 0;}
+
+.jfield input[type=text],.jfield input[type=number],.jfield textarea{
+  width:100%;padding:.55rem .7rem;border:1.6px solid var(--j-input-border);border-radius:4px;background:var(--j-input-bg);color:var(--j-text);
+  font-family:'Inter',Arial,sans-serif;font-size:.86rem;outline:none;transition:border-color .12s,box-shadow .12s,background .12s;
+}
+.jfield textarea{resize:vertical;min-height:90px;line-height:1.6;}
+.jfield input:hover,.jfield textarea:hover{background:#fff;}
+.jfield input:focus,.jfield textarea:focus{background:#fff;border-color:var(--j-focus);box-shadow:0 0 0 1px var(--j-focus);}
+.jfield.invalid input,.jfield.invalid textarea{border-color:#de350b !important;box-shadow:0 0 0 1px #de350b !important;}
+.jfield.invalid .jsel-control{border-color:#de350b !important;box-shadow:0 0 0 1px #de350b !important;}
+.jfield.invalid .jradio-group{outline:1px solid #de350b;outline-offset:4px;border-radius:3px;}
+.jfield.invalid .drop{border-color:#de350b !important;}
+
+/* data com ícone de calendário */
+.jdate{display:flex;align-items:stretch;border:1.6px solid var(--j-input-border);border-radius:4px;overflow:hidden;background:var(--j-input-bg);max-width:280px;transition:border-color .12s,box-shadow .12s;}
+.jdate:focus-within{background:#fff;border-color:var(--j-focus);box-shadow:0 0 0 1px var(--j-focus);}
+.jdate .cal{display:flex;align-items:center;justify-content:center;width:38px;background:#f4f5f7;border-right:1px solid var(--j-input-border);flex-shrink:0;}
+.jdate .cal svg{width:16px;height:16px;fill:none;stroke:#42526e;stroke-width:1.8;}
+.jdate input{border:none !important;box-shadow:none !important;background:transparent !important;border-radius:0;}
+
+/* select estilo react-select (digita no próprio controle) */
+.jsel{position:relative;}
+.jsel-control{display:flex;align-items:center;gap:.5rem;min-height:40px;padding:.35rem .7rem;background:var(--j-input-bg);border:1.6px solid var(--j-input-border);border-radius:4px;cursor:text;transition:background .12s,border-color .12s,box-shadow .12s;}
+.jsel-control:hover{background:#fff;}
+.jsel.open .jsel-control{background:#fff;border-color:var(--j-focus);box-shadow:0 0 0 1px var(--j-focus);}
+.jsel-input{flex:1;min-width:0;border:none;background:transparent;outline:none;font-family:'Inter',Arial,sans-serif;font-size:.86rem;color:var(--j-text);cursor:text;}
+.jsel-input::placeholder{color:#7a869a;}
+.jsel-input:disabled{cursor:not-allowed;}
+.jsel.disabled .jsel-control{cursor:not-allowed;background:#f4f5f7;opacity:.7;}
+.jsel-chev{width:18px;height:18px;fill:none;stroke:#42526e;stroke-width:2;flex-shrink:0;transition:transform .15s;}
+.jsel.open .jsel-chev{transform:rotate(180deg);}
+.jsel-menu{display:none;position:absolute;z-index:6;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid #dfe1e6;border-radius:4px;box-shadow:0 4px 16px rgba(9,30,66,.25);overflow:hidden;}
+.jsel.open .jsel-menu{display:block;}
+.jsel-list{max-height:210px;overflow-y:auto;}
+.jsel-opt{padding:.55rem .8rem;font-size:.85rem;color:var(--j-text);cursor:pointer;}
+.jsel-opt:hover{background:#f4f5f7;}
+.jsel-opt.sel{background:#deebff;color:#0052cc;font-weight:500;}
+.jsel-empty{padding:.6rem .8rem;font-size:.8rem;color:#7a869a;}
+
+/* radios estilo Jira */
+.jradio-group{display:flex;flex-direction:column;gap:.6rem;margin-top:.15rem;}
+.jradio{display:flex;align-items:flex-start;gap:.6rem;cursor:pointer;font-size:.86rem;color:var(--j-text);}
+.jradio input{position:absolute;opacity:0;width:0;height:0;}
+.jr-circle{width:16px;height:16px;border-radius:50%;border:2px solid var(--j-radio-border);background:#fafbfc;flex-shrink:0;margin-top:2px;position:relative;transition:border-color .12s,background .12s;}
+.jradio:hover .jr-circle{border-color:#7a869a;}
+.jradio input:checked + .jr-circle{border-color:var(--j-focus);background:#fff;}
+.jradio input:checked + .jr-circle::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--j-focus);}
+.jradio input:focus-visible + .jr-circle{box-shadow:0 0 0 2px rgba(0,82,204,.35);}
+.jr-text{line-height:1.5;}
+.jr-text small{display:block;color:#6b778c;font-size:.76rem;}
+
+/* callout Importante */
+.callout{border-radius:4px;overflow:hidden;margin-bottom:1.4rem;border:1px solid #dfe1e6;}
+.callout-h{background:#0747a6;color:#fff;font-size:.78rem;font-weight:700;padding:.45rem .85rem;}
+.callout-b{background:#f4f5f7;color:#42526e;font-size:.8rem;padding:.7rem .85rem;line-height:1.6;}
+.callout-b b{color:#172b4d;}
+
+/* hint amarelo (dica de uso do campo) */
+.hint{background:var(--hint);border:1px solid var(--hint-line);border-radius:4px;padding:.6rem .75rem;margin-top:.5rem;font-size:.74rem;color:#6b5d12;line-height:1.55;}
+.hint b{color:#5a4d0a;}
+.hint ul{margin:.3rem 0 0 .9rem;padding:0;}
+.hint li{margin-bottom:.2rem;}
+
+/* caixa documentos a anexar (orientação) */
+.docbox{background:#deebff;border:1px solid #b3d4ff;border-radius:4px;padding:.85rem .95rem;margin-bottom:1.3rem;}
+.docbox-h{font-size:.78rem;font-weight:700;color:#0747a6;margin-bottom:.45rem;display:flex;align-items:center;gap:.4rem;}
+.docbox-h svg{width:15px;height:15px;fill:none;stroke:#0747a6;stroke-width:2;}
+.docbox ul{margin:.2rem 0 0 1rem;padding:0;}
+.docbox li{font-size:.81rem;color:#172b4d;margin-bottom:.25rem;line-height:1.5;}
+.docbox .empty{font-size:.81rem;color:#42526e;}
+
+/* dropzone (campo de anexo) */
+.drop{border:1.6px dashed var(--j-input-border);border-radius:4px;padding:1.2rem;text-align:center;color:#6b778c;font-size:.8rem;cursor:pointer;background:var(--j-input-bg);transition:border-color .15s,background .15s;}
+.drop:hover{border-color:var(--j-focus);background:#fff;}
+.drop input{display:none;}
+.drop .di{display:flex;align-items:center;justify-content:center;gap:.45rem;}
+.drop svg{width:16px;height:16px;fill:none;stroke:#0052cc;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.files{margin-top:.5rem;display:flex;flex-direction:column;gap:.3rem;}
+.file-pill{display:flex;align-items:center;gap:.5rem;background:#fff;border:1px solid #dfe1e6;border-radius:4px;padding:.35rem .6rem;font-size:.76rem;color:#172b4d;}
+.file-pill .rm{margin-left:auto;cursor:pointer;color:#6b778c;font-weight:700;border:none;background:none;font-size:.9rem;}
+
+/* botões rodapé Jira */
+.btn-criar{background:#172b4d;color:#fff;border:none;border-radius:4px;padding:.55rem 1.2rem;font-family:'Inter',Arial,sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-criar:hover{background:#0d1b33;}
+.btn-cancelar{background:none;border:none;color:#42526e;font-family:'Inter',Arial,sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;padding:.55rem .9rem;border-radius:4px;}
+.btn-cancelar:hover{background:#f4f5f7;}
+
+/* sucesso */
+.success{text-align:center;padding:1.4rem .5rem;}
+.success .sc-ic{width:54px;height:54px;border-radius:50%;background:rgba(54,179,126,.13);display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;}
+.success .sc-ic svg{width:28px;height:28px;fill:none;stroke:#36b37e;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.success h3{font-size:1.15rem;font-weight:700;color:var(--ink);}
+.success p{color:#6b778c;font-size:.86rem;margin-top:.4rem;max-width:400px;margin-left:auto;margin-right:auto;}
+.protocolo{display:inline-block;margin-top:.9rem;font-family:'IBM Plex Mono',monospace;font-size:.85rem;font-weight:600;color:#172b4d;background:#f4f5f7;border:1px solid #dfe1e6;border-radius:4px;padding:.45rem .9rem;}
+</style>
+</head>
+<body>
+
+<!-- ===== TOPBAR ===== -->
+<div class="topbar">
+  <div class="crumbs">
+    <a href="#">Portal de Serviços FGV</a><span class="sep">›</span>
+    <a href="#">Serviços Internos FGV</a><span class="sep">›</span>
+    <a href="#">Atendimento Acadêmico</a><span class="sep">›</span>
+    <span class="cur">CEPH</span>
+  </div>
+  <div class="logo">
+    <svg viewBox="0 0 40 24"><path d="M3 3 L19 3 L11 21 Z" fill="#fff"/><path d="M21 3 L37 3 L29 21 Z" fill="#ffffff" opacity=".55"/></svg>
+    <span>FGV</span>
+  </div>
+  <div class="topicons">
+    <svg class="ti" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <svg class="ti" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5c.06-.32.1-.65.1-1z"/></svg>
+    <span class="av">LB<span class="bdg">1</span></span>
+  </div>
+</div>
+
+<!-- ===== BANNER ===== -->
+<div class="banner">
+  <div class="shape s1"></div><div class="shape s2"></div><div class="shape s3"></div>
+  <h1>Luiz, bem-vindo(a) ao Portal do CEPH</h1>
+  <div class="edit"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+</div>
+
+<!-- ===== CATÁLOGO ===== -->
+<div class="catalog">
+  <div class="catalog-inner">
+    <div class="cat-side">
+      <div class="cs-item active">Portal do CEPH</div>
+      <div class="cs-item">Diretrizes e Súmulas</div>
+    </div>
+    <div class="cat-grid">
+      <div class="rt-item" onclick="openModal('submissao')">
+        <div class="rt-ico"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 16.5h6"/></svg></div>
+        <div><div class="rt-t">Submissão de protocolo</div><div class="rt-d">Submeta seu protocolo de pesquisa para avaliação ética do CEPH. O formulário se adapta ao tipo da sua pesquisa.</div></div>
+      </div>
+      <div class="rt-item" onclick="openModal('duvidas')">
+        <div class="rt-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.4 2.4 0 1 1 3.4 2.2c-.8.4-1 .9-1 1.7"/><path d="M12 16.5h.01"/></svg></div>
+        <div><div class="rt-t">Dúvidas</div><div class="rt-d">Tire dúvidas sobre ética em pesquisa, enquadramento, prazos ou como preencher a submissão.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="page-footer">
+  <b>Copyright © 2026 FGV - Todos os Direitos Reservados.</b>
+  Política de Privacidade
+  <span class="small">Protótipo de demonstração — não conectado a sistemas de produção.</span>
+</div>
+
+<!-- ============ MODAL: SUBMISSÃO ============ -->
+<div class="overlay" id="ov-submissao">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="mh-ico"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></span>
+      <div class="mh-t"><h3>Submissão de protocolo</h3><div class="mh-sub">Portal do CEPH</div></div>
+      <button class="modal-close" onclick="closeModal('submissao')"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="modal-body">
+     <div class="modal-body-inner" id="body-submissao">
+
+      <div class="callout">
+        <div class="callout-h">Importante</div>
+        <div class="callout-b">A coleta de dados só pode ser iniciada <b>após</b> a emissão do parecer de aprovação pelo CEPH. Submeta com no mínimo <b>15 dias</b> de antecedência da reunião mensal.</div>
+      </div>
+
+      <div class="req-note">Os campos obrigatórios estão marcados com asterisco <b class="req">*</b></div>
+
+      <div class="jfield">
+        <label class="jlabel">Nome da escola e/ou centro de pesquisa <span class="req">*</span></label>
+        <div class="jsel" id="s-unidade"></div>
+        <div class="hint"><b>Dica de uso do campo</b><ul><li>A lista apresenta os valores em ordem alfabética. Comece digitando o nome de sua <b>Unidade</b> e selecione na lista.</li></ul></div>
+      </div>
+      <div class="jfield">
+        <label class="jlabel">Digite o nome de sua área <span class="req">*</span></label>
+        <div class="jsel" id="s-area"></div>
+        <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Área</b> e selecione na lista. Caso seja igual à Unidade, basta selecionar e seguir para a Equipe.</li><li>Listagem controlada pela SRH. Se identificar informação incorreta, abra um chamado neste portal.</li></ul></div>
+      </div>
+      <div class="jfield">
+        <label class="jlabel">Selecione a sua equipe <span class="req">*</span></label>
+        <div class="jsel" id="s-equipe"></div>
+        <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Equipe</b> e selecione na lista. Caso seja igual à Área, basta selecionar e seguir.</li></ul></div>
+      </div>
+
+      <div class="jdiv"></div>
+
+      <div class="jfield">
+        <label class="jlabel">Tipo de trabalho <span class="req">*</span></label>
+        <div class="jsel" id="s-tipotrab"></div>
+      </div>
+      <div class="jfield hidden" id="f-orientador">
+        <label class="jlabel">Orientador(a) <span class="req">*</span></label>
+        <input type="text" id="s-orientador" placeholder="Nome do(a) orientador(a)">
+      </div>
+      <div class="jfield">
+        <label class="jlabel">Título do projeto <span class="req">*</span></label>
+        <input type="text" id="s-titulo" placeholder="Título da pesquisa">
+      </div>
+      <div class="jfield">
+        <label class="jlabel">Objetivos e metodologia da pesquisa <span class="req">*</span></label>
+        <textarea id="s-objetivos" placeholder="Descreva, em resumo, o objetivo da pesquisa e como os dados serão coletados/tratados."></textarea>
+      </div>
+      <div class="jfield">
+        <label class="jlabel">Data prevista de início da coleta <span class="req">*</span></label>
+        <div class="jdate"><span class="cal"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span><input type="date" id="s-data"></div>
+      </div>
+
+      <div class="jdiv"></div>
+
+      <div class="jfield">
+        <label class="jlabel">Tipo de submissão <span class="req">*</span></label>
+        <div class="jradio-group" id="grp-tiposub">
+          <label class="jradio"><input type="radio" name="tiposub" value="A" onchange="onTipoSub()"><span class="jr-circle"></span><span class="jr-text">A — Interação direta com participantes capazes</span></label>
+          <label class="jradio"><input type="radio" name="tiposub" value="B" onchange="onTipoSub()"><span class="jr-circle"></span><span class="jr-text">B — Interação direta com menores ou incapazes</span></label>
+          <label class="jradio"><input type="radio" name="tiposub" value="C" onchange="onTipoSub()"><span class="jr-circle"></span><span class="jr-text">C — Uso de dados secundários identificáveis</span></label>
+        </div>
+        <div class="jhelp">Selecione conforme a natureza da pesquisa. O tipo define os campos e documentos exigidos a seguir.</div>
+      </div>
+
+      <!-- participantes (A/B) -->
+      <div class="cond cond-AB hidden">
+        <div class="jfield"><label class="jlabel">Perfil dos participantes <span class="req">*</span></label><input type="text" id="s-perfil" placeholder="Ex.: profissionais da área de saúde, estudantes universitários..."></div>
+        <div class="jfield"><label class="jlabel">Nº estimado de participantes <span class="req">*</span></label><input type="number" id="s-npart" min="1" placeholder="Ex.: 30"></div>
+      </div>
+
+      <!-- dados secundários (C) -->
+      <div class="cond cond-C hidden">
+        <div class="jfield"><label class="jlabel">Descrição dos dados/documentos secundários <span class="req">*</span></label><textarea id="s-desc-dados" placeholder="Quais dados/documentos serão consultados e quais variáveis serão utilizadas."></textarea></div>
+        <div class="jfield"><label class="jlabel">A base de dados é pública ou de acesso restrito? <span class="req">*</span></label><div class="jsel" id="s-base"></div></div>
+      </div>
+
+      <!-- tratamento de dados (qualquer tipo) -->
+      <div class="cond cond-any hidden">
+        <div class="jfield">
+          <label class="jlabel">A pesquisa envolve dados pessoais sensíveis? <span class="req">*</span></label>
+          <div class="jradio-group" id="grp-sens">
+            <label class="jradio"><input type="radio" name="sens" value="sim" onchange="onSens()"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+            <label class="jradio"><input type="radio" name="sens" value="nao" onchange="onSens()"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+          </div>
+          <div class="jhelp">Sensíveis: origem racial/étnica, convicção religiosa, opinião política, saúde, vida sexual, dado genético/biométrico (LGPD art. 5º, II).</div>
+        </div>
+        <div class="jfield hidden" id="f-sensiveis"><label class="jlabel">Justifique a coleta de dados sensíveis <span class="req">*</span></label><textarea id="s-just-sensiveis" placeholder="Por que a coleta é necessária e como os riscos serão mitigados."></textarea></div>
+        <div class="jfield">
+          <label class="jlabel">Haverá uso de Inteligência Artificial no tratamento dos dados? <span class="req">*</span></label>
+          <div class="jradio-group" id="grp-ia">
+            <label class="jradio"><input type="radio" name="ia" value="sim" onchange="onIa()"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+            <label class="jradio"><input type="radio" name="ia" value="nao" onchange="onIa()"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+          </div>
+        </div>
+        <div class="jfield hidden" id="f-ia"><label class="jlabel">Qual ferramenta e como garante a não-incorporação dos dados? <span class="req">*</span></label><textarea id="s-desc-ia" placeholder="Ferramenta utilizada e medida que impede o uso dos dados para treinar o modelo."></textarea></div>
+      </div>
+
+      <div class="jdiv"></div>
+
+      <!-- orientação de documentos (texto) + ANEXO ÚNICO -->
+      <div class="docbox" id="docGuide">
+        <div class="docbox-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>Documentos a anexar</div>
+        <div id="docGuideBody"><div class="empty">Selecione o tipo de submissão para ver os documentos que devem ser anexados.</div></div>
+      </div>
+      <div class="jfield">
+        <label class="jlabel">Anexo <span class="req" id="anexo-req">*</span></label>
+        <div class="drop" data-file="anexo"><div class="di"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Arraste e solte arquivos, cole capturas de tela ou navegue</div><input type="file" multiple></div>
+        <div class="files"></div>
+        <div class="jhelp">Anexe <b>todos os documentos</b> exigidos neste único campo. Formatos: PDF ou DOCX. Até 10 MB por arquivo.</div>
+      </div>
+
+     </div>
+    </div>
+    <div class="modal-foot">
+      <span class="foot-help">Ajuda de formatação</span>
+      <div class="foot-actions">
+        <button class="btn-cancelar" onclick="closeModal('submissao')">Cancelar</button>
+        <button class="btn-criar" onclick="submitSubmissao()">Criar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: DÚVIDAS ============ -->
+<div class="overlay" id="ov-duvidas">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-head">
+      <span class="mh-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.4 2.4 0 1 1 3.4 2.2c-.8.4-1 .9-1 1.7"/><path d="M12 16.5h.01"/></svg></span>
+      <div class="mh-t"><h3>Dúvidas</h3><div class="mh-sub">Portal do CEPH</div></div>
+      <button class="modal-close" onclick="closeModal('duvidas')"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="modal-body">
+     <div class="modal-body-inner" id="body-duvidas">
+      <div class="req-note">Os campos obrigatórios estão marcados com asterisco <b class="req">*</b></div>
+      <div class="jfield">
+        <label class="jlabel">Nome da escola e/ou centro de pesquisa <span class="req">*</span></label>
+        <div class="jsel" id="d-unidade"></div>
+        <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Unidade</b> e selecione na lista.</li></ul></div>
+      </div>
+      <div class="jfield"><label class="jlabel">Assunto <span class="req">*</span></label><input type="text" id="d-assunto" placeholder="Resuma sua dúvida"></div>
+      <div class="jfield"><label class="jlabel">Sua dúvida <span class="req">*</span></label><textarea id="d-desc" placeholder="Descreva sua dúvida com o máximo de detalhes."></textarea></div>
+      <div class="jfield"><label class="jlabel">Anexo (opcional)</label><div class="drop" data-file="dext"><div class="di"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Arraste e solte arquivos, cole capturas de tela ou navegue</div><input type="file" multiple></div><div class="files"></div></div>
+     </div>
+    </div>
+    <div class="modal-foot">
+      <span class="foot-help">Ajuda de formatação</span>
+      <div class="foot-actions">
+        <button class="btn-cancelar" onclick="closeModal('duvidas')">Cancelar</button>
+        <button class="btn-criar" onclick="submitDuvidas()">Criar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== dados cascata (amostra ilustrativa; escolas como Unidade) ===== */
+var CASCADE = {
+  "EAESP — Esc. de Administração de Empresas de SP": {
+    "Pós-Graduação": ["CMAE — Mestrado Acadêmico","CDAE — Doutorado","MPGC — Mestrado Profissional"],
+    "Graduação": ["Graduação em Administração de Empresas","Graduação em Administração Pública","NAPG — Apoio Pedagógico"],
+    "Centros de Estudo": ["FGVcepesp","FGVcemif","FGVethics","Pesquisa e Publicações"]
+  },
+  "EBAPE — Esc. Bras. de Adm. Pública e de Empresas": {
+    "Pós-Graduação": ["Mestrado Acadêmico","Mestrado Profissional","Doutorado"],
+    "Pesquisa": ["Pesquisa e Publicações","Centros EBAPE"]
+  },
+  "EPGE — Esc. Bras. de Economia e Finanças": {
+    "Pós-Graduação": ["Mestrado em Economia","Doutorado em Economia"], "Graduação": ["Graduação em Economia"]
+  },
+  "EESP — Esc. de Economia de SP": {
+    "Pós-Graduação": ["Mestrado Profissional","Mestrado Acadêmico","Doutorado"], "Graduação": ["Graduação em Economia"]
+  },
+  "Direito Rio — Esc. de Direito do RJ": {
+    "Graduação": ["Coordenação Executiva de Ensino","Graduação em Direito"], "Pós-Graduação": ["Mestrado","Doutorado"]
+  },
+  "Direito SP — Esc. de Direito de SP (FGVLaw)": {
+    "Graduação": ["Graduação em Direito"], "Pós-Graduação": ["Mestrado Profissional","FGVLaw"]
+  },
+  "CPDOC — Esc. de Ciências Sociais": { "Pesquisa": ["PPHPBC — Pós-Graduação","Núcleo de Pesquisa"] },
+  "IBRE — Inst. Bras. de Economia": { "Pesquisa Econômica": ["Pesquisa Aplicada","Sondagens e Índices"] }
+};
+var TIPO_TRAB = ["Trabalho de conclusão (graduação)","Dissertação (mestrado)","Tese (doutorado)","Pesquisa de pós-doutorado","Projeto docente / institucional"];
+var BASE_OPTS = ["Pública","Privada / de acesso restrito"];
+
+var ORIG = {};   // guarda o HTML original de cada modal para reabrir limpo
+var FILES = {};  // arquivos por dropzone
+
+/* ===== componente select estilo react-select (digita no controle) ===== */
+function makeSelect(id, conf){
+  var box=document.getElementById(id); if(!box) return;
+  box.classList.add('jsel'); box.classList.remove('disabled','open');
+  box.innerHTML='<div class="jsel-control"><input class="jsel-input" placeholder="'+conf.placeholder+'" autocomplete="off"'+(conf.disabled?' disabled':'')+'><svg class="jsel-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><input type="hidden" class="jsel-hidden"><div class="jsel-menu"><div class="jsel-list"></div></div>';
+  if(conf.disabled) box.classList.add('disabled');
+  var control=box.querySelector('.jsel-control'), input=box.querySelector('.jsel-input'), hidden=box.querySelector('.jsel-hidden'), list=box.querySelector('.jsel-list');
+  function render(f){
+    var opts=conf.getOptions()||[]; f=(f||'').toLowerCase();
+    var m=opts.filter(function(o){ return o.toLowerCase().indexOf(f)>-1; });
+    list.innerHTML='';
+    if(!opts.length){ list.innerHTML='<div class="jsel-empty">Selecione o campo anterior primeiro.</div>'; return; }
+    if(!m.length){ list.innerHTML='<div class="jsel-empty">Nenhum valor encontrado.</div>'; return; }
+    m.forEach(function(o){ var d=document.createElement('div'); d.className='jsel-opt'+(hidden.value===o?' sel':''); d.textContent=o;
+      d.onmousedown=function(e){ e.preventDefault(); hidden.value=o; input.value=o; close(); input.blur(); if(conf.onSelect)conf.onSelect(o); box.closest('.jfield').classList.remove('invalid'); };
+      list.appendChild(d); });
+  }
+  function open(){ if(input.disabled)return; closeAllSelects(); box.classList.add('open'); render(''); setTimeout(function(){ input.select(); },0); }
+  function close(){ box.classList.remove('open'); input.value=hidden.value; }
+  control.addEventListener('mousedown', function(e){ if(e.target===input) return; e.preventDefault(); if(box.classList.contains('open')){ close(); } else { input.focus(); open(); } });
+  input.addEventListener('focus', open);
+  input.addEventListener('input', function(){ box.classList.add('open'); render(input.value); });
+  box._value=function(){ return hidden.value; };
+  box._reset=function(dis){ hidden.value=''; input.value=''; input.disabled=!!dis; box.classList.toggle('disabled',!!dis); box.classList.remove('open'); };
+}
+function closeAllSelects(){ document.querySelectorAll('.jsel.open').forEach(function(b){ b.classList.remove('open'); var inp=b.querySelector('.jsel-input'), hid=b.querySelector('.jsel-hidden'); if(inp&&hid) inp.value=hid.value; }); }
+document.addEventListener('mousedown', function(e){ if(!e.target.closest('.jsel')) closeAllSelects(); });
+
+function buildCascade(p){
+  var uId=p+'-unidade', aId=p+'-area', eId=p+'-equipe';
+  makeSelect(uId,{placeholder:'Buscar', getOptions:function(){ return Object.keys(CASCADE); }, onSelect:function(){
+    if(document.getElementById(aId)) document.getElementById(aId)._reset(false);
+    if(document.getElementById(eId)) document.getElementById(eId)._reset(true);
+  }});
+  if(document.getElementById(aId)) makeSelect(aId,{placeholder:'Buscar', disabled:true, getOptions:function(){ var u=document.getElementById(uId)._value(); return u&&CASCADE[u]?Object.keys(CASCADE[u]):[]; }, onSelect:function(){ if(document.getElementById(eId)) document.getElementById(eId)._reset(false); }});
+  if(document.getElementById(eId)) makeSelect(eId,{placeholder:'Buscar', disabled:true, getOptions:function(){ var u=document.getElementById(uId)._value(), a=document.getElementById(aId)._value(); return (u&&a&&CASCADE[u]&&CASCADE[u][a])?CASCADE[u][a]:[]; }});
+}
+
+/* ===== dropzones ===== */
+function bindDrops(scopeSel){
+  document.querySelectorAll(scopeSel+' .drop').forEach(function(drop){
+    var key=drop.getAttribute('data-file'); FILES[key]=[];
+    var input=drop.querySelector('input[type=file]'), listEl=drop.parentElement.querySelector('.files');
+    listEl.innerHTML='';
+    drop.addEventListener('click', function(e){ if(e.target===input) return; input.click(); });
+    drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.style.borderColor='#0052cc'; });
+    drop.addEventListener('dragleave', function(){ drop.style.borderColor=''; });
+    drop.addEventListener('drop', function(e){ e.preventDefault(); drop.style.borderColor=''; add(e.dataTransfer.files); });
+    input.addEventListener('change', function(){ add(input.files); input.value=''; });
+    function add(fl){ Array.prototype.forEach.call(fl, function(f){ FILES[key].push(f.name); }); paint(); drop.closest('.jfield').classList.remove('invalid'); }
+    function paint(){ listEl.innerHTML=''; FILES[key].forEach(function(name,i){ var p=document.createElement('div'); p.className='file-pill'; p.innerHTML='📎 '+name+'<button class="rm" title="remover">×</button>'; p.querySelector('.rm').onclick=function(){ FILES[key].splice(i,1); paint(); }; listEl.appendChild(p); }); }
+  });
+}
+
+/* ===== modais (restaura HTML original ao abrir → some o bug de reabrir) ===== */
+function openModal(name){
+  var ov=document.getElementById('ov-'+name), modal=ov.querySelector('.modal');
+  modal.innerHTML=ORIG[name];
+  initModal(name);
+  ov.classList.add('on'); document.body.style.overflow='hidden';
+}
+function closeModal(name){ document.getElementById('ov-'+name).classList.remove('on'); document.body.style.overflow=''; }
+
+function initModal(name){
+  if(name==='submissao'){
+    buildCascade('s');
+    makeSelect('s-tipotrab',{placeholder:'Selecione...', getOptions:function(){ return TIPO_TRAB; }, onSelect:function(v){ onTipoTrab(v); }});
+    makeSelect('s-base',{placeholder:'Selecione...', getOptions:function(){ return BASE_OPTS; }, onSelect:function(v){ onBase(v); }});
+    bindDrops('#ov-submissao');
+    renderDocGuide();
+  } else {
+    makeSelect('d-unidade',{placeholder:'Buscar', getOptions:function(){ return Object.keys(CASCADE); }});
+    bindDrops('#ov-duvidas');
+  }
+}
+
+/* ===== lógica condicional ===== */
+function onTipoTrab(v){ var aluno=(v.indexOf('conclus')>-1||v.indexOf('Dissert')>-1||v.indexOf('Tese')>-1); document.getElementById('f-orientador').classList.toggle('hidden', !aluno); }
+function currentTipoSub(){ var r=document.querySelector('input[name="tiposub"]:checked'); return r?r.value:''; }
+function onTipoSub(){
+  var t=currentTipoSub();
+  document.querySelectorAll('#ov-submissao .cond').forEach(function(el){
+    var show=false;
+    if(el.classList.contains('cond-any')) show=!!t;
+    if(el.classList.contains('cond-AB')) show=(t==='A'||t==='B');
+    if(el.classList.contains('cond-C')) show=(t==='C');
+    el.classList.toggle('hidden', !show);
+  });
+  document.getElementById('grp-tiposub').closest('.jfield').classList.remove('invalid');
+  renderDocGuide();
+}
+function onSens(){ var v=(document.querySelector('input[name="sens"]:checked')||{}).value; document.getElementById('f-sensiveis').classList.toggle('hidden', v!=='sim'); document.getElementById('grp-sens').closest('.jfield').classList.remove('invalid'); }
+function onIa(){ var v=(document.querySelector('input[name="ia"]:checked')||{}).value; document.getElementById('f-ia').classList.toggle('hidden', v!=='sim'); document.getElementById('grp-ia').closest('.jfield').classList.remove('invalid'); }
+function onBase(v){ renderDocGuide(); }
+
+/* ===== orientação de documentos + obrigatoriedade do anexo ===== */
+function anexoObrigatorio(){
+  var t=currentTipoSub();
+  if(t==='A'||t==='B') return true;
+  if(t==='C') return document.getElementById('s-base')._value()==='Privada / de acesso restrito';
+  return false;
+}
+function renderDocGuide(){
+  var t=currentTipoSub(), body=document.getElementById('docGuideBody');
+  var req=document.getElementById('anexo-req');
+  if(!t){ body.innerHTML='<div class="empty">Selecione o tipo de submissão para ver os documentos que devem ser anexados.</div>'; if(req) req.style.display='none'; return; }
+  var docs=[];
+  if(t==='A'){ docs=['Instrumento de coleta (questionário/roteiro)','Termo de Consentimento Livre e Esclarecido (TCLE)']; }
+  if(t==='B'){ docs=['Instrumento de coleta (questionário/roteiro)','TCLE do responsável','Termo de Assentimento (TALE)']; }
+  if(t==='C'){
+    if(document.getElementById('s-base')._value()==='Privada / de acesso restrito') docs=['Comprovação de autorização de acesso aos dados'];
+    else docs=[];
+  }
+  if(!docs.length){ body.innerHTML='<div class="empty">Para este tipo, não há documento de anexo obrigatório. Anexe documentos complementares se houver.</div>'; }
+  else { body.innerHTML='<div style="font-size:.79rem;color:#42526e;margin-bottom:.3rem;">Anexe os seguintes documentos no campo <b>Anexo</b> abaixo:</div><ul>'+docs.map(function(d){ return '<li>'+d+'</li>'; }).join('')+'</ul>'; }
+  if(req) req.style.display = anexoObrigatorio()? 'inline':'none';
+}
+
+/* ===== validação + submit ===== */
+function clearInvalids(scope){ document.querySelectorAll('#'+scope+' .jfield.invalid').forEach(function(f){ f.classList.remove('invalid'); }); }
+function reqText(id){ var el=document.getElementById(id); if(!el.value.trim()){ el.closest('.jfield').classList.add('invalid'); return false; } return true; }
+function reqNum(id){ var el=document.getElementById(id); var n=parseInt(el.value,10); if(isNaN(n)||n<1){ el.closest('.jfield').classList.add('invalid'); return false; } return true; }
+function reqSelect(id){ var box=document.getElementById(id); if(!box._value()){ box.closest('.jfield').classList.add('invalid'); return false; } return true; }
+function reqRadio(name, grpId){ if(!document.querySelector('input[name="'+name+'"]:checked')){ document.getElementById(grpId).closest('.jfield').classList.add('invalid'); return false; } return true; }
+function reqFile(key){ if(!(FILES[key]&&FILES[key].length)){ var d=document.querySelector('.drop[data-file="'+key+'"]'); if(d) d.closest('.jfield').classList.add('invalid'); return false; } return true; }
+
+function submitSubmissao(){
+  clearInvalids('ov-submissao'); var ok=true;
+  ok=reqSelect('s-unidade')&&ok; ok=reqSelect('s-area')&&ok; ok=reqSelect('s-equipe')&&ok;
+  ok=reqSelect('s-tipotrab')&&ok;
+  if(!document.getElementById('f-orientador').classList.contains('hidden')) ok=reqText('s-orientador')&&ok;
+  ok=reqText('s-titulo')&&ok; ok=reqText('s-objetivos')&&ok; ok=reqText('s-data')&&ok;
+  ok=reqRadio('tiposub','grp-tiposub')&&ok;
+  var t=currentTipoSub();
+  if(t==='A'||t==='B'){ ok=reqText('s-perfil')&&ok; ok=reqNum('s-npart')&&ok; }
+  if(t==='C'){ ok=reqText('s-desc-dados')&&ok; ok=reqSelect('s-base')&&ok; }
+  if(t){
+    ok=reqRadio('sens','grp-sens')&&ok;
+    if((document.querySelector('input[name="sens"]:checked')||{}).value==='sim') ok=reqText('s-just-sensiveis')&&ok;
+    ok=reqRadio('ia','grp-ia')&&ok;
+    if((document.querySelector('input[name="ia"]:checked')||{}).value==='sim') ok=reqText('s-desc-ia')&&ok;
+  }
+  if(anexoObrigatorio()) ok=reqFile('anexo')&&ok;
+  if(!ok){ var first=document.querySelector('#ov-submissao .jfield.invalid'); if(first) first.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  showSuccess('submissao','Submissão registrada','Seu protocolo foi recebido e entrará na triagem do CEPH. Você acompanhará tudo por este portal.','CEPH-');
+}
+function submitDuvidas(){
+  clearInvalids('ov-duvidas'); var ok=true;
+  ok=reqSelect('d-unidade')&&ok; ok=reqText('d-assunto')&&ok; ok=reqText('d-desc')&&ok;
+  if(!ok){ var first=document.querySelector('#ov-duvidas .jfield.invalid'); if(first) first.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  showSuccess('duvidas','Dúvida registrada','Sua dúvida foi enviada ao CEPH. A resposta virá por este portal, com histórico completo.','CEPH-D-');
+}
+
+var PROTO_SEQ = 0;
+function genProtocolo(prefix){ var d=new Date(); var p=function(n){ return n<10?'0'+n:n; }; PROTO_SEQ++; return prefix+d.getFullYear()+'-'+p(d.getMonth()+1)+p(d.getDate())+'-'+(100+PROTO_SEQ); }
+function showSuccess(modal, titulo, texto, prefix){
+  var inner=document.getElementById('ov-'+modal).querySelector('.modal-body-inner');
+  inner.innerHTML='<div class="success"><div class="sc-ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><h3>'+titulo+'</h3><p>'+texto+'</p><span class="protocolo">'+genProtocolo(prefix)+'</span></div>';
+  document.querySelector('#ov-'+modal+' .foot-actions').innerHTML='<button class="btn-criar" onclick="closeModal(\''+modal+'\')">Fechar</button>';
+  document.querySelector('#ov-'+modal+' .foot-help').style.visibility='hidden';
+}
+
+/* ===== captura o HTML original dos modais (antes de qualquer init) ===== */
+ORIG['submissao']=document.getElementById('ov-submissao').querySelector('.modal').innerHTML;
+ORIG['duvidas']=document.getElementById('ov-duvidas').querySelector('.modal').innerHTML;
+</script>
+</body>
+</html>
