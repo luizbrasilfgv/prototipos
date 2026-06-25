@@ -17,22 +17,19 @@
 body{font-family:'Inter',Arial,sans-serif;background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.6;}
 a{color:inherit;text-decoration:none;}
 
-/* ========== TOPBAR ========== */
+/* TOPBAR */
 .topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:#003a79;color:#fff;padding:.6rem 1.5rem;font-size:.72rem;}
 .crumbs{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-weight:500;}
-.crumbs a{opacity:.9;}
-.crumbs a:hover{opacity:1;text-decoration:underline;}
-.crumbs .sep{opacity:.45;font-size:.8em;}
-.crumbs .cur{font-weight:600;opacity:1;}
+.crumbs a{opacity:.9;}.crumbs a:hover{opacity:1;text-decoration:underline;}
+.crumbs .sep{opacity:.45;font-size:.8em;}.crumbs .cur{font-weight:600;opacity:1;}
 .logo{display:flex;align-items:center;gap:.5rem;justify-self:center;}
-.logo svg{width:34px;height:20px;}
-.logo span{font-weight:800;font-size:1.05rem;letter-spacing:.04em;}
+.logo svg{width:34px;height:20px;}.logo span{font-weight:800;font-size:1.05rem;letter-spacing:.04em;}
 .topicons{display:flex;align-items:center;gap:1.1rem;justify-self:end;}
 .topicons .ti{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;opacity:.92;cursor:pointer;}
 .topicons .av{position:relative;width:30px;height:30px;border-radius:50%;background:#0b66a8;display:flex;align-items:center;justify-content:center;font-size:.64rem;font-weight:700;}
 .topicons .av .bdg{position:absolute;top:-3px;right:-3px;background:#e23b3b;color:#fff;font-size:.55rem;font-weight:700;border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;}
 
-/* ========== BANNER ========== */
+/* BANNER */
 .banner{position:relative;height:128px;background:linear-gradient(105deg,#002d4d 0%,#0a4f8c 55%,#0a6bb0 100%);color:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .banner .shape{position:absolute;border-radius:46% 54% 60% 40%;background:rgba(255,255,255,.045);}
 .banner .s1{width:360px;height:360px;left:8%;top:-150px;}
@@ -42,13 +39,12 @@ a{color:inherit;text-decoration:none;}
 .banner .edit{position:absolute;top:14px;right:22px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .banner .edit svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2;}
 
-/* ========== CATÁLOGO ========== */
+/* CATÁLOGO */
 .catalog{background:var(--gray-band);padding:2.4rem 1.5rem 3rem;min-height:60vh;}
 .catalog-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px 1fr;gap:1.5rem;}
 .cat-side{display:flex;flex-direction:column;gap:.1rem;}
 .cat-side .cs-item{padding:.7rem 1rem;font-size:.84rem;font-weight:600;color:var(--ink);cursor:pointer;border-radius:3px;}
 .cat-side .cs-item.active{background:#111;color:#fff;}
-.cat-side .cs-item:not(.active):hover{color:var(--blue);}
 .cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.6rem 1.4rem;align-content:start;}
 @media(max-width:900px){.catalog-inner{grid-template-columns:1fr;}}
 @media(max-width:600px){.cat-grid{grid-template-columns:1fr;}}
@@ -59,12 +55,12 @@ a{color:inherit;text-decoration:none;}
 .rt-item:hover .rt-t{color:var(--blue);text-decoration:underline;}
 .rt-item .rt-d{font-size:.78rem;color:#5a6b80;margin-top:.3rem;line-height:1.5;}
 
-/* ========== PAGE FOOTER ========== */
+/* FOOTER */
 .page-footer{background:#003a79;color:#cfe0f0;text-align:center;padding:1.6rem 1rem;font-size:.78rem;line-height:1.8;}
 .page-footer b{color:#fff;display:block;font-weight:700;}
 .page-footer .small{display:block;font-size:.68rem;opacity:.7;margin-top:.4rem;}
 
-/* ========== MODAL ========== */
+/* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,25,55,.55);z-index:50;align-items:flex-start;justify-content:center;padding:2.5rem 1rem;overflow-y:auto;}
 .overlay.on{display:flex;}
 .modal{background:#fff;border-radius:6px;width:100%;max-width:720px;box-shadow:0 24px 70px rgba(0,20,60,.35);display:flex;flex-direction:column;max-height:calc(100vh - 5rem);animation:pop .25s ease both;}
@@ -85,34 +81,33 @@ a{color:inherit;text-decoration:none;}
 .foot-help{font-size:.78rem;color:#0052cc;cursor:pointer;}
 .foot-actions{display:flex;gap:.4rem;align-items:center;}
 
-/* ===== campos estilo Jira ===== */
+/* CAMPOS estilo Jira */
 .jfield{margin-bottom:1.3rem;}
 .jfield.hidden{display:none;}
 .jlabel{display:block;font-size:.79rem;font-weight:700;color:var(--j-label);margin-bottom:.45rem;}
 .req{color:#de350b;font-weight:700;}
 .jhelp{font-size:.74rem;color:#6b778c;margin-top:.4rem;line-height:1.5;}
 .jdiv{height:1px;background:#dfe1e6;margin:1.5rem 0;}
-
-.jfield input[type=text],.jfield input[type=number],.jfield textarea{
+.jsection{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);font-weight:600;margin:1.5rem 0 1rem;padding-top:1.1rem;border-top:1px solid #dfe1e6;}
+.row2{display:flex;gap:.8rem;}.row2 > *{flex:1;}
+.jfield input[type=text],.jfield input[type=number],.jfield input[type=date],.jfield textarea{
   width:100%;padding:.55rem .7rem;border:1.6px solid var(--j-input-border);border-radius:4px;background:var(--j-input-bg);color:var(--j-text);
-  font-family:'Inter',Arial,sans-serif;font-size:.86rem;outline:none;transition:border-color .12s,box-shadow .12s,background .12s;
-}
-.jfield textarea{resize:vertical;min-height:90px;line-height:1.6;}
+  font-family:'Inter',Arial,sans-serif;font-size:.86rem;outline:none;transition:border-color .12s,box-shadow .12s,background .12s;}
+.jfield textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .jfield input:hover,.jfield textarea:hover{background:#fff;}
 .jfield input:focus,.jfield textarea:focus{background:#fff;border-color:var(--j-focus);box-shadow:0 0 0 1px var(--j-focus);}
 .jfield.invalid input,.jfield.invalid textarea{border-color:#de350b !important;box-shadow:0 0 0 1px #de350b !important;}
 .jfield.invalid .jsel-control{border-color:#de350b !important;box-shadow:0 0 0 1px #de350b !important;}
-.jfield.invalid .jradio-group{outline:1px solid #de350b;outline-offset:4px;border-radius:3px;}
-.jfield.invalid .drop{border-color:#de350b !important;}
+.jfield.invalid .jradio-group,.jfield.invalid .jcheck-group{outline:1px solid #de350b;outline-offset:4px;border-radius:3px;}
 
-/* data com ícone de calendário */
-.jdate{display:flex;align-items:stretch;border:1.6px solid var(--j-input-border);border-radius:4px;overflow:hidden;background:var(--j-input-bg);max-width:280px;transition:border-color .12s,box-shadow .12s;}
+/* date com ícone */
+.jdate{display:flex;align-items:stretch;border:1.6px solid var(--j-input-border);border-radius:4px;overflow:hidden;background:var(--j-input-bg);transition:border-color .12s,box-shadow .12s;}
 .jdate:focus-within{background:#fff;border-color:var(--j-focus);box-shadow:0 0 0 1px var(--j-focus);}
 .jdate .cal{display:flex;align-items:center;justify-content:center;width:38px;background:#f4f5f7;border-right:1px solid var(--j-input-border);flex-shrink:0;}
 .jdate .cal svg{width:16px;height:16px;fill:none;stroke:#42526e;stroke-width:1.8;}
 .jdate input{border:none !important;box-shadow:none !important;background:transparent !important;border-radius:0;}
 
-/* select estilo react-select (digita no próprio controle) */
+/* select react-select */
 .jsel{position:relative;}
 .jsel-control{display:flex;align-items:center;gap:.5rem;min-height:40px;padding:.35rem .7rem;background:var(--j-input-bg);border:1.6px solid var(--j-input-border);border-radius:4px;cursor:text;transition:background .12s,border-color .12s,box-shadow .12s;}
 .jsel-control:hover{background:#fff;}
@@ -131,39 +126,33 @@ a{color:inherit;text-decoration:none;}
 .jsel-opt.sel{background:#deebff;color:#0052cc;font-weight:500;}
 .jsel-empty{padding:.6rem .8rem;font-size:.8rem;color:#7a869a;}
 
-/* radios estilo Jira */
-.jradio-group{display:flex;flex-direction:column;gap:.6rem;margin-top:.15rem;}
-.jradio{display:flex;align-items:flex-start;gap:.6rem;cursor:pointer;font-size:.86rem;color:var(--j-text);}
-.jradio input{position:absolute;opacity:0;width:0;height:0;}
+/* radios e checkboxes */
+.jradio-group,.jcheck-group{display:flex;flex-direction:column;gap:.55rem;margin-top:.15rem;}
+.jradio,.jcheck{display:flex;align-items:flex-start;gap:.6rem;cursor:pointer;font-size:.86rem;color:var(--j-text);}
+.jradio input,.jcheck input{position:absolute;opacity:0;width:0;height:0;}
 .jr-circle{width:16px;height:16px;border-radius:50%;border:2px solid var(--j-radio-border);background:#fafbfc;flex-shrink:0;margin-top:2px;position:relative;transition:border-color .12s,background .12s;}
 .jradio:hover .jr-circle{border-color:#7a869a;}
 .jradio input:checked + .jr-circle{border-color:var(--j-focus);background:#fff;}
 .jradio input:checked + .jr-circle::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--j-focus);}
-.jradio input:focus-visible + .jr-circle{box-shadow:0 0 0 2px rgba(0,82,204,.35);}
+.jc-box{width:16px;height:16px;border-radius:3px;border:2px solid var(--j-radio-border);background:#fafbfc;flex-shrink:0;margin-top:2px;position:relative;transition:border-color .12s,background .12s;}
+.jcheck:hover .jc-box{border-color:#7a869a;}
+.jcheck input:checked + .jc-box{border-color:var(--j-focus);background:var(--j-focus);}
+.jcheck input:checked + .jc-box::after{content:'';position:absolute;left:4px;top:1px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
 .jr-text{line-height:1.5;}
-.jr-text small{display:block;color:#6b778c;font-size:.76rem;}
 
-/* callout Importante */
+/* callout / hint / docbox / dropzone / botões / sucesso */
 .callout{border-radius:4px;overflow:hidden;margin-bottom:1.4rem;border:1px solid #dfe1e6;}
 .callout-h{background:#0747a6;color:#fff;font-size:.78rem;font-weight:700;padding:.45rem .85rem;}
 .callout-b{background:#f4f5f7;color:#42526e;font-size:.8rem;padding:.7rem .85rem;line-height:1.6;}
 .callout-b b{color:#172b4d;}
-
-/* hint amarelo (dica de uso do campo) */
 .hint{background:var(--hint);border:1px solid var(--hint-line);border-radius:4px;padding:.6rem .75rem;margin-top:.5rem;font-size:.74rem;color:#6b5d12;line-height:1.55;}
-.hint b{color:#5a4d0a;}
-.hint ul{margin:.3rem 0 0 .9rem;padding:0;}
-.hint li{margin-bottom:.2rem;}
-
-/* caixa documentos a anexar (orientação) */
+.hint b{color:#5a4d0a;}.hint ul{margin:.3rem 0 0 .9rem;padding:0;}.hint li{margin-bottom:.2rem;}
 .docbox{background:#deebff;border:1px solid #b3d4ff;border-radius:4px;padding:.85rem .95rem;margin-bottom:1.3rem;}
 .docbox-h{font-size:.78rem;font-weight:700;color:#0747a6;margin-bottom:.45rem;display:flex;align-items:center;gap:.4rem;}
 .docbox-h svg{width:15px;height:15px;fill:none;stroke:#0747a6;stroke-width:2;}
 .docbox ul{margin:.2rem 0 0 1rem;padding:0;}
 .docbox li{font-size:.81rem;color:#172b4d;margin-bottom:.25rem;line-height:1.5;}
-.docbox .empty{font-size:.81rem;color:#42526e;}
-
-/* dropzone (campo de anexo) */
+.docbox li b{color:#0747a6;}
 .drop{border:1.6px dashed var(--j-input-border);border-radius:4px;padding:1.2rem;text-align:center;color:#6b778c;font-size:.8rem;cursor:pointer;background:var(--j-input-bg);transition:border-color .15s,background .15s;}
 .drop:hover{border-color:var(--j-focus);background:#fff;}
 .drop input{display:none;}
@@ -172,14 +161,10 @@ a{color:inherit;text-decoration:none;}
 .files{margin-top:.5rem;display:flex;flex-direction:column;gap:.3rem;}
 .file-pill{display:flex;align-items:center;gap:.5rem;background:#fff;border:1px solid #dfe1e6;border-radius:4px;padding:.35rem .6rem;font-size:.76rem;color:#172b4d;}
 .file-pill .rm{margin-left:auto;cursor:pointer;color:#6b778c;font-weight:700;border:none;background:none;font-size:.9rem;}
-
-/* botões rodapé Jira */
 .btn-criar{background:#172b4d;color:#fff;border:none;border-radius:4px;padding:.55rem 1.2rem;font-family:'Inter',Arial,sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:background .15s;}
 .btn-criar:hover{background:#0d1b33;}
 .btn-cancelar{background:none;border:none;color:#42526e;font-family:'Inter',Arial,sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;padding:.55rem .9rem;border-radius:4px;}
 .btn-cancelar:hover{background:#f4f5f7;}
-
-/* sucesso */
 .success{text-align:center;padding:1.4rem .5rem;}
 .success .sc-ic{width:54px;height:54px;border-radius:50%;background:rgba(54,179,126,.13);display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;}
 .success .sc-ic svg{width:28px;height:28px;fill:none;stroke:#36b37e;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
@@ -190,7 +175,6 @@ a{color:inherit;text-decoration:none;}
 </head>
 <body>
 
-<!-- ===== TOPBAR ===== -->
 <div class="topbar">
   <div class="crumbs">
     <a href="#">Portal de Serviços FGV</a><span class="sep">›</span>
@@ -209,19 +193,16 @@ a{color:inherit;text-decoration:none;}
   </div>
 </div>
 
-<!-- ===== BANNER ===== -->
 <div class="banner">
   <div class="shape s1"></div><div class="shape s2"></div><div class="shape s3"></div>
   <h1>Luiz, bem-vindo(a) ao Portal do CEPH</h1>
   <div class="edit"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
 </div>
 
-<!-- ===== CATÁLOGO ===== -->
 <div class="catalog">
   <div class="catalog-inner">
     <div class="cat-side">
       <div class="cs-item active">Portal do CEPH</div>
-      <div class="cs-item">Diretrizes e Súmulas</div>
     </div>
     <div class="cat-grid">
       <div class="rt-item" onclick="openModal('submissao')">
@@ -236,7 +217,6 @@ a{color:inherit;text-decoration:none;}
   </div>
 </div>
 
-<!-- ===== FOOTER ===== -->
 <div class="page-footer">
   <b>Copyright © 2026 FGV - Todos os Direitos Reservados.</b>
   Política de Privacidade
@@ -256,107 +236,193 @@ a{color:inherit;text-decoration:none;}
 
       <div class="callout">
         <div class="callout-h">Importante</div>
-        <div class="callout-b">A coleta de dados só pode ser iniciada <b>após</b> a emissão do parecer de aprovação pelo CEPH. Submeta com no mínimo <b>15 dias</b> de antecedência da reunião mensal.</div>
+        <div class="callout-b">Este portal capta as informações principais. O <b>formulário de submissão completo preenchido</b> e os demais documentos devem ser anexados no campo <b>Anexo</b>, ao final. A coleta de dados só pode iniciar <b>após</b> o parecer de aprovação do CEPH.</div>
       </div>
 
       <div class="req-note">Os campos obrigatórios estão marcados com asterisco <b class="req">*</b></div>
 
+      <!-- Resumo + cascata (topo) -->
+      <div class="jfield">
+        <label class="jlabel">Resumo <span class="req">*</span></label>
+        <input type="text" id="s-resumo" placeholder="Título / identificação do protocolo de pesquisa">
+      </div>
       <div class="jfield">
         <label class="jlabel">Nome da escola e/ou centro de pesquisa <span class="req">*</span></label>
         <div class="jsel" id="s-unidade"></div>
-        <div class="hint"><b>Dica de uso do campo</b><ul><li>A lista apresenta os valores em ordem alfabética. Comece digitando o nome de sua <b>Unidade</b> e selecione na lista.</li></ul></div>
+        <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Unidade</b> e selecione na lista.</li></ul></div>
       </div>
       <div class="jfield">
         <label class="jlabel">Digite o nome de sua área <span class="req">*</span></label>
         <div class="jsel" id="s-area"></div>
-        <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Área</b> e selecione na lista. Caso seja igual à Unidade, basta selecionar e seguir para a Equipe.</li><li>Listagem controlada pela SRH. Se identificar informação incorreta, abra um chamado neste portal.</li></ul></div>
+        <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Área</b> e selecione na lista. Listagem controlada pela SRH.</li></ul></div>
       </div>
       <div class="jfield">
         <label class="jlabel">Selecione a sua equipe <span class="req">*</span></label>
         <div class="jsel" id="s-equipe"></div>
-        <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Equipe</b> e selecione na lista. Caso seja igual à Área, basta selecionar e seguir.</li></ul></div>
+        <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Equipe</b> e selecione na lista.</li></ul></div>
       </div>
-
-      <div class="jdiv"></div>
-
       <div class="jfield">
-        <label class="jlabel">Tipo de trabalho <span class="req">*</span></label>
-        <div class="jsel" id="s-tipotrab"></div>
+        <label class="jlabel">Vínculo com a FGV <span class="req">*</span></label>
+        <div class="jsel" id="s-vinculo"></div>
       </div>
-      <div class="jfield hidden" id="f-orientador">
-        <label class="jlabel">Orientador(a) <span class="req">*</span></label>
+
+      <div class="jsection">Submissão</div>
+      <div class="jfield">
+        <label class="jlabel">Esta pesquisa já foi submetida ao CEPH anteriormente? <span class="req">*</span></label>
+        <div class="jradio-group" id="grp-jasub">
+          <label class="jradio"><input type="radio" name="jasub" value="sim" onchange="onJaSub()"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+          <label class="jradio"><input type="radio" name="jasub" value="nao" onchange="onJaSub()"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+        </div>
+      </div>
+      <div class="jfield hidden" id="f-protocolo">
+        <label class="jlabel">Número do protocolo anterior <span class="req">*</span></label>
+        <input type="text" id="s-protocolo" placeholder="Ex.: CEPH-2025-...">
+        <div style="height:.8rem"></div>
+        <label class="jlabel">Justificativa para nova submissão</label>
+        <textarea id="s-just-nova" placeholder="Por que está submetendo novamente."></textarea>
+      </div>
+
+      <div class="jsection">Projeto de pesquisa</div>
+      <div class="jfield">
+        <label class="jlabel">Natureza do trabalho <span class="req">*</span></label>
+        <div class="jsel" id="s-natureza"></div>
+      </div>
+      <div class="jfield hidden" id="f-orientacao">
+        <label class="jlabel">Curso ou programa <span class="req">*</span></label>
+        <input type="text" id="s-curso" placeholder="Ex.: Mestrado em Gestão Empresarial">
+        <div style="height:.8rem"></div>
+        <label class="jlabel">Orientador(a) / Supervisor(a) <span class="req">*</span></label>
         <input type="text" id="s-orientador" placeholder="Nome do(a) orientador(a)">
+        <div style="height:.8rem"></div>
+        <label class="jlabel">E-mail do(a) orientador(a) <span class="req">*</span></label>
+        <input type="text" id="s-orientador-email" placeholder="email@fgv.br">
+        <div class="jhelp">A anuência do(a) orientador(a) deve ser anexada junto com os documentos.</div>
       </div>
       <div class="jfield">
-        <label class="jlabel">Título do projeto <span class="req">*</span></label>
-        <input type="text" id="s-titulo" placeholder="Título da pesquisa">
+        <label class="jlabel">A pesquisa é financiada por alguma instituição? <span class="req">*</span></label>
+        <div class="jradio-group" id="grp-financ">
+          <label class="jradio"><input type="radio" name="financ" value="sim" onchange="onFinanc()"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+          <label class="jradio"><input type="radio" name="financ" value="nao" onchange="onFinanc()"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+        </div>
+      </div>
+      <div class="jfield hidden" id="f-financiador">
+        <label class="jlabel">Instituição financiadora <span class="req">*</span></label>
+        <input type="text" id="s-financiador" placeholder="Nome da instituição">
       </div>
       <div class="jfield">
-        <label class="jlabel">Objetivos e metodologia da pesquisa <span class="req">*</span></label>
-        <textarea id="s-objetivos" placeholder="Descreva, em resumo, o objetivo da pesquisa e como os dados serão coletados/tratados."></textarea>
+        <label class="jlabel">Objetivo da pesquisa (resumo) <span class="req">*</span></label>
+        <textarea id="s-objetivo" placeholder="Em termos claros, o que a pesquisa busca alcançar. O detalhamento vai no formulário anexado."></textarea>
+      </div>
+      <div class="row2">
+        <div class="jfield">
+          <label class="jlabel">Início da coleta <span class="req">*</span></label>
+          <div class="jdate"><span class="cal"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span><input type="date" id="s-data-inicio"></div>
+        </div>
+        <div class="jfield">
+          <label class="jlabel">Término da coleta</label>
+          <div class="jdate"><span class="cal"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span><input type="date" id="s-data-fim"></div>
+        </div>
+      </div>
+
+      <div class="jsection">Caracterização geral</div>
+      <div class="jfield">
+        <label class="jlabel">A pesquisa envolve interação direta com seres humanos? <span class="req">*</span></label>
+        <div class="jradio-group" id="grp-interacao">
+          <label class="jradio"><input type="radio" name="interacao" value="sim" onchange="onInteracao()"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+          <label class="jradio"><input type="radio" name="interacao" value="nao" onchange="onInteracao()"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+        </div>
+      </div>
+
+      <div id="blk-interacao" class="hidden">
+        <div class="jfield">
+          <label class="jlabel">Modalidades de interação <span class="req">*</span></label>
+          <div class="jcheck-group" id="grp-mod" onchange="onModOutro()">
+            <label class="jcheck"><input type="checkbox" name="mod" value="Entrevistas semiestruturadas"><span class="jc-box"></span><span class="jr-text">Entrevistas semiestruturadas</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="Questionários/surveys"><span class="jc-box"></span><span class="jr-text">Questionários / surveys</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="Grupo focal"><span class="jc-box"></span><span class="jr-text">Grupo focal</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="História oral"><span class="jc-box"></span><span class="jr-text">História oral</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="Pesquisa etnográfica"><span class="jc-box"></span><span class="jr-text">Pesquisa etnográfica</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="Pesquisa participativa"><span class="jc-box"></span><span class="jr-text">Pesquisa participativa</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="Pesquisa-ação"><span class="jc-box"></span><span class="jr-text">Pesquisa-ação</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="Observação"><span class="jc-box"></span><span class="jr-text">Observação</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="Observação participante"><span class="jc-box"></span><span class="jr-text">Observação participante</span></label>
+            <label class="jcheck"><input type="checkbox" name="mod" value="Outro"><span class="jc-box"></span><span class="jr-text">Outro</span></label>
+          </div>
+          <div class="jfield hidden" id="f-mod-outro" style="margin-top:.7rem;margin-bottom:0"><input type="text" id="s-mod-outro" placeholder="Especifique a modalidade"></div>
+        </div>
+        <div class="jfield">
+          <label class="jlabel">Quem são os participantes? <span class="req">*</span></label>
+          <div class="jcheck-group" id="grp-perfil" onchange="renderDocGuide()">
+            <label class="jcheck"><input type="checkbox" name="perfil" value="Pessoas a partir de 18 anos absolutamente capazes"><span class="jc-box"></span><span class="jr-text">Pessoas a partir de 18 anos absolutamente capazes</span></label>
+            <label class="jcheck"><input type="checkbox" name="perfil" value="incapazes"><span class="jc-box"></span><span class="jr-text">Pessoas incapazes (ex.: menores de 18 anos)</span></label>
+            <label class="jcheck"><input type="checkbox" name="perfil" value="assistencia"><span class="jc-box"></span><span class="jr-text">Pessoas que precisam de assistência</span></label>
+            <label class="jcheck"><input type="checkbox" name="perfil" value="vulnerabilidade"><span class="jc-box"></span><span class="jr-text">Pessoas em situação de vulnerabilidade</span></label>
+            <label class="jcheck"><input type="checkbox" name="perfil" value="indigenas"><span class="jc-box"></span><span class="jr-text">Populações indígenas</span></label>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="jfield"><label class="jlabel">Nº mínimo de participantes <span class="req">*</span></label><input type="number" id="s-npart-min" min="1" placeholder="Ex.: 120"></div>
+          <div class="jfield"><label class="jlabel">Nº máximo de participantes <span class="req">*</span></label><input type="number" id="s-npart-max" min="1" placeholder="Ex.: 240"></div>
+        </div>
+        <div class="jfield">
+          <label class="jlabel">Haverá gravação da interação? <span class="req">*</span></label>
+          <div class="jradio-group" id="grp-grav">
+            <label class="jradio"><input type="radio" name="grav" value="sim"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+            <label class="jradio"><input type="radio" name="grav" value="nao"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+          </div>
+        </div>
+        <div class="jfield">
+          <label class="jlabel">A pesquisa usa deception (engano)? <span class="req">*</span></label>
+          <div class="jradio-group" id="grp-decep">
+            <label class="jradio"><input type="radio" name="decep" value="sim"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+            <label class="jradio"><input type="radio" name="decep" value="nao"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+          </div>
+        </div>
+        <div class="jfield">
+          <label class="jlabel">Serão oferecidos incentivos / reembolsos? <span class="req">*</span></label>
+          <div class="jradio-group" id="grp-incent">
+            <label class="jradio"><input type="radio" name="incent" value="sim"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+            <label class="jradio"><input type="radio" name="incent" value="nao"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="jfield">
+        <label class="jlabel">Uso de documentos / dados secundários <span class="req">*</span></label>
+        <div class="jradio-group" id="grp-dadossec">
+          <label class="jradio"><input type="radio" name="dadossec" value="nao" onchange="renderDocGuide()"><span class="jr-circle"></span><span class="jr-text">Não haverá uso de dados secundários</span></label>
+          <label class="jradio"><input type="radio" name="dadossec" value="anonimizados" onchange="renderDocGuide()"><span class="jr-circle"></span><span class="jr-text">Uso de dados anonimizados</span></label>
+          <label class="jradio"><input type="radio" name="dadossec" value="identificados" onchange="renderDocGuide()"><span class="jr-circle"></span><span class="jr-text">Uso de dados identificados / identificáveis</span></label>
+        </div>
+      </div>
+
+      <div class="jsection">Tratamento de dados</div>
+      <div class="jfield">
+        <label class="jlabel">A pesquisa envolve dados pessoais sensíveis? <span class="req">*</span></label>
+        <div class="jradio-group" id="grp-sens">
+          <label class="jradio"><input type="radio" name="sens" value="sim"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+          <label class="jradio"><input type="radio" name="sens" value="nao"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+        </div>
+        <div class="jhelp">Sensíveis (LGPD art. 5º II): origem racial/étnica, religião, opinião política, saúde, vida sexual, dado genético/biométrico.</div>
       </div>
       <div class="jfield">
-        <label class="jlabel">Data prevista de início da coleta <span class="req">*</span></label>
-        <div class="jdate"><span class="cal"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span><input type="date" id="s-data"></div>
+        <label class="jlabel">Haverá uso de Inteligência Artificial no tratamento dos dados? <span class="req">*</span></label>
+        <div class="jradio-group" id="grp-ia">
+          <label class="jradio"><input type="radio" name="ia" value="sim"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
+          <label class="jradio"><input type="radio" name="ia" value="nao"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
+        </div>
       </div>
 
       <div class="jdiv"></div>
-
-      <div class="jfield">
-        <label class="jlabel">Tipo de submissão <span class="req">*</span></label>
-        <div class="jradio-group" id="grp-tiposub">
-          <label class="jradio"><input type="radio" name="tiposub" value="A" onchange="onTipoSub()"><span class="jr-circle"></span><span class="jr-text">A — Interação direta com participantes capazes</span></label>
-          <label class="jradio"><input type="radio" name="tiposub" value="B" onchange="onTipoSub()"><span class="jr-circle"></span><span class="jr-text">B — Interação direta com menores ou incapazes</span></label>
-          <label class="jradio"><input type="radio" name="tiposub" value="C" onchange="onTipoSub()"><span class="jr-circle"></span><span class="jr-text">C — Uso de dados secundários identificáveis</span></label>
-        </div>
-        <div class="jhelp">Selecione conforme a natureza da pesquisa. O tipo define os campos e documentos exigidos a seguir.</div>
-      </div>
-
-      <!-- participantes (A/B) -->
-      <div class="cond cond-AB hidden">
-        <div class="jfield"><label class="jlabel">Perfil dos participantes <span class="req">*</span></label><input type="text" id="s-perfil" placeholder="Ex.: profissionais da área de saúde, estudantes universitários..."></div>
-        <div class="jfield"><label class="jlabel">Nº estimado de participantes <span class="req">*</span></label><input type="number" id="s-npart" min="1" placeholder="Ex.: 30"></div>
-      </div>
-
-      <!-- dados secundários (C) -->
-      <div class="cond cond-C hidden">
-        <div class="jfield"><label class="jlabel">Descrição dos dados/documentos secundários <span class="req">*</span></label><textarea id="s-desc-dados" placeholder="Quais dados/documentos serão consultados e quais variáveis serão utilizadas."></textarea></div>
-        <div class="jfield"><label class="jlabel">A base de dados é pública ou de acesso restrito? <span class="req">*</span></label><div class="jsel" id="s-base"></div></div>
-      </div>
-
-      <!-- tratamento de dados (qualquer tipo) -->
-      <div class="cond cond-any hidden">
-        <div class="jfield">
-          <label class="jlabel">A pesquisa envolve dados pessoais sensíveis? <span class="req">*</span></label>
-          <div class="jradio-group" id="grp-sens">
-            <label class="jradio"><input type="radio" name="sens" value="sim" onchange="onSens()"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
-            <label class="jradio"><input type="radio" name="sens" value="nao" onchange="onSens()"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
-          </div>
-          <div class="jhelp">Sensíveis: origem racial/étnica, convicção religiosa, opinião política, saúde, vida sexual, dado genético/biométrico (LGPD art. 5º, II).</div>
-        </div>
-        <div class="jfield hidden" id="f-sensiveis"><label class="jlabel">Justifique a coleta de dados sensíveis <span class="req">*</span></label><textarea id="s-just-sensiveis" placeholder="Por que a coleta é necessária e como os riscos serão mitigados."></textarea></div>
-        <div class="jfield">
-          <label class="jlabel">Haverá uso de Inteligência Artificial no tratamento dos dados? <span class="req">*</span></label>
-          <div class="jradio-group" id="grp-ia">
-            <label class="jradio"><input type="radio" name="ia" value="sim" onchange="onIa()"><span class="jr-circle"></span><span class="jr-text">Sim</span></label>
-            <label class="jradio"><input type="radio" name="ia" value="nao" onchange="onIa()"><span class="jr-circle"></span><span class="jr-text">Não</span></label>
-          </div>
-        </div>
-        <div class="jfield hidden" id="f-ia"><label class="jlabel">Qual ferramenta e como garante a não-incorporação dos dados? <span class="req">*</span></label><textarea id="s-desc-ia" placeholder="Ferramenta utilizada e medida que impede o uso dos dados para treinar o modelo."></textarea></div>
-      </div>
-
-      <div class="jdiv"></div>
-
-      <!-- orientação de documentos (texto) + ANEXO ÚNICO -->
       <div class="docbox" id="docGuide">
-        <div class="docbox-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>Documentos a anexar</div>
-        <div id="docGuideBody"><div class="empty">Selecione o tipo de submissão para ver os documentos que devem ser anexados.</div></div>
+        <div class="docbox-h"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Documentos a anexar</div>
+        <div id="docGuideBody"></div>
       </div>
       <div class="jfield">
-        <label class="jlabel">Anexo <span class="req" id="anexo-req">*</span></label>
+        <label class="jlabel">Anexo <span class="req">*</span></label>
         <div class="drop" data-file="anexo"><div class="di"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Arraste e solte arquivos, cole capturas de tela ou navegue</div><input type="file" multiple></div>
         <div class="files"></div>
-        <div class="jhelp">Anexe <b>todos os documentos</b> exigidos neste único campo. Formatos: PDF ou DOCX. Até 10 MB por arquivo.</div>
+        <div class="jhelp">Anexe <b>todos os documentos</b> aqui (PDF/DOCX). Comece pelo <b>formulário de submissão completo preenchido</b>.</div>
       </div>
 
      </div>
@@ -382,12 +448,12 @@ a{color:inherit;text-decoration:none;}
     <div class="modal-body">
      <div class="modal-body-inner" id="body-duvidas">
       <div class="req-note">Os campos obrigatórios estão marcados com asterisco <b class="req">*</b></div>
+      <div class="jfield"><label class="jlabel">Resumo <span class="req">*</span></label><input type="text" id="d-assunto" placeholder="Resuma sua dúvida"></div>
       <div class="jfield">
         <label class="jlabel">Nome da escola e/ou centro de pesquisa <span class="req">*</span></label>
         <div class="jsel" id="d-unidade"></div>
         <div class="hint"><b>Dica de uso do campo</b><ul><li>Comece digitando o nome de sua <b>Unidade</b> e selecione na lista.</li></ul></div>
       </div>
-      <div class="jfield"><label class="jlabel">Assunto <span class="req">*</span></label><input type="text" id="d-assunto" placeholder="Resuma sua dúvida"></div>
       <div class="jfield"><label class="jlabel">Sua dúvida <span class="req">*</span></label><textarea id="d-desc" placeholder="Descreva sua dúvida com o máximo de detalhes."></textarea></div>
       <div class="jfield"><label class="jlabel">Anexo (opcional)</label><div class="drop" data-file="dext"><div class="di"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Arraste e solte arquivos, cole capturas de tela ou navegue</div><input type="file" multiple></div><div class="files"></div></div>
      </div>
@@ -403,7 +469,7 @@ a{color:inherit;text-decoration:none;}
 </div>
 
 <script>
-/* ===== dados cascata (amostra ilustrativa; escolas como Unidade) ===== */
+/* ===== dados ===== */
 var CASCADE = {
   "EAESP — Esc. de Administração de Empresas de SP": {
     "Pós-Graduação": ["CMAE — Mestrado Acadêmico","CDAE — Doutorado","MPGC — Mestrado Profissional"],
@@ -411,31 +477,22 @@ var CASCADE = {
     "Centros de Estudo": ["FGVcepesp","FGVcemif","FGVethics","Pesquisa e Publicações"]
   },
   "EBAPE — Esc. Bras. de Adm. Pública e de Empresas": {
-    "Pós-Graduação": ["Mestrado Acadêmico","Mestrado Profissional","Doutorado"],
-    "Pesquisa": ["Pesquisa e Publicações","Centros EBAPE"]
+    "Pós-Graduação": ["Mestrado Acadêmico","Mestrado Profissional","Doutorado"], "Pesquisa": ["Pesquisa e Publicações","Centros EBAPE"]
   },
-  "EPGE — Esc. Bras. de Economia e Finanças": {
-    "Pós-Graduação": ["Mestrado em Economia","Doutorado em Economia"], "Graduação": ["Graduação em Economia"]
-  },
-  "EESP — Esc. de Economia de SP": {
-    "Pós-Graduação": ["Mestrado Profissional","Mestrado Acadêmico","Doutorado"], "Graduação": ["Graduação em Economia"]
-  },
-  "Direito Rio — Esc. de Direito do RJ": {
-    "Graduação": ["Coordenação Executiva de Ensino","Graduação em Direito"], "Pós-Graduação": ["Mestrado","Doutorado"]
-  },
-  "Direito SP — Esc. de Direito de SP (FGVLaw)": {
-    "Graduação": ["Graduação em Direito"], "Pós-Graduação": ["Mestrado Profissional","FGVLaw"]
-  },
+  "EPGE — Esc. Bras. de Economia e Finanças": { "Pós-Graduação": ["Mestrado em Economia","Doutorado em Economia"], "Graduação": ["Graduação em Economia"] },
+  "EESP — Esc. de Economia de SP": { "Pós-Graduação": ["Mestrado Profissional","Mestrado Acadêmico","Doutorado"], "Graduação": ["Graduação em Economia"] },
+  "Direito Rio — Esc. de Direito do RJ": { "Graduação": ["Coordenação Executiva de Ensino","Graduação em Direito"], "Pós-Graduação": ["Mestrado","Doutorado"] },
+  "Direito SP — Esc. de Direito de SP (FGVLaw)": { "Graduação": ["Graduação em Direito"], "Pós-Graduação": ["Mestrado Profissional","FGVLaw"] },
   "CPDOC — Esc. de Ciências Sociais": { "Pesquisa": ["PPHPBC — Pós-Graduação","Núcleo de Pesquisa"] },
   "IBRE — Inst. Bras. de Economia": { "Pesquisa Econômica": ["Pesquisa Aplicada","Sondagens e Índices"] }
 };
-var TIPO_TRAB = ["Trabalho de conclusão (graduação)","Dissertação (mestrado)","Tese (doutorado)","Pesquisa de pós-doutorado","Projeto docente / institucional"];
-var BASE_OPTS = ["Pública","Privada / de acesso restrito"];
+var VINCULO = ["Funcionário(a)","Professor(a)","Aluno(a)","Bolsista","Prestador(a) de serviços","Outro"];
+var NATUREZA = ["Trabalho de conclusão de curso (monografia)","Iniciação científica","Projeto de extensão","Trabalho de disciplina","Dissertação (mestrado)","Tese (doutorado)","Pesquisa de pós-doutorado","Projeto docente / institucional"];
+var NAT_SEM_ORIENTADOR = "Projeto docente / institucional";
 
-var ORIG = {};   // guarda o HTML original de cada modal para reabrir limpo
-var FILES = {};  // arquivos por dropzone
+var ORIG = {}; var FILES = {};
 
-/* ===== componente select estilo react-select (digita no controle) ===== */
+/* ===== select react-select ===== */
 function makeSelect(id, conf){
   var box=document.getElementById(id); if(!box) return;
   box.classList.add('jsel'); box.classList.remove('disabled','open');
@@ -489,20 +546,14 @@ function bindDrops(scopeSel){
   });
 }
 
-/* ===== modais (restaura HTML original ao abrir → some o bug de reabrir) ===== */
-function openModal(name){
-  var ov=document.getElementById('ov-'+name), modal=ov.querySelector('.modal');
-  modal.innerHTML=ORIG[name];
-  initModal(name);
-  ov.classList.add('on'); document.body.style.overflow='hidden';
-}
+/* ===== modais ===== */
+function openModal(name){ var ov=document.getElementById('ov-'+name), modal=ov.querySelector('.modal'); modal.innerHTML=ORIG[name]; initModal(name); ov.classList.add('on'); document.body.style.overflow='hidden'; }
 function closeModal(name){ document.getElementById('ov-'+name).classList.remove('on'); document.body.style.overflow=''; }
-
 function initModal(name){
   if(name==='submissao'){
     buildCascade('s');
-    makeSelect('s-tipotrab',{placeholder:'Selecione...', getOptions:function(){ return TIPO_TRAB; }, onSelect:function(v){ onTipoTrab(v); }});
-    makeSelect('s-base',{placeholder:'Selecione...', getOptions:function(){ return BASE_OPTS; }, onSelect:function(v){ onBase(v); }});
+    makeSelect('s-vinculo',{placeholder:'Selecione...', getOptions:function(){ return VINCULO; }});
+    makeSelect('s-natureza',{placeholder:'Selecione...', getOptions:function(){ return NATUREZA; }, onSelect:function(v){ onNatureza(v); }});
     bindDrops('#ov-submissao');
     renderDocGuide();
   } else {
@@ -511,93 +562,84 @@ function initModal(name){
   }
 }
 
-/* ===== lógica condicional ===== */
-function onTipoTrab(v){ var aluno=(v.indexOf('conclus')>-1||v.indexOf('Dissert')>-1||v.indexOf('Tese')>-1); document.getElementById('f-orientador').classList.toggle('hidden', !aluno); }
-function currentTipoSub(){ var r=document.querySelector('input[name="tiposub"]:checked'); return r?r.value:''; }
-function onTipoSub(){
-  var t=currentTipoSub();
-  document.querySelectorAll('#ov-submissao .cond').forEach(function(el){
-    var show=false;
-    if(el.classList.contains('cond-any')) show=!!t;
-    if(el.classList.contains('cond-AB')) show=(t==='A'||t==='B');
-    if(el.classList.contains('cond-C')) show=(t==='C');
-    el.classList.toggle('hidden', !show);
-  });
-  document.getElementById('grp-tiposub').closest('.jfield').classList.remove('invalid');
-  renderDocGuide();
-}
-function onSens(){ var v=(document.querySelector('input[name="sens"]:checked')||{}).value; document.getElementById('f-sensiveis').classList.toggle('hidden', v!=='sim'); document.getElementById('grp-sens').closest('.jfield').classList.remove('invalid'); }
-function onIa(){ var v=(document.querySelector('input[name="ia"]:checked')||{}).value; document.getElementById('f-ia').classList.toggle('hidden', v!=='sim'); document.getElementById('grp-ia').closest('.jfield').classList.remove('invalid'); }
-function onBase(v){ renderDocGuide(); }
+/* ===== condicionais (estilo Bundle Fields) ===== */
+function val(name){ var r=document.querySelector('input[name="'+name+'"]:checked'); return r?r.value:''; }
+function getChecks(name){ return [].map.call(document.querySelectorAll('input[name="'+name+'"]:checked'), function(c){ return c.value; }); }
+function clearInvalidGrp(id){ var el=document.getElementById(id); if(el) el.closest('.jfield').classList.remove('invalid'); }
 
-/* ===== orientação de documentos + obrigatoriedade do anexo ===== */
-function anexoObrigatorio(){
-  var t=currentTipoSub();
-  if(t==='A'||t==='B') return true;
-  if(t==='C') return document.getElementById('s-base')._value()==='Privada / de acesso restrito';
-  return false;
-}
+function onJaSub(){ document.getElementById('f-protocolo').classList.toggle('hidden', val('jasub')!=='sim'); clearInvalidGrp('grp-jasub'); }
+function onFinanc(){ document.getElementById('f-financiador').classList.toggle('hidden', val('financ')!=='sim'); clearInvalidGrp('grp-financ'); }
+function onNatureza(v){ var show = v && v!==NAT_SEM_ORIENTADOR; document.getElementById('f-orientacao').classList.toggle('hidden', !show); }
+function onInteracao(){ document.getElementById('blk-interacao').classList.toggle('hidden', val('interacao')!=='sim'); clearInvalidGrp('grp-interacao'); renderDocGuide(); }
+function onModOutro(){ var outro=[].some.call(document.querySelectorAll('input[name="mod"]'), function(c){ return c.value==='Outro' && c.checked; }); document.getElementById('f-mod-outro').classList.toggle('hidden', !outro); clearInvalidGrp('grp-mod'); }
+
 function renderDocGuide(){
-  var t=currentTipoSub(), body=document.getElementById('docGuideBody');
-  var req=document.getElementById('anexo-req');
-  if(!t){ body.innerHTML='<div class="empty">Selecione o tipo de submissão para ver os documentos que devem ser anexados.</div>'; if(req) req.style.display='none'; return; }
-  var docs=[];
-  if(t==='A'){ docs=['Instrumento de coleta (questionário/roteiro)','Termo de Consentimento Livre e Esclarecido (TCLE)']; }
-  if(t==='B'){ docs=['Instrumento de coleta (questionário/roteiro)','TCLE do responsável','Termo de Assentimento (TALE)']; }
-  if(t==='C'){
-    if(document.getElementById('s-base')._value()==='Privada / de acesso restrito') docs=['Comprovação de autorização de acesso aos dados'];
-    else docs=[];
+  var body=document.getElementById('docGuideBody'); if(!body) return;
+  var docs=['<b>Formulário de Submissão completo preenchido</b> (.docx)'];
+  var interacao = val('interacao')==='sim';
+  var perfil = getChecks('perfil');
+  if(interacao){
+    docs.push('Instrumento de coleta (questionário/roteiro)');
+    docs.push('Termo de Consentimento Livre e Esclarecido (TCLE)');
+    if(perfil.indexOf('incapazes')>-1 || perfil.indexOf('assistencia')>-1) docs.push('Termo de Assentimento (TALE) + TCLE do responsável');
   }
-  if(!docs.length){ body.innerHTML='<div class="empty">Para este tipo, não há documento de anexo obrigatório. Anexe documentos complementares se houver.</div>'; }
-  else { body.innerHTML='<div style="font-size:.79rem;color:#42526e;margin-bottom:.3rem;">Anexe os seguintes documentos no campo <b>Anexo</b> abaixo:</div><ul>'+docs.map(function(d){ return '<li>'+d+'</li>'; }).join('')+'</ul>'; }
-  if(req) req.style.display = anexoObrigatorio()? 'inline':'none';
+  var nat=document.getElementById('s-natureza'); var natV=nat?nat._value():'';
+  if(natV && natV!==NAT_SEM_ORIENTADOR) docs.push('Anuência do(a) orientador(a)');
+  if(val('dadossec')==='identificados') docs.push('Comprovação de autorização de acesso aos dados');
+  body.innerHTML='<div style="font-size:.79rem;color:#42526e;margin-bottom:.3rem;">Anexe os seguintes documentos no campo <b>Anexo</b> abaixo:</div><ul>'+docs.map(function(d){ return '<li>'+d+'</li>'; }).join('')+'</ul>';
 }
 
-/* ===== validação + submit ===== */
+/* ===== validação ===== */
 function clearInvalids(scope){ document.querySelectorAll('#'+scope+' .jfield.invalid').forEach(function(f){ f.classList.remove('invalid'); }); }
 function reqText(id){ var el=document.getElementById(id); if(!el.value.trim()){ el.closest('.jfield').classList.add('invalid'); return false; } return true; }
 function reqNum(id){ var el=document.getElementById(id); var n=parseInt(el.value,10); if(isNaN(n)||n<1){ el.closest('.jfield').classList.add('invalid'); return false; } return true; }
 function reqSelect(id){ var box=document.getElementById(id); if(!box._value()){ box.closest('.jfield').classList.add('invalid'); return false; } return true; }
 function reqRadio(name, grpId){ if(!document.querySelector('input[name="'+name+'"]:checked')){ document.getElementById(grpId).closest('.jfield').classList.add('invalid'); return false; } return true; }
+function reqChecks(name, grpId){ if(!document.querySelectorAll('input[name="'+name+'"]:checked').length){ document.getElementById(grpId).closest('.jfield').classList.add('invalid'); return false; } return true; }
 function reqFile(key){ if(!(FILES[key]&&FILES[key].length)){ var d=document.querySelector('.drop[data-file="'+key+'"]'); if(d) d.closest('.jfield').classList.add('invalid'); return false; } return true; }
 
 function submitSubmissao(){
   clearInvalids('ov-submissao'); var ok=true;
+  ok=reqText('s-resumo')&&ok;
   ok=reqSelect('s-unidade')&&ok; ok=reqSelect('s-area')&&ok; ok=reqSelect('s-equipe')&&ok;
-  ok=reqSelect('s-tipotrab')&&ok;
-  if(!document.getElementById('f-orientador').classList.contains('hidden')) ok=reqText('s-orientador')&&ok;
-  ok=reqText('s-titulo')&&ok; ok=reqText('s-objetivos')&&ok; ok=reqText('s-data')&&ok;
-  ok=reqRadio('tiposub','grp-tiposub')&&ok;
-  var t=currentTipoSub();
-  if(t==='A'||t==='B'){ ok=reqText('s-perfil')&&ok; ok=reqNum('s-npart')&&ok; }
-  if(t==='C'){ ok=reqText('s-desc-dados')&&ok; ok=reqSelect('s-base')&&ok; }
-  if(t){
-    ok=reqRadio('sens','grp-sens')&&ok;
-    if((document.querySelector('input[name="sens"]:checked')||{}).value==='sim') ok=reqText('s-just-sensiveis')&&ok;
-    ok=reqRadio('ia','grp-ia')&&ok;
-    if((document.querySelector('input[name="ia"]:checked')||{}).value==='sim') ok=reqText('s-desc-ia')&&ok;
+  ok=reqSelect('s-vinculo')&&ok;
+  ok=reqRadio('jasub','grp-jasub')&&ok;
+  if(val('jasub')==='sim') ok=reqText('s-protocolo')&&ok;
+  ok=reqSelect('s-natureza')&&ok;
+  if(!document.getElementById('f-orientacao').classList.contains('hidden')){ ok=reqText('s-curso')&&ok; ok=reqText('s-orientador')&&ok; ok=reqText('s-orientador-email')&&ok; }
+  ok=reqRadio('financ','grp-financ')&&ok;
+  if(val('financ')==='sim') ok=reqText('s-financiador')&&ok;
+  ok=reqText('s-objetivo')&&ok;
+  ok=reqText('s-data-inicio')&&ok;
+  ok=reqRadio('interacao','grp-interacao')&&ok;
+  if(val('interacao')==='sim'){
+    ok=reqChecks('mod','grp-mod')&&ok;
+    ok=reqChecks('perfil','grp-perfil')&&ok;
+    ok=reqNum('s-npart-min')&&ok; ok=reqNum('s-npart-max')&&ok;
+    ok=reqRadio('grav','grp-grav')&&ok; ok=reqRadio('decep','grp-decep')&&ok; ok=reqRadio('incent','grp-incent')&&ok;
   }
-  if(anexoObrigatorio()) ok=reqFile('anexo')&&ok;
+  ok=reqRadio('dadossec','grp-dadossec')&&ok;
+  ok=reqRadio('sens','grp-sens')&&ok;
+  ok=reqRadio('ia','grp-ia')&&ok;
+  ok=reqFile('anexo')&&ok;
   if(!ok){ var first=document.querySelector('#ov-submissao .jfield.invalid'); if(first) first.scrollIntoView({behavior:'smooth',block:'center'}); return; }
   showSuccess('submissao','Submissão registrada','Seu protocolo foi recebido e entrará na triagem do CEPH. Você acompanhará tudo por este portal.','CEPH-');
 }
 function submitDuvidas(){
   clearInvalids('ov-duvidas'); var ok=true;
-  ok=reqSelect('d-unidade')&&ok; ok=reqText('d-assunto')&&ok; ok=reqText('d-desc')&&ok;
+  ok=reqText('d-assunto')&&ok; ok=reqSelect('d-unidade')&&ok; ok=reqText('d-desc')&&ok;
   if(!ok){ var first=document.querySelector('#ov-duvidas .jfield.invalid'); if(first) first.scrollIntoView({behavior:'smooth',block:'center'}); return; }
   showSuccess('duvidas','Dúvida registrada','Sua dúvida foi enviada ao CEPH. A resposta virá por este portal, com histórico completo.','CEPH-D-');
 }
-
-var PROTO_SEQ = 0;
+var PROTO_SEQ=0;
 function genProtocolo(prefix){ var d=new Date(); var p=function(n){ return n<10?'0'+n:n; }; PROTO_SEQ++; return prefix+d.getFullYear()+'-'+p(d.getMonth()+1)+p(d.getDate())+'-'+(100+PROTO_SEQ); }
 function showSuccess(modal, titulo, texto, prefix){
-  var inner=document.getElementById('ov-'+modal).querySelector('.modal-body-inner');
-  inner.innerHTML='<div class="success"><div class="sc-ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><h3>'+titulo+'</h3><p>'+texto+'</p><span class="protocolo">'+genProtocolo(prefix)+'</span></div>';
+  document.getElementById('ov-'+modal).querySelector('.modal-body-inner').innerHTML='<div class="success"><div class="sc-ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><h3>'+titulo+'</h3><p>'+texto+'</p><span class="protocolo">'+genProtocolo(prefix)+'</span></div>';
   document.querySelector('#ov-'+modal+' .foot-actions').innerHTML='<button class="btn-criar" onclick="closeModal(\''+modal+'\')">Fechar</button>';
   document.querySelector('#ov-'+modal+' .foot-help').style.visibility='hidden';
 }
 
-/* ===== captura o HTML original dos modais (antes de qualquer init) ===== */
+/* ===== captura HTML original ===== */
 ORIG['submissao']=document.getElementById('ov-submissao').querySelector('.modal').innerHTML;
 ORIG['duvidas']=document.getElementById('ov-duvidas').querySelector('.modal').innerHTML;
 </script>
