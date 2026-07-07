@@ -40,11 +40,19 @@
             max-width: 480px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             margin: auto;
+            position: relative;
         }
 
-        header { text-align: center; margin-bottom: 2rem; }
+        header { text-align: center; margin-bottom: 2rem; position: relative;}
         header h1 { font-size: 1.8rem; color: var(--primary-color); margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         header p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .auth-bar { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); align-items: center;}
+        .auth-bar button { background: none; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 8px; cursor: pointer; font-size: 0.75rem;}
+        .auth-bar button:hover { background: var(--primary-color); color: #000; }
+        
+        .adm-btn { border-color: var(--success) !important; color: var(--success) !important; margin-right: 0.5rem;}
+        .adm-btn:hover { background: var(--success) !important; color: #000 !important; }
 
         .instruction-text { color: var(--primary-color); font-size: 1rem; margin-bottom: 0.8rem; text-align: left; font-weight: 600; }
         .date-container { margin-bottom: 2rem; text-align: left; }
@@ -57,6 +65,7 @@
         .participants-list {
             display: flex; flex-direction: column; gap: 1rem; background: rgba(0,0,0,0.2);
             padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);
+            max-height: 250px; overflow-y: auto;
         }
         .participant-item { display: flex; align-items: center; gap: 1rem; }
         .participant-checkbox { width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary-color); }
@@ -69,6 +78,9 @@
         .primary-btn { background: var(--primary-color); color: #3e2723; box-shadow: 0 4px 15px rgba(255, 213, 79, 0.3); }
         .primary-btn:active { transform: translateY(2px); }
         .secondary-btn { background: rgba(255,255,255,0.1); color: var(--primary-color); border: 1px solid var(--primary-color); margin-top: 1rem; }
+        
+        .danger-btn { background: rgba(239, 83, 80, 0.1); color: var(--danger); border: 1px solid var(--danger); margin-top: 1rem; width: 100%; padding: 1rem; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .danger-btn:hover { background: var(--danger); color: white; }
 
         .result-container {
             margin-top: 2rem; text-align: center; padding: 2rem 1rem; background: rgba(0,0,0,0.4);
@@ -85,7 +97,7 @@
             margin-bottom: 1.5rem;
             animation: popIn 1s;
         }
-        .cpf-box span { color: var(--text-main); font-size: 1.3rem; font-weight: 800; letter-spacing: 1px; display: block; margin-top: 0.5rem;}
+        .cpf-box span { color: var(--text-main); font-size: 1.1rem; font-weight: 800; letter-spacing: 1px; display: block; margin-top: 0.5rem;}
         .cpf-box small { color: var(--primary-color); font-weight: 600;}
 
         .hidden { display: none !important; }
@@ -138,7 +150,7 @@
 
         .empty-msg { text-align: center; color: var(--text-muted); font-size: 0.9rem; font-style: italic; }
 
-        /* Modal de Edição */
+        /* Modais */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
@@ -147,6 +159,7 @@
         .modal-content {
             background: var(--surface-color); border: 1px solid var(--primary-color); border-radius: 20px;
             padding: 1.5rem; width: 100%; max-width: 400px;
+            max-height: 90vh; overflow-y: auto;
         }
         .modal-content h3 { color: var(--primary-color); margin-bottom: 1.5rem; font-size: 1.3rem; text-align: center; }
         .modal-field { margin-bottom: 1.5rem; }
@@ -155,10 +168,55 @@
         
         .modal-actions { display: flex; gap: 1rem; margin-top: 2rem;}
         .modal-actions button { margin: 0; padding: 0.8rem; }
+        
+        /* Auth Screen */
+        .auth-container { text-align: center; }
+        .auth-container input { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 1rem; border-radius: 12px; width: 100%; color: white; margin-bottom: 1rem; font-size: 1rem;}
+        .auth-links { margin-top: 1.5rem; font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .auth-links a { color: var(--primary-color); text-decoration: none; cursor: pointer; }
+        .auth-links a:hover { text-decoration: underline; }
+        
+        .adm-section { border: 1px dashed var(--primary-color); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; background: rgba(0,0,0,0.3);}
+        .adm-section h4 { color: var(--primary-color); margin-bottom: 1rem; font-size: 1rem; }
+        .inline-form { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .inline-form input { flex: 1; padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white;}
+        .inline-form button { background: var(--success); color: #000; font-weight: bold; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer;}
+        .adm-participant-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .adm-participant-item { display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 0.5rem 1rem; border-radius: 8px; align-items: center;}
+        .adm-remove-btn { color: var(--danger); cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="app-container">
+    
+    <!-- TELA DE AUTENTICAÇÃO -->
+    <div class="app-container" id="auth-screen">
+        <header>
+            <h1>Quem Paga? ☕</h1>
+            <p>Acesso Restrito</p>
+        </header>
+        <div class="auth-container">
+            <input type="email" id="auth-email" placeholder="E-mail">
+            <input type="password" id="auth-password" placeholder="Senha">
+            <button id="auth-login-btn" class="primary-btn">Entrar</button>
+            
+            <div class="auth-links">
+                <a id="auth-register-btn">Não tem conta? Criar conta</a>
+                <a id="auth-reset-btn">Esqueci minha senha</a>
+            </div>
+            <div id="auth-msg" style="color: var(--danger); margin-top: 1rem; font-size: 0.9rem;"></div>
+        </div>
+    </div>
+
+    <!-- TELA PRINCIPAL (APP) -->
+    <div class="app-container hidden" id="main-app">
+        <div class="auth-bar">
+            <span id="user-email-display">usuario@email.com</span>
+            <div>
+                <button class="adm-btn" id="open-adm-btn">Área ADM</button>
+                <button id="logout-btn">Sair</button>
+            </div>
+        </div>
+        
         <header>
             <h1>Quem Paga? ☕</h1>
             <p>O tribunal oficial da Kopenhagen</p>
@@ -186,7 +244,7 @@
                 
                 <div id="cpf-box" class="cpf-box hidden">
                     <small>Fidelidade Kopenhagen (Kop Club)</small>
-                    <span>CPF: 106.567.097-40</span>
+                    <span>⚠️ Lembre-se de informar o CPF do Leo no balcão!</span>
                 </div>
 
                 <p id="winner-msg" class="hidden">Prepare a carteira! 💳</p>
@@ -225,7 +283,37 @@
         </main>
     </div>
 
-    <!-- Modal de Edição -->
+    <!-- Modal de Área ADM -->
+    <div id="adm-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Área Administrativa</h3>
+            
+            <div class="adm-section">
+                <h4>Participantes do Grupo</h4>
+                <div class="inline-form">
+                    <input type="text" id="new-participant-name" placeholder="Nome do novo membro">
+                    <button id="add-participant-btn">+</button>
+                </div>
+                <div class="adm-participant-list" id="adm-participant-list">
+                    <!-- Lista de participantes para remover -->
+                </div>
+            </div>
+
+            <div class="adm-section" style="border-color: #757575;">
+                <h4 style="color: #bdbdbd;">Trocar Senha</h4>
+                <div class="modal-field">
+                    <input type="password" id="adm-new-password" class="date-input" placeholder="Nova senha (min. 6 letras)">
+                </div>
+                <button id="adm-change-pwd-btn" class="secondary-btn" style="margin-top:0;">Atualizar Senha</button>
+            </div>
+
+            <div class="modal-actions">
+                <button id="close-adm-btn" class="primary-btn">Fechar Painel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição (CRUD) -->
     <div id="edit-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Editar Lançamento</h3>
@@ -259,6 +347,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCgvPP1pD5z7ew2r3UQNPWW1biT6EwO7S0",
@@ -269,12 +358,38 @@
             appId: "1:637591640131:web:aa08f616597e5375b85cf6"
         };
 
-        const participantNames = ["Leo", "Ademir", "Luiz", "André", "Samuel"];
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
         
+        let participantNames = []; // Agora é dinâmico
         let events = []; 
         let currentAggregates = {};
         let editingEventId = null;
 
+        // Referências do DOM (Auth)
+        const authScreen = document.getElementById("auth-screen");
+        const mainApp = document.getElementById("main-app");
+        const authEmail = document.getElementById("auth-email");
+        const authPassword = document.getElementById("auth-password");
+        const authLoginBtn = document.getElementById("auth-login-btn");
+        const authRegisterBtn = document.getElementById("auth-register-btn");
+        const authResetBtn = document.getElementById("auth-reset-btn");
+        const authMsg = document.getElementById("auth-msg");
+        const userEmailDisplay = document.getElementById("user-email-display");
+        const logoutBtn = document.getElementById("logout-btn");
+        
+        // Referências do DOM (ADM)
+        const admModal = document.getElementById("adm-modal");
+        const openAdmBtn = document.getElementById("open-adm-btn");
+        const closeAdmBtn = document.getElementById("close-adm-btn");
+        const newParticipantName = document.getElementById("new-participant-name");
+        const addParticipantBtn = document.getElementById("add-participant-btn");
+        const admParticipantList = document.getElementById("adm-participant-list");
+        const admNewPassword = document.getElementById("adm-new-password");
+        const admChangePwdBtn = document.getElementById("adm-change-pwd-btn");
+
+        // Referências do DOM (App Principal)
         const dateInput = document.getElementById("coffee-date");
         const listEl = document.getElementById("participants-list");
         const calcBtn = document.getElementById("calculate-btn");
@@ -285,12 +400,11 @@
         const cpfBox = document.getElementById("cpf-box");
         const winnerMsg = document.getElementById("winner-msg");
         const confirmBtn = document.getElementById("confirm-btn");
-        
         const statsTbody = document.getElementById("stats-tbody");
         const totalIdasBadge = document.getElementById("total-idas-badge");
         const historyList = document.getElementById("history-list");
 
-        // Elementos do Modal de Edição
+        // Elementos do Modal de Edição (CRUD)
         const editModal = document.getElementById("edit-modal");
         const editDateInput = document.getElementById("edit-date");
         const editParticipantsList = document.getElementById("edit-participants-list");
@@ -300,35 +414,162 @@
 
         let currentWinner = null;
         let currentPresent = [];
-        let db = null;
-        let coffeeDocRef = null;
+        let coffeeDocRef = doc(db, "coffee", "data_v3");
+        let configDocRef = doc(db, "coffee", "config_v3");
+        
+        let unsubData = null;
+        let unsubConfig = null;
 
-        function init() {
+        // =====================================
+        // AUTENTICAÇÃO E LOGIN
+        // =====================================
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authScreen.classList.add("hidden");
+                mainApp.classList.remove("hidden");
+                userEmailDisplay.textContent = user.email;
+                initApp();
+            } else {
+                authScreen.classList.remove("hidden");
+                mainApp.classList.add("hidden");
+                if (unsubData) unsubData();
+                if (unsubConfig) unsubConfig();
+            }
+        });
+
+        authLoginBtn.addEventListener("click", () => {
+            const email = authEmail.value;
+            const pass = authPassword.value;
+            if(!email || !pass) return showAuthMsg("Preencha e-mail e senha.");
+            signInWithEmailAndPassword(auth, email, pass)
+                .catch(err => showAuthMsg("Erro ao entrar: " + err.message));
+        });
+
+        authRegisterBtn.addEventListener("click", () => {
+            const email = authEmail.value;
+            const pass = authPassword.value;
+            if(!email || !pass) return showAuthMsg("Preencha e-mail e senha para registrar.");
+            createUserWithEmailAndPassword(auth, email, pass)
+                .then(() => alert("Conta criada com sucesso!"))
+                .catch(err => showAuthMsg("Erro ao criar: " + err.message));
+        });
+
+        authResetBtn.addEventListener("click", () => {
+            const email = authEmail.value;
+            if(!email) return showAuthMsg("Preencha o e-mail para recuperar a senha.");
+            sendPasswordResetEmail(auth, email)
+                .then(() => showAuthMsg("Link de redefinição enviado para o e-mail!"))
+                .catch(err => showAuthMsg("Erro ao recuperar: " + err.message));
+        });
+
+        logoutBtn.addEventListener("click", () => {
+            signOut(auth);
+        });
+
+        function showAuthMsg(msg) {
+            authMsg.textContent = msg;
+        }
+
+        // =====================================
+        // INICIALIZAÇÃO DO APP
+        // =====================================
+        function initApp() {
             const today = new Date().toISOString().split('T')[0];
             dateInput.value = today;
 
-            renderCheckboxes();
+            // Escuta as configurações (lista de participantes)
+            unsubConfig = onSnapshot(configDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    participantNames = docSnap.data().participants || [];
+                } else {
+                    participantNames = ["Leo", "Ademir", "Luiz", "André", "Samuel"]; // Padrão
+                    updateConfigCloud();
+                }
+                renderCheckboxes();
+                renderAdmParticipantList();
+                calculateAndRender();
+            });
 
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                coffeeDocRef = doc(db, "coffee", "data_v3");
-                
-                onSnapshot(coffeeDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        events = docSnap.data().events || [];
-                    } else {
-                        events = [];
-                        updateCloudData();
-                    }
-                    calculateAndRender();
-                });
-            } catch (e) {
-                console.error("Erro ao conectar no Firebase: ", e);
-            }
+            // Escuta os eventos (banco de dados)
+            unsubData = onSnapshot(coffeeDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    events = docSnap.data().events || [];
+                } else {
+                    events = [];
+                    updateCloudData();
+                }
+                calculateAndRender();
+            });
         }
 
+        // =====================================
+        // ÁREA ADM (Participantes e Senha)
+        // =====================================
+        openAdmBtn.addEventListener("click", () => {
+            admModal.classList.remove("hidden");
+            admNewPassword.value = "";
+        });
+
+        closeAdmBtn.addEventListener("click", () => {
+            admModal.classList.add("hidden");
+        });
+
+        admChangePwdBtn.addEventListener("click", () => {
+            const newPwd = admNewPassword.value;
+            if(newPwd.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+            updatePassword(auth.currentUser, newPwd)
+                .then(() => {
+                    alert("Senha alterada com sucesso!");
+                    admNewPassword.value = "";
+                })
+                .catch((err) => alert("Erro ao alterar senha. Talvez seja necessário fazer login novamente."));
+        });
+
+        function updateConfigCloud() {
+            setDoc(configDocRef, { participants: participantNames }).catch(console.error);
+        }
+
+        addParticipantBtn.addEventListener("click", () => {
+            const nome = newParticipantName.value.trim();
+            if(!nome) return;
+            if(participantNames.includes(nome)) return alert("Nome já existe.");
+            
+            participantNames.push(nome);
+            updateConfigCloud();
+            newParticipantName.value = "";
+        });
+
+        function renderAdmParticipantList() {
+            admParticipantList.innerHTML = "";
+            participantNames.forEach(p => {
+                const div = document.createElement("div");
+                div.className = "adm-participant-item";
+                div.innerHTML = `
+                    <span>${p}</span>
+                    <span class="adm-remove-btn" data-nome="${p}">Remover</span>
+                `;
+                admParticipantList.appendChild(div);
+            });
+
+            document.querySelectorAll(".adm-remove-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const nome = e.currentTarget.getAttribute("data-nome");
+                    if(confirm(`Remover ${nome} da lista atual?`)) {
+                        participantNames = participantNames.filter(n => n !== nome);
+                        updateConfigCloud();
+                    }
+                });
+            });
+        }
+
+        // =====================================
+        // LÓGICA PRINCIPAL (Cálculo e CRUD)
+        // =====================================
         function calculateAndRender() {
+            // Inicializa as métricas dinamicamente baseado nos eventos
+            currentAggregates = {};
+            
+            // Cria um dicionário base para os participantes ativos
             participantNames.forEach(p => {
                 currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0 };
             });
@@ -336,15 +577,16 @@
             events.forEach(ev => {
                 const numPresent = ev.present.length;
                 ev.present.forEach(p => {
-                    if(currentAggregates[p]) {
-                        currentAggregates[p].saldo += 1;
-                        currentAggregates[p].vezes_presente += 1;
-                    }
+                    // Adiciona na tabela se a pessoa fez parte do histórico, mesmo que já excluída da base
+                    if(!currentAggregates[p]) currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0 };
+                    
+                    currentAggregates[p].saldo += 1;
+                    currentAggregates[p].vezes_presente += 1;
                 });
-                if(currentAggregates[ev.payer]) {
-                    currentAggregates[ev.payer].saldo -= numPresent;
-                    currentAggregates[ev.payer].vezes_pagou += 1;
-                }
+                
+                if(!currentAggregates[ev.payer]) currentAggregates[ev.payer] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0 };
+                currentAggregates[ev.payer].saldo -= numPresent;
+                currentAggregates[ev.payer].vezes_pagou += 1;
             });
 
             renderStats();
@@ -377,9 +619,13 @@
             statsTbody.innerHTML = "";
             totalIdasBadge.textContent = `Total Idas: ${events.length}`;
 
+            // Ordena os maiores devedores primeiro
             const sorted = Object.entries(currentAggregates).sort((a, b) => b[1].saldo - a[1].saldo);
             
             sorted.forEach(([name, data]) => {
+                // Não mostra participantes antigos que tem saldo 0, 0 presenças e 0 pagamentos e não estão na lista ativa
+                if(data.vezes_presente === 0 && data.vezes_pagou === 0 && !participantNames.includes(name)) return;
+                
                 const tr = document.createElement("tr");
                 
                 let valClass = "val-neutral";
@@ -392,7 +638,7 @@
                 }
                 
                 tr.innerHTML = `
-                    <td class="left-align">${name}</td>
+                    <td class="left-align">${name} ${!participantNames.includes(name) ? '(Inativo)' : ''}</td>
                     <td class="${valClass}">${displayBal}</td>
                     <td>${data.vezes_presente}</td>
                     <td>${data.vezes_pagou}</td>
@@ -408,7 +654,7 @@
                 return;
             }
 
-            const sortedEvents = [...events].sort((a, b) => b.id - a.id);
+            const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedEvents.forEach(ev => {
                 const div = document.createElement("div");
@@ -429,7 +675,6 @@
                 historyList.appendChild(div);
             });
 
-            // Delete action
             document.querySelectorAll(".delete-btn").forEach(btn => {
                 btn.addEventListener("click", (e) => {
                     const idToDelete = parseInt(e.currentTarget.getAttribute("data-id"));
@@ -440,7 +685,6 @@
                 });
             });
 
-            // Edit action
             document.querySelectorAll(".edit-btn").forEach(btn => {
                 btn.addEventListener("click", (e) => {
                     const idToEdit = parseInt(e.currentTarget.getAttribute("data-id"));
@@ -450,7 +694,7 @@
         }
 
         // =====================================
-        // Lógica de Edição (Modal)
+        // EDIÇÃO CRUD MODAL
         // =====================================
         function openEditModal(eventId) {
             const ev = events.find(e => e.id === eventId);
@@ -459,9 +703,11 @@
             editingEventId = eventId;
             editDateInput.value = ev.date;
 
-            // Popular checkboxes
+            // Popular checkboxes unindo a lista atual + quem estava presente na época
             editParticipantsList.innerHTML = "";
-            participantNames.forEach(p => {
+            const allPossible = Array.from(new Set([...participantNames, ...ev.present]));
+            
+            allPossible.forEach(p => {
                 const isChecked = ev.present.includes(p) ? "checked" : "";
                 const div = document.createElement("div");
                 div.className = "participant-item";
@@ -475,7 +721,7 @@
 
             // Popular select do pagador
             editPayerSelect.innerHTML = "";
-            participantNames.forEach(p => {
+            allPossible.forEach(p => {
                 const selected = (ev.payer === p) ? "selected" : "";
                 editPayerSelect.innerHTML += `<option value="${p}" ${selected}>${p}</option>`;
             });
@@ -496,13 +742,11 @@
             const newPresent = Array.from(checkboxes).map(cb => cb.value);
             const newPayer = editPayerSelect.value;
 
-            if (newPresent.length === 0) {
-                alert("O lançamento precisa ter pelo menos 1 pessoa presente.");
-                return;
-            }
+            if (newPresent.length === 0) { alert("O lançamento precisa ter pelo menos 1 pessoa presente."); return; }
+            if (!newPresent.includes(newPayer)) { alert("O pagador da conta precisa estar entre os presentes!"); return; }
 
-            if (!newPresent.includes(newPayer)) {
-                alert("O pagador da conta precisa estar entre os presentes!");
+            if (events.some(e => e.date === newDate && e.id !== editingEventId)) {
+                alert("Já existe outro café registrado para esta mesma data!");
                 return;
             }
 
@@ -512,17 +756,19 @@
                 events[evIndex].date = newDate;
                 events[evIndex].present = newPresent;
                 events[evIndex].payer = newPayer;
-                updateCloudData(); // A mágica acontece aqui (onSnapshot recalcula tudo)
+                updateCloudData(); 
             }
 
             editModal.classList.add("hidden");
             editingEventId = null;
         });
+
         // =====================================
-
-
+        // ROLETAS E SORTEIO
+        // =====================================
         calcBtn.addEventListener("click", () => {
             if (!dateInput.value) { alert("Por favor, selecione a data!"); return; }
+            if (events.some(e => e.date === dateInput.value)) { alert("Já existe um café registrado para esta data!"); return; }
 
             const checkboxes = document.querySelectorAll(".participant-checkbox:checked");
             currentPresent = Array.from(checkboxes).map(cb => cb.value);
@@ -590,7 +836,6 @@
             currentWinner = null;
         });
 
-        init();
     </script>
 </body>
 </html>
