@@ -121,6 +121,11 @@
         .stats-table td.left-align { text-align: left; font-weight: 600; }
         .stats-table td { padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .stats-table tr:last-child td { border-bottom: none; }
+        .clickable-row { cursor: pointer; transition: background 0.2s; }
+        .clickable-row:hover { background: rgba(255, 213, 79, 0.1); }
+        .statement-box { background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 12px; font-size: 1.05rem; line-height: 1.6; text-align: left;}
+        .statement-box strong { color: var(--primary-color); }
+        .math-result { font-size: 1.3rem; text-align: center; margin-top: 1rem; border-top: 1px dashed var(--text-muted); padding-top: 1rem;}
 
         .val-positive { color: var(--danger); font-weight: bold; } 
         .val-negative { color: var(--success); font-weight: bold; } 
@@ -324,6 +329,19 @@
 
             <div class="modal-actions">
                 <button id="close-adm-btn" class="primary-btn">Fechar Painel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Explicação de Saldo -->
+    <div id="statement-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="statement-title">Entenda a Conta</h3>
+            <div id="statement-body" class="statement-box">
+                <!-- Preenchido via JS -->
+            </div>
+            <div class="modal-actions">
+                <button id="close-statement-btn" class="primary-btn">Entendi!</button>
             </div>
         </div>
     </div>
@@ -586,22 +604,22 @@
             
             // Cria um dicionário base para os participantes ativos
             participantNames.forEach(p => {
-                currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0 };
+                currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0 };
             });
 
             events.forEach(ev => {
                 const numPresent = ev.present.length;
                 ev.present.forEach(p => {
-                    // Adiciona na tabela se a pessoa fez parte do histórico, mesmo que já excluída da base
-                    if(!currentAggregates[p]) currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0 };
+                    if(!currentAggregates[p]) currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0 };
                     
                     currentAggregates[p].saldo += 1;
                     currentAggregates[p].vezes_presente += 1;
                 });
                 
-                if(!currentAggregates[ev.payer]) currentAggregates[ev.payer] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0 };
+                if(!currentAggregates[ev.payer]) currentAggregates[ev.payer] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0 };
                 currentAggregates[ev.payer].saldo -= numPresent;
                 currentAggregates[ev.payer].vezes_pagou += 1;
+                currentAggregates[ev.payer].cafes_pagos += numPresent;
             });
 
             renderStats();
@@ -658,8 +676,39 @@
                     <td>${data.vezes_presente}</td>
                     <td>${data.vezes_pagou}</td>
                 `;
+                tr.className = "clickable-row";
+                tr.title = "Clique para entender a matemática desta pessoa";
+                tr.addEventListener("click", () => openStatementModal(name, data));
                 statsTbody.appendChild(tr);
             });
+        }
+
+        const statementModal = document.getElementById("statement-modal");
+        const statementTitle = document.getElementById("statement-title");
+        const statementBody = document.getElementById("statement-body");
+        document.getElementById("close-statement-btn").addEventListener("click", () => statementModal.classList.add("hidden"));
+
+        function openStatementModal(name, data) {
+            statementTitle.textContent = `A Conta de ${name}`;
+            let expl = `<p>O VAR puxou a ficha do(a) <strong>${name}</strong>:</p><br>`;
+            expl += `<ul>`;
+            expl += `<li>☕ Tomou café <strong>${data.vezes_presente} vezes</strong>. A dívida subiu <strong>+${data.vezes_presente}</strong>.</li>`;
+            expl += `<li>💳 Pagou a conta <strong>${data.vezes_pagou} vezes</strong>. Nessas vezes, pagou um total de <strong>${data.cafes_pagos} cafés</strong> para a galera. A dívida desceu <strong>-${data.cafes_pagos}</strong>.</li>`;
+            expl += `</ul>`;
+            
+            let statusText = "";
+            if (data.saldo > 0) statusText = `🚨 ESTÁ DEVENDO! (+${data.saldo})`;
+            else if (data.saldo < 0) statusText = `😎 TEM CRÉDITO NA CASA! (${data.saldo})`;
+            else statusText = `⚖️ TUDO ZERADO! (0)`;
+
+            expl += `<div class="math-result">
+                Resumo da Matemática (Fácil):<br>
+                ${data.vezes_presente} (tomou) - ${data.cafes_pagos} (pagou) = <strong>${data.saldo}</strong><br><br>
+                ${statusText}
+            </div>`;
+
+            statementBody.innerHTML = expl;
+            statementModal.classList.remove("hidden");
         }
 
         function renderHistory() {
