@@ -150,6 +150,11 @@
 
         .empty-msg { text-align: center; color: var(--text-muted); font-size: 0.9rem; font-style: italic; }
 
+        .rules-box { background: rgba(0,0,0,0.3); border-left: 3px solid var(--primary-color); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; font-size: 0.85rem;}
+        .rules-box h4 { color: var(--primary-color); margin-bottom: 0.5rem;}
+        .rules-box ul { padding-left: 1.5rem; color: var(--text-muted); }
+        .rules-box li { margin-bottom: 0.3rem; }
+
         /* Modais */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -223,6 +228,16 @@
         </header>
 
         <main>
+            <div class="rules-box">
+                <h4>📜 Regras da Caverna (Para quem tem QI negativo entender)</h4>
+                <ul>
+                    <li>Toma café e NÃO paga? <strong>Dívida sobe (+1)</strong>.</li>
+                    <li>Paga a conta? <strong>Dívida desce (menos o número de macacos presentes)</strong>.</li>
+                    <li>Quem paga hoje? <strong>SEMPRE O MACACO COM A MAIOR DÍVIDA</strong>.</li>
+                    <li>Empatou a maior dívida? A roleta decide quem morre!</li>
+                </ul>
+            </div>
+
             <div class="date-container">
                 <p class="instruction-text">1. Informe a data do café:</p>
                 <input type="date" id="coffee-date" class="date-input">
@@ -796,10 +811,10 @@
                 
                 let reasonText = "";
                 if (tied.length === 1) {
-                    reasonText = `Motivo: É o maior devedor da mesa (+${maxBalance} cafés).`;
+                    reasonText = `UGA UGA! 🦍 VOCÊ TER MAIOR DÍVIDA NA TRIBO (+${maxBalance})! VOCÊ SER ESCOLHIDO PARA PAGAR!`;
                 } else {
-                    const tiedNames = tied.join(", ");
-                    reasonText = `Motivo: Empate de dívida (+${maxBalance}) entre ${tiedNames}. A roleta escolheu!`;
+                    const tiedNames = tied.join(" E ");
+                    reasonText = `UGA UGA! 🦍 EMPATE DE MAIOR DÍVIDA (+${maxBalance}) ENTRE MACACOS: ${tiedNames.toUpperCase()}! ROLETA GIRAR E VOCÊ PERDER! VOCÊ PAGAR HOJE!`;
                 }
                 
                 spinner.classList.add("hidden");
