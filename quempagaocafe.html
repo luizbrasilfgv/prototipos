@@ -229,11 +229,11 @@
 
         <main>
             <div class="rules-box">
-                <h4>📜 Regras da Caverna (Para quem tem QI negativo entender)</h4>
+                <h4>📜 Regras da Caverna (Para entender fácil)</h4>
                 <ul>
                     <li>Toma café e NÃO paga? <strong>Dívida sobe (+1)</strong>.</li>
-                    <li>Paga a conta? <strong>Dívida desce (menos o número de macacos presentes)</strong>.</li>
-                    <li>Quem paga hoje? <strong>SEMPRE O MACACO COM A MAIOR DÍVIDA</strong>.</li>
+                    <li>Paga a conta? <strong>Dívida desce (menos o número de pessoas presentes)</strong>.</li>
+                    <li>Quem paga hoje? <strong>SEMPRE QUEM TIVER A MAIOR DÍVIDA</strong>.</li>
                     <li>Empatou a maior dívida? A roleta decide quem morre!</li>
                 </ul>
             </div>
@@ -814,7 +814,7 @@
                     reasonText = `UGA UGA! 🦍 VOCÊ TER MAIOR DÍVIDA NA TRIBO (+${maxBalance})! VOCÊ SER ESCOLHIDO PARA PAGAR!`;
                 } else {
                     const tiedNames = tied.join(" E ");
-                    reasonText = `UGA UGA! 🦍 EMPATE DE MAIOR DÍVIDA (+${maxBalance}) ENTRE MACACOS: ${tiedNames.toUpperCase()}! ROLETA GIRAR E VOCÊ PERDER! VOCÊ PAGAR HOJE!`;
+                    reasonText = `UGA UGA! 🦍 EMPATE DE MAIOR DÍVIDA (+${maxBalance}) ENTRE: ${tiedNames.toUpperCase()}! ROLETA GIRAR E VOCÊ PERDER! VOCÊ PAGAR HOJE!`;
                 }
                 
                 spinner.classList.add("hidden");
