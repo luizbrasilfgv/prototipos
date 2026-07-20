@@ -322,8 +322,14 @@
             <div class="adm-section" style="border-color: #757575;">
                 <h4 style="color: #bdbdbd;">Trocar Senha</h4>
                 <div class="modal-field">
+                    <label style="color:#bdbdbd;">Senha atual (para confirmar identidade):</label>
+                    <input type="password" id="adm-current-password" class="date-input" placeholder="Digite sua senha atual">
+                </div>
+                <div class="modal-field">
+                    <label style="color:#bdbdbd;">Nova senha:</label>
                     <input type="password" id="adm-new-password" class="date-input" placeholder="Nova senha (min. 6 letras)">
                 </div>
+                <div id="adm-pwd-msg" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 0.5rem;"></div>
                 <button id="adm-change-pwd-btn" class="secondary-btn" style="margin-top:0;">Atualizar Senha</button>
             </div>
 
@@ -380,7 +386,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCgvPP1pD5z7ew2r3UQNPWW1biT6EwO750",
@@ -419,7 +425,9 @@
         const newParticipantName = document.getElementById("new-participant-name");
         const addParticipantBtn = document.getElementById("add-participant-btn");
         const admParticipantList = document.getElementById("adm-participant-list");
+        const admCurrentPassword = document.getElementById("adm-current-password");
         const admNewPassword = document.getElementById("adm-new-password");
+        const admPwdMsg = document.getElementById("adm-pwd-msg");
         const admChangePwdBtn = document.getElementById("adm-change-pwd-btn");
 
         // Referências do DOM (App Principal)
@@ -540,22 +548,47 @@
         // =====================================
         openAdmBtn.addEventListener("click", () => {
             admModal.classList.remove("hidden");
+            admCurrentPassword.value = "";
             admNewPassword.value = "";
+            admPwdMsg.textContent = "";
         });
 
         closeAdmBtn.addEventListener("click", () => {
             admModal.classList.add("hidden");
         });
 
-        admChangePwdBtn.addEventListener("click", () => {
+        admChangePwdBtn.addEventListener("click", async () => {
+            const currentPwd = admCurrentPassword.value;
             const newPwd = admNewPassword.value;
-            if(newPwd.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
-            updatePassword(auth.currentUser, newPwd)
-                .then(() => {
-                    alert("Senha alterada com sucesso!");
-                    admNewPassword.value = "";
-                })
-                .catch((err) => alert("Erro ao alterar senha. Talvez seja necessário fazer login novamente."));
+            admPwdMsg.textContent = "";
+
+            if(!currentPwd) { admPwdMsg.textContent = "⚠️ Digite sua senha atual para confirmar."; return; }
+            if(newPwd.length < 6) { admPwdMsg.textContent = "⚠️ A nova senha precisa ter pelo menos 6 caracteres."; return; }
+            if(currentPwd === newPwd) { admPwdMsg.textContent = "⚠️ A nova senha deve ser diferente da atual."; return; }
+
+            admChangePwdBtn.disabled = true;
+            admChangePwdBtn.textContent = "Aguarde...";
+
+            try {
+                const user = auth.currentUser;
+                const credential = EmailAuthProvider.credential(user.email, currentPwd);
+                await reauthenticateWithCredential(user, credential);
+                await updatePassword(user, newPwd);
+                admPwdMsg.style.color = "var(--success)";
+                admPwdMsg.textContent = "✅ Senha alterada com sucesso!";
+                admCurrentPassword.value = "";
+                admNewPassword.value = "";
+            } catch(err) {
+                admPwdMsg.style.color = "var(--danger)";
+                if(err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+                    admPwdMsg.textContent = "❌ Senha atual incorreta. Tente novamente.";
+                } else {
+                    admPwdMsg.textContent = "❌ Erro: " + err.message;
+                }
+            } finally {
+                admChangePwdBtn.disabled = false;
+                admChangePwdBtn.textContent = "Atualizar Senha";
+            }
         });
 
         function updateConfigCloud() {
