@@ -320,7 +320,7 @@
             </div>
 
             <div class="adm-section" style="border-color: #757575;">
-                <h4 style="color: #bdbdbd;">Trocar Senha</h4>
+                <h4 style="color: #bdbdbd;">Trocar Senha (minha conta)</h4>
                 <div class="modal-field">
                     <label style="color:#bdbdbd;">Senha atual (para confirmar identidade):</label>
                     <input type="password" id="adm-current-password" class="date-input" placeholder="Digite sua senha atual">
@@ -331,6 +331,16 @@
                 </div>
                 <div id="adm-pwd-msg" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 0.5rem;"></div>
                 <button id="adm-change-pwd-btn" class="secondary-btn" style="margin-top:0;">Atualizar Senha</button>
+            </div>
+
+            <div class="adm-section" style="border-color: #757575;">
+                <h4 style="color: #bdbdbd;">🔑 Resetar Senha de Usuário</h4>
+                <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Manda um link de redefinição para o e-mail de qualquer pessoa do grupo.</p>
+                <div class="inline-form">
+                    <input type="email" id="adm-reset-email" placeholder="e-mail do usuário (ex: leo@gmail.com)">
+                    <button id="adm-send-reset-btn">Enviar</button>
+                </div>
+                <div id="adm-reset-msg" style="font-size: 0.85rem; margin-top: 0.3rem;"></div>
             </div>
 
             <div class="modal-actions">
@@ -588,6 +598,36 @@
             } finally {
                 admChangePwdBtn.disabled = false;
                 admChangePwdBtn.textContent = "Atualizar Senha";
+            }
+        });
+
+        // Reset de senha de qualquer usuário (pelo admin)
+        const admResetEmail = document.getElementById("adm-reset-email");
+        const admSendResetBtn = document.getElementById("adm-send-reset-btn");
+        const admResetMsg = document.getElementById("adm-reset-msg");
+
+        admSendResetBtn.addEventListener("click", async () => {
+            const email = admResetEmail.value.trim();
+            admResetMsg.textContent = "";
+            if (!email) { admResetMsg.style.color = "var(--danger)"; admResetMsg.textContent = "⚠️ Digite o e-mail do usuário."; return; }
+
+            admSendResetBtn.disabled = true;
+            admSendResetBtn.textContent = "...";
+            try {
+                await sendPasswordResetEmail(auth, email);
+                admResetMsg.style.color = "var(--success)";
+                admResetMsg.textContent = `✅ Link enviado para ${email}! Avisa pra checar o spam.`;
+                admResetEmail.value = "";
+            } catch(err) {
+                admResetMsg.style.color = "var(--danger)";
+                if (err.code === "auth/user-not-found") {
+                    admResetMsg.textContent = "❌ E-mail não encontrado no sistema.";
+                } else {
+                    admResetMsg.textContent = "❌ Erro: " + err.message;
+                }
+            } finally {
+                admSendResetBtn.disabled = false;
+                admSendResetBtn.textContent = "Enviar";
             }
         });
 
