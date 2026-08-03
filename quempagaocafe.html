@@ -567,16 +567,25 @@
                         }
                     } else {
                         // Usuário logou, mas não tem doc na coleção (conta legada do Firebase Auth)
-                        getDocs(collection(db, 'users')).then(usersSnap => {
-                            const isFirstUser = usersSnap.empty;
-                            setDoc(userDocRef, {
-                                email: user.email,
-                                status: isFirstUser ? 'approved' : 'pending',
-                                roles: isFirstUser ? ['member', 'admin'] : ['member']
-                            }).catch(err => {
-                                console.error("Erro ao criar doc para usuário legado:", err);
+                        const isMaster = user.email === 'luizbrasil.rj@gmail.com';
+                        const fallbackRoles = isMaster ? ['member', 'admin'] : ['member'];
+                        
+                        setDoc(userDocRef, {
+                            email: user.email,
+                            status: isMaster ? 'approved' : 'pending',
+                            roles: fallbackRoles
+                        }).catch(err => {
+                            console.error("Erro ao criar doc para usuário legado:", err);
+                            // Se der erro de permissão no banco, libera visualmente na memória para não trancar o dono
+                            if (isMaster) {
+                                currentUserRoles = fallbackRoles;
+                                authScreen.classList.add("hidden");
+                                mainApp.classList.remove("hidden");
+                                openAdmBtn.style.display = 'inline-block';
+                                initApp();
+                            } else {
                                 auth.signOut();
-                            });
+                            }
                         });
                     }
                 });
@@ -605,16 +614,15 @@
             if(!email || !pass) return showAuthMsg("Preencha e-mail e senha para registrar.");
             createUserWithEmailAndPassword(auth, email, pass)
                 .then(async (userCred) => {
-                    const usersSnap = await getDocs(collection(db, 'users'));
-                    const isFirstUser = usersSnap.empty;
+                    const isMaster = email === 'luizbrasil.rj@gmail.com';
                     
                     await setDoc(doc(db, 'users', userCred.user.uid), {
                         email: email,
-                        status: isFirstUser ? 'approved' : 'pending',
-                        roles: isFirstUser ? ['member', 'admin'] : ['member']
-                    });
+                        status: isMaster ? 'approved' : 'pending',
+                        roles: isMaster ? ['member', 'admin'] : ['member']
+                    }).catch(e => console.error("Erro ao salvar perfil:", e));
                     
-                    alert(isFirstUser ? "Você é o primeiro usuário, ganhou acesso de ADM Master!" : "Conta criada! Aguarde a aprovação de um Gestor.");
+                    alert(isMaster ? "Você é o ADM Master, acesso liberado!" : "Conta criada! Aguarde a aprovação de um Gestor.");
                 })
                 .catch(err => showAuthMsg("Erro ao criar: " + err.message));
         });
