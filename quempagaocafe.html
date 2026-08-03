@@ -540,9 +540,8 @@
                         
                         // Migração automática de legacy "role" (string) para "roles" (array)
                         if (userData.role && !userData.roles) {
-                            const newRoles = userData.role === 'adm' ? ['member', 'admin'] : ['member'];
-                            await updateDoc(userDocRef, { roles: newRoles, role: null });
-                            return; // O onSnapshot será chamado novamente pós-update
+                            userData.roles = userData.role === 'adm' ? ['member', 'admin'] : ['member'];
+                            updateDoc(userDocRef, { roles: userData.roles, role: null }).catch(e => console.error("Erro na migração:", e));
                         }
                         
                         currentUserRoles = userData.roles || ['member'];
