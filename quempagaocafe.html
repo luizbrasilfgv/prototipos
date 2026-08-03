@@ -566,7 +566,18 @@
                             pendingEmailDisplay.textContent = user.email;
                         }
                     } else {
-                        auth.signOut();
+                        // Usuário logou, mas não tem doc na coleção (conta legada do Firebase Auth)
+                        getDocs(collection(db, 'users')).then(usersSnap => {
+                            const isFirstUser = usersSnap.empty;
+                            setDoc(userDocRef, {
+                                email: user.email,
+                                status: isFirstUser ? 'approved' : 'pending',
+                                roles: isFirstUser ? ['member', 'admin'] : ['member']
+                            }).catch(err => {
+                                console.error("Erro ao criar doc para usuário legado:", err);
+                                auth.signOut();
+                            });
+                        });
                     }
                 });
             } else {
