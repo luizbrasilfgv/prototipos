@@ -296,8 +296,9 @@
                         <tr>
                             <th class="left-align">Nome</th>
                             <th>Saldo<br>(Dívida)</th>
-                            <th>Fois</th>
-                            <th>Pagou</th>
+                            <th title="Vezes presente nos últimos 30 dias">Fois<br>(30d)</th>
+                            <th title="Cafés pagos nos últimos 30 dias">Pagou<br>(30d)</th>
+                            <th title="Créditos de proteção adquiridos há mais de 23 dias que expirarão em menos de 1 semana">Expira<br>(7d)</th>
                         </tr>
                     </thead>
                     <tbody id="stats-tbody">
@@ -757,22 +758,42 @@
             
             // Cria um dicionário base para os participantes ativos
             participantNames.forEach(p => {
-                currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0 };
+                currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0 };
             });
 
-            events.forEach(ev => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Filtra os eventos dos últimos 30 dias para o cálculo do saldo
+            const eventsLast30Days = events.filter(ev => {
+                const evDate = new Date(ev.date + 'T00:00:00');
+                const diffTime = Math.abs(today - evDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays <= 30;
+            });
+
+            eventsLast30Days.forEach(ev => {
                 const numPresent = ev.present.length;
+                const evDate = new Date(ev.date + 'T00:00:00');
+                const diffTime = Math.abs(today - evDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
                 ev.present.forEach(p => {
-                    if(!currentAggregates[p]) currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0 };
+                    if(!currentAggregates[p]) currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0 };
                     
                     currentAggregates[p].saldo += 1;
                     currentAggregates[p].vezes_presente += 1;
                 });
                 
-                if(!currentAggregates[ev.payer]) currentAggregates[ev.payer] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0 };
+                if(!currentAggregates[ev.payer]) currentAggregates[ev.payer] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0 };
                 currentAggregates[ev.payer].saldo -= numPresent;
                 currentAggregates[ev.payer].vezes_pagou += 1;
                 currentAggregates[ev.payer].cafes_pagos += numPresent;
+
+                if (diffDays > 23 && diffDays <= 30) {
+                    const netCredit = ev.present.includes(ev.payer) ? numPresent - 1 : numPresent;
+                    if (netCredit > 0) currentAggregates[ev.payer].creditos_expirando += netCredit;
+                }
             });
 
             renderStats();
@@ -823,11 +844,17 @@
                     valClass = "val-negative"; 
                 }
                 
+                let expiraHTML = "-";
+                if (data.creditos_expirando > 0) {
+                    expiraHTML = `<span style="color:var(--danger); font-weight:bold;">${data.creditos_expirando}</span>`;
+                }
+
                 tr.innerHTML = `
                     <td class="left-align">${name} ${!participantNames.includes(name) ? '(Inativo)' : ''}</td>
                     <td class="${valClass}">${displayBal}</td>
                     <td>${data.vezes_presente}</td>
                     <td>${data.vezes_pagou}</td>
+                    <td>${expiraHTML}</td>
                 `;
                 tr.className = "clickable-row";
                 tr.title = "Clique para entender a matemática desta pessoa";
