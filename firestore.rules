@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isApprovedUser() {
+      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
+    }
+
+    function hasRole(role) {
+      return role in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles;
+    }
+
+    match /users/{userId} {
+      allow create: if request.auth.uid == userId; 
+      allow read: if request.auth.uid == userId || (request.auth != null && hasRole('admin'));
+      allow update: if (request.auth != null && hasRole('admin')) 
+                    || (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['roles', 'status', 'role']));
+      allow delete: if request.auth != null && hasRole('admin');
+    }
+
+    match /coffee/{document=**} {
+      allow read, write: if isApprovedUser();
+    }
+  }
+}

@@ -338,7 +338,7 @@
         <div class="modal-content">
             <h3>Área Administrativa</h3>
             
-            <div class="adm-section" id="hub-participants">
+            <div class="adm-section">
                 <h4>Participantes do Grupo</h4>
                 <div class="inline-form">
                     <input type="text" id="new-participant-name" placeholder="Nome do novo membro">
@@ -349,7 +349,7 @@
                 </div>
             </div>
 
-            <div class="adm-section" style="border-color: #757575;" id="hub-change-pwd">
+            <div class="adm-section" style="border-color: #757575;">
                 <h4 style="color: #bdbdbd;">Trocar Senha (minha conta)</h4>
                 <div class="modal-field">
                     <label style="color:#bdbdbd;">Senha atual (para confirmar identidade):</label>
@@ -363,7 +363,7 @@
                 <button id="adm-change-pwd-btn" class="secondary-btn" style="margin-top:0;">Atualizar Senha</button>
             </div>
 
-            <div class="adm-section" style="border-color: var(--primary-color);" id="hub-access">
+            <div class="adm-section" style="border-color: var(--primary-color);">
                 <h4>🔒 Controle de Acessos</h4>
                 <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Aprove contas novas e defina quem é ADM ou Usuário comum.</p>
                 <div class="adm-participant-list" id="adm-access-list">
@@ -371,7 +371,7 @@
                 </div>
             </div>
 
-            <div class="adm-section" style="border-color: #757575;" id="hub-reset-pwd">
+            <div class="adm-section" style="border-color: #757575;">
                 <h4 style="color: #bdbdbd;">🔑 Resetar Senha de Usuário</h4>
                 <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Manda um link de redefinição para o e-mail de qualquer pessoa do grupo.</p>
                 <div class="inline-form">
@@ -381,7 +381,7 @@
                 <div id="adm-reset-msg" style="font-size: 0.85rem; margin-top: 0.3rem;"></div>
             </div>
 
-            <div class="logs-section" id="hub-logs">
+            <div class="logs-section">
                 <h4>📋 Logs de Auditoria (Últimas Ações)</h4>
                 <div class="log-list" id="adm-logs-list">
                     <p style='color:var(--text-muted); font-size:0.85rem; text-align: center;'>Carregando logs...</p>
@@ -529,32 +529,18 @@
         // AUTENTICAÇÃO E LOGIN
         // =====================================
         let unsubUser = null;
-        let currentUserRoles = []; // Array global para checar permissões na UI
-
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userDocRef = doc(db, 'users', user.uid);
-                unsubUser = onSnapshot(userDocRef, async (docSnap) => {
+                unsubUser = onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
-                        let userData = docSnap.data();
-                        
-                        // Migração automática de legacy "role" (string) para "roles" (array)
-                        if (userData.role && !userData.roles) {
-                            const newRoles = userData.role === 'adm' ? ['member', 'admin'] : ['member'];
-                            await updateDoc(userDocRef, { roles: newRoles, role: null });
-                            return; // O onSnapshot será chamado novamente pós-update
-                        }
-                        
-                        currentUserRoles = userData.roles || ['member'];
-
+                        const userData = docSnap.data();
                         if (userData.status === 'approved') {
                             authScreen.classList.add("hidden");
                             pendingScreen.classList.add("hidden");
                             mainApp.classList.remove("hidden");
                             userEmailDisplay.textContent = user.email;
-                            
-                            // Hub: Qualquer role além de member exibe o botão
-                            if (currentUserRoles.length > 1 || currentUserRoles.includes('admin')) {
+                            if (userData.role === 'adm') {
                                 openAdmBtn.style.display = 'inline-block';
                             } else {
                                 openAdmBtn.style.display = 'none';
@@ -601,7 +587,7 @@
                     await setDoc(doc(db, 'users', userCred.user.uid), {
                         email: email,
                         status: isFirstUser ? 'approved' : 'pending',
-                        roles: isFirstUser ? ['member', 'admin'] : ['member']
+                        role: isFirstUser ? 'adm' : 'user'
                     });
                     
                     alert(isFirstUser ? "Você é o primeiro usuário, ganhou acesso de ADM Master!" : "Conta criada! Aguarde a aprovação de um Gestor.");
@@ -678,18 +664,15 @@
                         const div = document.createElement("div");
                         div.className = "adm-participant-item";
                         
-                        const userRoles = u.roles || ['member']; // Fallback
-                        const isAdmin = userRoles.includes('admin');
-                        
                         const statusColor = u.status === 'approved' ? 'var(--success)' : 'var(--danger)';
-                        const roleColor = isAdmin ? 'var(--primary-color)' : 'var(--text-main)';
+                        const roleColor = u.role === 'adm' ? 'var(--primary-color)' : 'var(--text-main)';
                         
                         div.innerHTML = `
                             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                                 <strong>${u.email}</strong>
                                 <span style="font-size:0.75rem;">
                                     Status: <span style="color:${statusColor}">${u.status.toUpperCase()}</span> | 
-                                    Perfis: <span style="color:${roleColor}">${userRoles.join(', ')}</span>
+                                    Perfil: <span style="color:${roleColor}">${u.role.toUpperCase()}</span>
                                 </span>
                             </div>
                             <div style="display:flex; flex-direction:column; gap:0.3rem;" id="actions-${uid}">
@@ -715,17 +698,12 @@
                         const btnRole = document.createElement("button");
                         btnRole.className = "secondary-btn";
                         btnRole.style.cssText = `padding:0.2rem 0.5rem; font-size:0.7rem; margin:0; border-color:${roleColor}; color:${roleColor};`;
-                        btnRole.textContent = isAdmin ? 'Remover ADM' : 'Tornar ADM';
+                        btnRole.textContent = u.role === 'adm' ? 'Virar User' : 'Virar ADM';
                         btnRole.onclick = async () => {
-                            let newRoles = [...userRoles];
-                            if (isAdmin) {
-                                newRoles = newRoles.filter(r => r !== 'admin');
-                            } else {
-                                newRoles.push('admin');
-                            }
-                            if(confirm(`Atualizar perfil de ${u.email}?`)) {
-                                await updateDoc(doc(db, 'users', uid), { roles: newRoles });
-                                registrarLog("EDITOU", "config", `Mudou perfis de ${u.email} para ${newRoles.join(', ')}`);
+                            const newRole = u.role === 'adm' ? 'user' : 'adm';
+                            if(confirm(`Mudar perfil para ${newRole}?`)) {
+                                await updateDoc(doc(db, 'users', uid), { role: newRole });
+                                registrarLog("EDITOU", "config", `Mudou perfil de ${u.email} para ${newRole}`);
                             }
                         };
                         actionsDiv.appendChild(btnRole);
@@ -780,12 +758,6 @@
         // ÁREA ADM (Participantes e Senha)
         // =====================================
         openAdmBtn.addEventListener("click", () => {
-            document.getElementById("hub-participants").style.display = currentUserRoles.includes('admin') ? 'block' : 'none';
-            document.getElementById("hub-change-pwd").style.display = 'block'; 
-            document.getElementById("hub-access").style.display = currentUserRoles.includes('admin') ? 'block' : 'none';
-            document.getElementById("hub-reset-pwd").style.display = currentUserRoles.includes('admin') ? 'block' : 'none';
-            document.getElementById("hub-logs").style.display = (currentUserRoles.includes('admin') || currentUserRoles.includes('auditor')) ? 'block' : 'none';
-
             admModal.classList.remove("hidden");
             admCurrentPassword.value = "";
             admNewPassword.value = "";
