@@ -232,12 +232,26 @@
         </div>
     </div>
 
+    <!-- TELA DE PENDENTE -->
+    <div class="app-container hidden" id="pending-screen">
+        <header>
+            <h1>Quem Paga? ☕</h1>
+            <p>Acesso em Análise</p>
+        </header>
+        <div style="text-align: center; margin-top: 2rem; color: var(--text-muted); line-height: 1.5;">
+            <p style="font-size: 3rem; margin-bottom: 1rem;">⏳</p>
+            <p>Olá, <strong id="pending-email-display" style="color:var(--text-main);"></strong>!</p>
+            <p style="margin-bottom: 2rem;">Sua conta foi criada, mas o aplicativo está trancado. Você precisa aguardar que um <strong>Gestor</strong> aprove o seu acesso.</p>
+            <button id="pending-logout-btn" class="secondary-btn">Sair da Conta</button>
+        </div>
+    </div>
+
     <!-- TELA PRINCIPAL (APP) -->
     <div class="app-container hidden" id="main-app">
         <div class="auth-bar">
             <span id="user-email-display">usuario@email.com</span>
             <div>
-                <button class="adm-btn" id="open-adm-btn">Área ADM</button>
+                <button class="adm-btn" id="open-adm-btn" style="display:none;">Área ADM</button>
                 <button id="logout-btn">Sair</button>
             </div>
         </div>
@@ -349,6 +363,14 @@
                 <button id="adm-change-pwd-btn" class="secondary-btn" style="margin-top:0;">Atualizar Senha</button>
             </div>
 
+            <div class="adm-section" style="border-color: var(--primary-color);">
+                <h4>🔒 Controle de Acessos</h4>
+                <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Aprove contas novas e defina quem é ADM ou Usuário comum.</p>
+                <div class="adm-participant-list" id="adm-access-list">
+                    <p style="text-align:center; color:var(--text-muted); font-size:0.85rem;">Carregando acessos...</p>
+                </div>
+            </div>
+
             <div class="adm-section" style="border-color: #757575;">
                 <h4 style="color: #bdbdbd;">🔑 Resetar Senha de Usuário</h4>
                 <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Manda um link de redefinição para o e-mail de qualquer pessoa do grupo.</p>
@@ -418,7 +440,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -443,6 +465,12 @@
         // Referências do DOM (Auth)
         const authScreen = document.getElementById("auth-screen");
         const mainApp = document.getElementById("main-app");
+        const pendingScreen = document.getElementById("pending-screen");
+        const pendingEmailDisplay = document.getElementById("pending-email-display");
+        const pendingLogoutBtn = document.getElementById("pending-logout-btn");
+        const admAccessList = document.getElementById("adm-access-list");
+        
+        pendingLogoutBtn.addEventListener("click", () => signOut(auth));
         const authEmail = document.getElementById("auth-email");
         const authPassword = document.getElementById("auth-password");
         const authLoginBtn = document.getElementById("auth-login-btn");
@@ -500,15 +528,39 @@
         // =====================================
         // AUTENTICAÇÃO E LOGIN
         // =====================================
+        let unsubUser = null;
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                authScreen.classList.add("hidden");
-                mainApp.classList.remove("hidden");
-                userEmailDisplay.textContent = user.email;
-                initApp();
+                const userDocRef = doc(db, 'users', user.uid);
+                unsubUser = onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        if (userData.status === 'approved') {
+                            authScreen.classList.add("hidden");
+                            pendingScreen.classList.add("hidden");
+                            mainApp.classList.remove("hidden");
+                            userEmailDisplay.textContent = user.email;
+                            if (userData.role === 'adm') {
+                                openAdmBtn.style.display = 'inline-block';
+                            } else {
+                                openAdmBtn.style.display = 'none';
+                            }
+                            initApp();
+                        } else {
+                            authScreen.classList.add("hidden");
+                            mainApp.classList.add("hidden");
+                            pendingScreen.classList.remove("hidden");
+                            pendingEmailDisplay.textContent = user.email;
+                        }
+                    } else {
+                        auth.signOut();
+                    }
+                });
             } else {
                 authScreen.classList.remove("hidden");
                 mainApp.classList.add("hidden");
+                pendingScreen.classList.add("hidden");
+                if (unsubUser) unsubUser();
                 if (unsubData) unsubData();
                 if (unsubConfig) unsubConfig();
                 if (unsubLogs) unsubLogs();
@@ -528,7 +580,18 @@
             const pass = authPassword.value;
             if(!email || !pass) return showAuthMsg("Preencha e-mail e senha para registrar.");
             createUserWithEmailAndPassword(auth, email, pass)
-                .then(() => alert("Conta criada com sucesso!"))
+                .then(async (userCred) => {
+                    const usersSnap = await getDocs(collection(db, 'users'));
+                    const isFirstUser = usersSnap.empty;
+                    
+                    await setDoc(doc(db, 'users', userCred.user.uid), {
+                        email: email,
+                        status: isFirstUser ? 'approved' : 'pending',
+                        role: isFirstUser ? 'adm' : 'user'
+                    });
+                    
+                    alert(isFirstUser ? "Você é o primeiro usuário, ganhou acesso de ADM Master!" : "Conta criada! Aguarde a aprovação de um Gestor.");
+                })
                 .catch(err => showAuthMsg("Erro ao criar: " + err.message));
         });
 
@@ -589,6 +652,64 @@
                 }
                 renderLogs();
             });
+
+            // Escuta a coleção de Usuários (para o painel de Acessos)
+            if (openAdmBtn.style.display !== 'none') {
+                onSnapshot(collection(db, 'users'), (snapshot) => {
+                    admAccessList.innerHTML = "";
+                    snapshot.forEach(docSnap => {
+                        const u = docSnap.data();
+                        const uid = docSnap.id;
+                        
+                        const div = document.createElement("div");
+                        div.className = "adm-participant-item";
+                        
+                        const statusColor = u.status === 'approved' ? 'var(--success)' : 'var(--danger)';
+                        const roleColor = u.role === 'adm' ? 'var(--primary-color)' : 'var(--text-main)';
+                        
+                        div.innerHTML = `
+                            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                                <strong>${u.email}</strong>
+                                <span style="font-size:0.75rem;">
+                                    Status: <span style="color:${statusColor}">${u.status.toUpperCase()}</span> | 
+                                    Perfil: <span style="color:${roleColor}">${u.role.toUpperCase()}</span>
+                                </span>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:0.3rem;" id="actions-${uid}">
+                            </div>
+                        `;
+                        admAccessList.appendChild(div);
+
+                        const actionsDiv = document.getElementById(`actions-${uid}`);
+                        
+                        const btnStatus = document.createElement("button");
+                        btnStatus.className = "secondary-btn";
+                        btnStatus.style.cssText = `padding:0.2rem 0.5rem; font-size:0.7rem; margin:0; border-color:${statusColor}; color:${statusColor};`;
+                        btnStatus.textContent = u.status === 'approved' ? 'Bloquear' : 'Aprovar';
+                        btnStatus.onclick = async () => {
+                            const newStatus = u.status === 'approved' ? 'pending' : 'approved';
+                            if(confirm(`Mudar status para ${newStatus}?`)) {
+                                await updateDoc(doc(db, 'users', uid), { status: newStatus });
+                                registrarLog("EDITOU", "config", `Mudou status de ${u.email} para ${newStatus}`);
+                            }
+                        };
+                        actionsDiv.appendChild(btnStatus);
+
+                        const btnRole = document.createElement("button");
+                        btnRole.className = "secondary-btn";
+                        btnRole.style.cssText = `padding:0.2rem 0.5rem; font-size:0.7rem; margin:0; border-color:${roleColor}; color:${roleColor};`;
+                        btnRole.textContent = u.role === 'adm' ? 'Virar User' : 'Virar ADM';
+                        btnRole.onclick = async () => {
+                            const newRole = u.role === 'adm' ? 'user' : 'adm';
+                            if(confirm(`Mudar perfil para ${newRole}?`)) {
+                                await updateDoc(doc(db, 'users', uid), { role: newRole });
+                                registrarLog("EDITOU", "config", `Mudou perfil de ${u.email} para ${newRole}`);
+                            }
+                        };
+                        actionsDiv.appendChild(btnRole);
+                    });
+                });
+            }
         }
 
         // =====================================
