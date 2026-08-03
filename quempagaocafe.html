@@ -194,6 +194,20 @@
         .adm-participant-list { display: flex; flex-direction: column; gap: 0.5rem; }
         .adm-participant-item { display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 0.5rem 1rem; border-radius: 8px; align-items: center;}
         .adm-remove-btn { color: var(--danger); cursor: pointer; font-weight: bold; }
+        
+        /* Logs de Auditoria */
+        .logs-section { border: 1px solid var(--primary-color); padding: 1rem; border-radius: 12px; margin-top: 1.5rem; background: rgba(0,0,0,0.4); max-height: 250px; overflow-y: auto;}
+        .logs-section h4 { color: var(--primary-color); margin-bottom: 1rem; font-size: 1rem; position: sticky; top: -1rem; background: var(--bg-color); padding: 0.5rem; border-radius: 8px; z-index: 2;}
+        .log-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .log-item { background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; border-left: 3px solid var(--primary-color); font-size: 0.85rem;}
+        .log-header { display: flex; justify-content: space-between; color: var(--text-muted); margin-bottom: 0.3rem;}
+        .log-header strong { color: var(--text-main); font-size: 0.9rem;}
+        .log-body { color: var(--text-main); line-height: 1.4;}
+        .log-badge { padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: bold; font-size: 0.7rem; margin-right: 0.5rem; display: inline-block;}
+        .log-badge.apagou { background: rgba(239, 83, 80, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .log-badge.editou { background: rgba(255, 213, 79, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); }
+        .log-badge.criou { background: rgba(129, 199, 132, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .log-badge.config { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--text-muted); }
     </style>
 </head>
 <body>
@@ -343,6 +357,13 @@
                 <div id="adm-reset-msg" style="font-size: 0.85rem; margin-top: 0.3rem;"></div>
             </div>
 
+            <div class="logs-section">
+                <h4>📋 Logs de Auditoria (Últimas Ações)</h4>
+                <div class="log-list" id="adm-logs-list">
+                    <p style='color:var(--text-muted); font-size:0.85rem; text-align: center;'>Carregando logs...</p>
+                </div>
+            </div>
+
             <div class="modal-actions">
                 <button id="close-adm-btn" class="primary-btn">Fechar Painel</button>
             </div>
@@ -415,6 +436,7 @@
         let events = []; 
         let currentAggregates = {};
         let editingEventId = null;
+        let logs = [];
 
         // Referências do DOM (Auth)
         const authScreen = document.getElementById("auth-screen");
@@ -467,9 +489,11 @@
         let currentPresent = [];
         let coffeeDocRef = doc(db, "coffee", "data_v3");
         let configDocRef = doc(db, "coffee", "config_v3");
+        let logsDocRef = doc(db, "coffee", "logs_v3");
         
         let unsubData = null;
         let unsubConfig = null;
+        let unsubLogs = null;
 
         // =====================================
         // AUTENTICAÇÃO E LOGIN
@@ -485,6 +509,7 @@
                 mainApp.classList.add("hidden");
                 if (unsubData) unsubData();
                 if (unsubConfig) unsubConfig();
+                if (unsubLogs) unsubLogs();
             }
         });
 
@@ -550,6 +575,59 @@
                     updateCloudData();
                 }
                 calculateAndRender();
+            });
+
+            // Escuta os logs
+            unsubLogs = onSnapshot(logsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    logs = docSnap.data().list || [];
+                } else {
+                    logs = [];
+                    setDoc(logsDocRef, { list: [] }).catch(console.error);
+                }
+                renderLogs();
+            });
+        }
+
+        // =====================================
+        // FUNÇÕES DE LOG DE AUDITORIA
+        // =====================================
+        function registrarLog(acao, badgeClass, detalhes) {
+            if(!auth.currentUser) return;
+            const newLog = {
+                id: Date.now(),
+                dataIso: new Date().toISOString(),
+                usuario: auth.currentUser.email,
+                acao: acao,
+                badge: badgeClass,
+                detalhes: detalhes
+            };
+            logs.unshift(newLog);
+            if (logs.length > 100) logs = logs.slice(0, 100);
+            setDoc(logsDocRef, { list: logs }).catch(err => console.error("Erro ao salvar log:", err));
+        }
+
+        function renderLogs() {
+            const container = document.getElementById("adm-logs-list");
+            if(!container) return;
+            container.innerHTML = "";
+            if(logs.length === 0) {
+                container.innerHTML = "<p style='color:var(--text-muted); font-size:0.85rem; text-align: center;'>Nenhum registro encontrado.</p>";
+                return;
+            }
+            logs.forEach(log => {
+                const dateObj = new Date(log.dataIso);
+                const dataFmt = dateObj.toLocaleDateString("pt-BR") + " " + dateObj.toLocaleTimeString("pt-BR", {hour: '2-digit', minute:'2-digit'});
+                const div = document.createElement("div");
+                div.className = "log-item";
+                div.innerHTML = \`
+                    <div class="log-header"><strong>\${dataFmt}</strong><span>\${log.usuario}</span></div>
+                    <div class="log-body">
+                        <span class="log-badge \${log.badge}">\${log.acao}</span>
+                        \${log.detalhes}
+                    </div>
+                \`;
+                container.appendChild(div);
             });
         }
 
@@ -642,6 +720,7 @@
             
             participantNames.push(nome);
             updateConfigCloud();
+            registrarLog("CRIOU", "config", \`Adicionou participante <strong>\${nome}</strong>.\`);
             newParticipantName.value = "";
         });
 
@@ -663,6 +742,7 @@
                     if(confirm(`Remover ${nome} da lista atual?`)) {
                         participantNames = participantNames.filter(n => n !== nome);
                         updateConfigCloud();
+                        registrarLog("APAGOU", "config", `Removeu participante <strong>${nome}</strong>.`);
                     }
                 });
             });
@@ -816,6 +896,10 @@
                 btn.addEventListener("click", (e) => {
                     const idToDelete = parseInt(e.currentTarget.getAttribute("data-id"));
                     if(confirm("Tem certeza que deseja apagar este lançamento? O saldo de todos será recalculado.")) {
+                        const evToDelete = events.find(e => e.id === idToDelete);
+                        if (evToDelete) {
+                            registrarLog("APAGOU", "apagou", \`Lançamento do dia <strong>\${evToDelete.date.split('-').reverse().join('/')}</strong> pago por <strong>\${evToDelete.payer}</strong>\`);
+                        }
                         events = events.filter(ev => ev.id !== idToDelete);
                         updateCloudData();
                     }
@@ -894,6 +978,7 @@
                 events[evIndex].present = newPresent;
                 events[evIndex].payer = newPayer;
                 updateCloudData(); 
+                registrarLog("EDITOU", "editou", \`Editou lançamento do dia <strong>\${newDate.split('-').reverse().join('/')}</strong> (Novo Pagador: <strong>\${newPayer}</strong>)\`);
             }
 
             editModal.classList.add("hidden");
@@ -966,6 +1051,7 @@
             
             events.push(newEvent);
             updateCloudData();
+            registrarLog("CRIOU", "criou", \`Novo sorteio/pagamento no dia <strong>\${dateInput.value.split('-').reverse().join('/')}</strong> pago por <strong>\${currentWinner}</strong>\`);
             
             alert(`Sorteio e Pagamento registrados com sucesso! ☁️`);
             
