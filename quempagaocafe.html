@@ -251,7 +251,7 @@
         <div class="auth-bar">
             <span id="user-email-display">usuario@email.com</span>
             <div>
-                <button class="adm-btn" id="open-adm-btn" style="display:none;">Área ADM</button>
+                <button class="adm-btn" id="open-adm-btn" style="display:none;">⚙️ Meu Painel</button>
                 <button id="logout-btn">Sair</button>
             </div>
         </div>
@@ -336,7 +336,7 @@
     <!-- Modal de Área ADM -->
     <div id="adm-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3>Área Administrativa</h3>
+            <h3>Meu Painel</h3>
             
             <div class="adm-section" id="hub-participants">
                 <h4>Participantes do Grupo</h4>
@@ -552,12 +552,8 @@
                             mainApp.classList.remove("hidden");
                             userEmailDisplay.textContent = user.email;
                             
-                            // Hub: Qualquer role além de member exibe o botão
-                            if (currentUserRoles.length > 1 || currentUserRoles.includes('admin')) {
-                                openAdmBtn.style.display = 'inline-block';
-                            } else {
-                                openAdmBtn.style.display = 'none';
-                            }
+                            // Hub: Qualquer usuário logado e aprovado tem acesso ao painel (ao menos para Logs e Senha)
+                            openAdmBtn.style.display = 'inline-block';
                             initApp();
                         } else {
                             authScreen.classList.add("hidden");
@@ -802,7 +798,7 @@
             document.getElementById("hub-change-pwd").style.display = 'block'; 
             document.getElementById("hub-access").style.display = currentUserRoles.includes('admin') ? 'block' : 'none';
             document.getElementById("hub-reset-pwd").style.display = currentUserRoles.includes('admin') ? 'block' : 'none';
-            document.getElementById("hub-logs").style.display = (currentUserRoles.includes('admin') || currentUserRoles.includes('auditor')) ? 'block' : 'none';
+            document.getElementById("hub-logs").style.display = 'block'; 
 
             admModal.classList.remove("hidden");
             admCurrentPassword.value = "";
@@ -1136,15 +1132,22 @@
                 
                 const dataBr = ev.date.split('-').reverse().join('/');
                 
+                let actionBtns = "";
+                if (currentUserRoles.includes('admin')) {
+                    actionBtns = `
+                        <div class="action-btns">
+                            <button class="crud-btn edit-btn" data-id="${ev.id}" title="Editar este lançamento">✏️</button>
+                            <button class="crud-btn delete-btn" data-id="${ev.id}" title="Apagar este lançamento">🗑️</button>
+                        </div>
+                    `;
+                }
+
                 div.innerHTML = `
                     <div class="history-info">
                         <strong>${dataBr} - Pagador: ${ev.payer}</strong>
                         Galera: ${ev.present.join(', ')}
                     </div>
-                    <div class="action-btns">
-                        <button class="crud-btn edit-btn" data-id="${ev.id}" title="Editar este lançamento">✏️</button>
-                        <button class="crud-btn delete-btn" data-id="${ev.id}" title="Apagar este lançamento">🗑️</button>
-                    </div>
+                    ${actionBtns}
                 `;
                 historyList.appendChild(div);
             });
