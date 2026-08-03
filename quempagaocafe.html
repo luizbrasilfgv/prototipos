@@ -209,6 +209,24 @@
         .log-badge.editou { background: rgba(255, 213, 79, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); }
         .log-badge.criou { background: rgba(129, 199, 132, 0.2); color: var(--success); border: 1px solid var(--success); }
         .log-badge.config { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--text-muted); }
+        
+        /* Extrato Modal */
+        .extrato-btn {
+            background: rgba(255, 213, 79, 0.15); border: 1px solid var(--primary-color);
+            color: var(--primary-color); padding: 0.8rem; border-radius: 8px; font-weight: bold;
+            cursor: pointer; width: 100%; margin-top: 0.8rem; text-transform: uppercase; font-size: 0.85rem; transition: all 0.2s;
+        }
+        .extrato-btn:hover { background: var(--primary-color); color: #000; }
+        .extrato-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; max-height: 50vh; overflow-y: auto;}
+        .extrato-item { 
+            background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; font-size: 0.85rem; 
+            border-left: 3px solid var(--danger); display: flex; justify-content: space-between; align-items: center;
+        }
+        .extrato-item.pago { border-left-color: var(--success); }
+        .extrato-item-text { color: var(--text-main); }
+        .extrato-item-score { font-weight: bold; font-family: monospace; font-size: 1rem; }
+        .extrato-item-score.neg { color: var(--danger); }
+        .extrato-item-score.pos { color: var(--success); }
     </style>
 </head>
 <body>
@@ -311,7 +329,7 @@
                         <tr>
                             <th class="left-align">Nome</th>
                             <th>Saldo<br>(Dívida)</th>
-                            <th title="Vezes presente nos últimos 30 dias">Fois<br>(30d)</th>
+                            <th title="Vezes presente nos últimos 30 dias">Idas<br>(30d)</th>
                             <th title="Cafés pagos nos últimos 30 dias">Pagou<br>(30d)</th>
                             <th title="Créditos de proteção adquiridos há mais de 23 dias que expirarão em menos de 1 semana">Expira<br>(7d)</th>
                         </tr>
@@ -396,14 +414,12 @@
 
     <!-- Modal de Explicação de Saldo -->
     <div id="statement-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 id="statement-title">Entenda a Conta</h3>
-            <div id="statement-body" class="statement-box">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 id="statement-title">Extrato</h3>
+            <div id="statement-body">
                 <!-- Preenchido via JS -->
             </div>
-            <div class="modal-actions">
-                <button id="close-statement-btn" class="primary-btn">Entendi!</button>
-            </div>
+            <button id="close-statement-btn" class="secondary-btn" style="margin-top: 1.5rem;">FECHAR</button>
         </div>
     </div>
 
@@ -1073,12 +1089,18 @@
                     <td colspan="5" style="padding: 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                         <div class="accordion-content">
                             <div style="display:flex; justify-content: space-between; align-items:center;">
-                                <span>🏆 Saldo Histórico (Todos os tempos): <strong class="${globalValClass}">${globalBal}</strong></span>
-                                <span>💔 Pontos Perdidos (Expiraram): <strong>${globalData.creditos_perdidos}</strong></span>
+                                <span>🏆 Saldo Histórico: <strong class="${globalValClass}">${globalBal}</strong></span>
+                                <span>💔 Pontos Perdidos: <strong>${globalData.creditos_perdidos}</strong></span>
                             </div>
+                            <button class="extrato-btn" data-name="${name}">📄 Ver Extrato Detalhado</button>
                         </div>
                     </td>
                 `;
+
+                accordionTr.querySelector('.extrato-btn').addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    openStatementModal(name);
+                });
 
                 tr.addEventListener("click", () => {
                     accordionTr.classList.toggle("open");
@@ -1094,26 +1116,62 @@
         const statementBody = document.getElementById("statement-body");
         document.getElementById("close-statement-btn").addEventListener("click", () => statementModal.classList.add("hidden"));
 
-        function openStatementModal(name, data) {
-            statementTitle.textContent = `A Conta de ${name}`;
-            let expl = `<p>O VAR puxou a ficha do(a) <strong>${name}</strong>:</p><br>`;
-            expl += `<ul>`;
-            expl += `<li>☕ Tomou café <strong>${data.vezes_presente} vezes</strong>. A dívida subiu <strong>+${data.vezes_presente}</strong>.</li>`;
-            expl += `<li>💳 Pagou a conta <strong>${data.vezes_pagou} vezes</strong>. Nessas vezes, pagou um total de <strong>${data.cafes_pagos} cafés</strong> para a galera. A dívida desceu <strong>-${data.cafes_pagos}</strong>.</li>`;
-            expl += `</ul>`;
+        function openStatementModal(name) {
+            const data = currentAggregates[name] || { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0 };
+            statementTitle.textContent = `Extrato de ${name}`;
             
-            let statusText = "";
-            if (data.saldo > 0) statusText = `🚨 ESTÁ DEVENDO! (+${data.saldo})`;
-            else if (data.saldo < 0) statusText = `😎 TEM CRÉDITO NA CASA! (${data.saldo})`;
-            else statusText = `⚖️ TUDO ZERADO! (0)`;
+            const today = new Date();
+            let extratoHTML = "";
+            let saldoCalc = 0;
+            
+            const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedEvents.forEach(ev => {
+                const evDate = new Date(ev.date + 'T00:00:00');
+                const diffTime = Math.abs(today - evDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays <= 30) {
+                    const isPayer = ev.payer === name;
+                    const isPresent = ev.present.includes(name);
+                    
+                    if (isPayer || isPresent) {
+                        const dataBr = ev.date.split('-').reverse().join('/');
+                        
+                        if (isPresent) {
+                             const text = isPayer ? `Tomou café (Você pagou)` : `Tomou café (${ev.payer} pagou)`;
+                             extratoHTML += `
+                             <div class="extrato-item">
+                                <span class="extrato-item-text">🔴 <strong>${dataBr}</strong> - ${text}</span>
+                                <span class="extrato-item-score neg">[+1]</span>
+                             </div>`;
+                        }
+                        if (isPayer) {
+                             extratoHTML += `
+                             <div class="extrato-item pago">
+                                <span class="extrato-item-text">🟢 <strong>${dataBr}</strong> - Pagou a conta (${ev.present.length} cafés)</span>
+                                <span class="extrato-item-score pos">[-${ev.present.length}]</span>
+                             </div>`;
+                        }
+                    }
+                }
+            });
+            
+            if (extratoHTML === "") extratoHTML = "<p class='empty-msg'>Nenhuma movimentação nos últimos 30 dias.</p>";
 
-            expl += `<div class="math-result">
-                Resumo da Matemática (Fácil):<br>
-                ${data.vezes_presente} (tomou) - ${data.cafes_pagos} (pagou) = <strong>${data.saldo}</strong><br><br>
-                ${statusText}
+            const headerHTML = `<div style="margin-bottom: 1rem; color: var(--primary-color); font-weight: bold; background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 6px; text-align: center;">
+                🧮 Resumo (30 dias): ${data.vezes_presente} idas - ${data.cafes_pagos} pagos = ${data.saldo}
+            </div>`;
+            
+            const footerHTML = `
+            <div style="margin-top: 1.5rem; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: var(--text-muted); border-left: 3px solid #64b5f6;">
+                <strong>💡 Entenda o Cálculo:</strong><br>
+                Toda vez que você toma café, você ganha <strong>[+1]</strong> na dívida.<br>
+                Ao pagar a conta, sua dívida cai na proporção de quantas pessoas participaram (ex: pagou pra 4? <strong>[-4]</strong>).<br><br>
+                <i>O saldo final é a soma de todos os positivos e negativos.</i>
             </div>`;
 
-            statementBody.innerHTML = expl;
+            statementBody.innerHTML = headerHTML + `<div class="extrato-list">` + extratoHTML + `</div>` + footerHTML;
             statementModal.classList.remove("hidden");
         }
 
