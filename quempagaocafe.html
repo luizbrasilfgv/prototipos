@@ -121,15 +121,16 @@
         .stats-table td.left-align { text-align: left; font-weight: 600; }
         .stats-table td { padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .stats-table tr:last-child td { border-bottom: none; }
+        .val-positive { color: var(--danger); font-weight: bold; } /* Devendo = positivo/vermelho */
+        .val-negative { color: var(--success); font-weight: bold; } /* Crédito = negativo/verde */
+        
+        /* Acordeão */
+        .accordion-row { display: none; background: rgba(0,0,0,0.2); }
+        .accordion-row.open { display: table-row; }
+        .accordion-content { padding: 1rem; border-left: 3px solid var(--primary-color); font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;}
+        .accordion-content strong { color: var(--text-main); }
         .clickable-row { cursor: pointer; transition: background 0.2s; }
-        .clickable-row:hover { background: rgba(255, 213, 79, 0.1); }
-        .statement-box { background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 12px; font-size: 1.05rem; line-height: 1.6; text-align: left;}
-        .statement-box strong { color: var(--primary-color); }
-        .math-result { font-size: 1.3rem; text-align: center; margin-top: 1rem; border-top: 1px dashed var(--text-muted); padding-top: 1rem;}
-
-        .val-positive { color: var(--danger); font-weight: bold; } 
-        .val-negative { color: var(--success); font-weight: bold; } 
-        .val-neutral { color: var(--text-muted); }
+        .clickable-row:hover { background: rgba(255,255,255,0.05); }
 
         /* Painel CRUD Histórico */
         .history-panel { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
@@ -752,19 +753,57 @@
         // =====================================
         // LÓGICA PRINCIPAL (Cálculo e CRUD)
         // =====================================
+        let globalAggregates = {};
+
         function calculateAndRender() {
-            // Inicializa as métricas dinamicamente baseado nos eventos
             currentAggregates = {};
+            globalAggregates = {};
             
-            // Cria um dicionário base para os participantes ativos
             participantNames.forEach(p => {
                 currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0 };
+                globalAggregates[p] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [] };
             });
 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            // Filtra os eventos dos últimos 30 dias para o cálculo do saldo
+            const sortedEvents = [...events].sort((a, b) => new Date(a.date + 'T00:00:00') - new Date(b.date + 'T00:00:00'));
+
+            sortedEvents.forEach(ev => {
+                const numPresent = ev.present.length;
+                const evDate = new Date(ev.date + 'T00:00:00');
+                
+                ev.present.forEach(p => {
+                    if(!globalAggregates[p]) globalAggregates[p] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [] };
+                    globalAggregates[p].saldo_geral += 1;
+                    
+                    if (p !== ev.payer) {
+                        const activeCredit = globalAggregates[p].all_credits.find(c => {
+                            const diffDays = Math.ceil((evDate - c.date) / (1000 * 60 * 60 * 24));
+                            return c.used < c.amount && diffDays <= 30;
+                        });
+                        if (activeCredit) activeCredit.used += 1;
+                    }
+                });
+
+                if(!globalAggregates[ev.payer]) globalAggregates[ev.payer] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [] };
+                globalAggregates[ev.payer].saldo_geral -= numPresent;
+                
+                const netCredit = ev.present.includes(ev.payer) ? numPresent - 1 : numPresent;
+                if (netCredit > 0) {
+                    globalAggregates[ev.payer].all_credits.push({ date: evDate, amount: netCredit, used: 0 });
+                }
+            });
+
+            Object.keys(globalAggregates).forEach(p => {
+                globalAggregates[p].all_credits.forEach(c => {
+                    const diffDays = Math.ceil((today - c.date) / (1000 * 60 * 60 * 24));
+                    if (diffDays > 30 && c.amount > c.used) {
+                        globalAggregates[p].creditos_perdidos += (c.amount - c.used);
+                    }
+                });
+            });
+
             const eventsLast30Days = events.filter(ev => {
                 const evDate = new Date(ev.date + 'T00:00:00');
                 const diffTime = Math.abs(today - evDate);
@@ -857,9 +896,33 @@
                     <td>${expiraHTML}</td>
                 `;
                 tr.className = "clickable-row";
-                tr.title = "Clique para entender a matemática desta pessoa";
-                tr.addEventListener("click", () => openStatementModal(name, data));
+                tr.title = "Clique para ver o histórico detalhado";
+                
+                let globalData = globalAggregates[name] || { saldo_geral: 0, creditos_perdidos: 0 };
+                let globalValClass = "val-neutral";
+                let globalBal = globalData.saldo_geral.toString();
+                if (globalData.saldo_geral > 0) { globalValClass = "val-positive"; globalBal = "+" + globalData.saldo_geral; }
+                else if (globalData.saldo_geral < 0) { globalValClass = "val-negative"; }
+
+                const accordionTr = document.createElement("tr");
+                accordionTr.className = "accordion-row";
+                accordionTr.innerHTML = `
+                    <td colspan="5" style="padding: 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div class="accordion-content">
+                            <div style="display:flex; justify-content: space-between; align-items:center;">
+                                <span>🏆 Saldo Histórico (Todos os tempos): <strong class="${globalValClass}">${globalBal}</strong></span>
+                                <span>💔 Pontos Perdidos (Expiraram): <strong>${globalData.creditos_perdidos}</strong></span>
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                tr.addEventListener("click", () => {
+                    accordionTr.classList.toggle("open");
+                });
+
                 statsTbody.appendChild(tr);
+                statsTbody.appendChild(accordionTr);
             });
         }
 
