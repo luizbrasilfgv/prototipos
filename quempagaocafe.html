@@ -677,12 +677,28 @@
             });
         });
 
+        window.openBottomSheet = function(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.remove('hidden');
+            }
+        };
+        window.closeBottomSheet = function(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.add('hidden');
+            }
+        };
+
         function setupRoleBasedUI() {
-            document.getElementById("hub-participants").style.display = currentUserRoles.includes('admin') ? 'block' : 'none';
-            document.getElementById("hub-change-pwd").style.display = 'block'; 
-            document.getElementById("hub-access").style.display = currentUserRoles.includes('admin') ? 'block' : 'none';
-            document.getElementById("hub-reset-pwd").style.display = currentUserRoles.includes('admin') ? 'block' : 'none';
-            document.getElementById("hub-logs").style.display = 'block'; 
+            const adminMenus = document.getElementById('admin-menus');
+            if (adminMenus) {
+                if (currentUserRoles.includes('admin')) {
+                    adminMenus.classList.remove('hidden');
+                } else {
+                    adminMenus.classList.add('hidden');
+                }
+            }
         }
 
         const newParticipantName = document.getElementById("new-participant-name");
