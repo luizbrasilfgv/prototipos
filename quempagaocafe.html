@@ -262,6 +262,16 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    
+        .menu-list { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2rem; }
+        .menu-group-title { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem; margin-top: 1.5rem; padding-left: 0.5rem; font-weight: bold; }
+        .menu-btn { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.2s ease; }
+        .menu-btn:hover { background: rgba(0,0,0,0.5); transform: translateY(-2px); }
+        .menu-btn-left { display: flex; align-items: center; gap: 1rem; }
+        .menu-btn-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 213, 79, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .menu-btn-text { font-weight: 500; font-size: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; }
+        .menu-chevron { fill: var(--text-muted); width: 24px; height: 24px; }
+
     </style>
 </head>
 <body>
@@ -403,63 +413,67 @@
                     <div style="text-align: center; margin-bottom: 2rem;">
                         <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255,213,79,0.2); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">👤</div>
                         <span id="user-email-display" style="font-size: 1.1rem; color: var(--text-main); font-weight: bold;"></span>
-                        <button id="logout-btn" class="secondary-btn" style="margin-top: 1rem;">Sair da Conta</button>
+                        
                     </div>
                     
-                    <h3>Meu Painel</h3>
-            
-            <div class="adm-section" id="hub-participants">
-                <h4>Participantes do Grupo</h4>
-                <div class="inline-form">
-                    <input type="text" id="new-participant-name" placeholder="Nome do novo membro">
-                    <button id="add-participant-btn">+</button>
-                </div>
-                <div class="adm-participant-list" id="adm-participant-list">
-                    <!-- Lista de participantes para remover -->
-                </div>
-            </div>
+                    
+                    <div id="admin-menus" class="hidden">
+                        <div class="menu-group-title">Administração</div>
+                        <div class="menu-list">
+                            <div class="menu-btn" onclick="openBottomSheet('sheet-participants')">
+                                <div class="menu-btn-left">
+                                    <div class="menu-btn-icon">👥</div>
+                                    <div class="menu-btn-text">Participantes</div>
+                                </div>
+                                <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                            </div>
+                            
+                            <div class="menu-btn" onclick="openBottomSheet('sheet-access')">
+                                <div class="menu-btn-left">
+                                    <div class="menu-btn-icon">🔒</div>
+                                    <div class="menu-btn-text">
+                                        Controle de Acessos
+                                        <div class="badge-notification" id="pending-badge-menu" style="position: static; margin-left: 0.5rem; transform: none; display: none;"></div>
+                                    </div>
+                                </div>
+                                <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                            </div>
 
-            <div class="adm-section" style="border-color: #757575;" id="hub-change-pwd">
-                <h4 style="color: #bdbdbd;">Trocar Senha (minha conta)</h4>
-                <div class="modal-field">
-                    <label style="color:#bdbdbd;">Senha atual (para confirmar identidade):</label>
-                    <input type="password" id="adm-current-password" class="date-input" placeholder="Digite sua senha atual">
-                </div>
-                <div class="modal-field">
-                    <label style="color:#bdbdbd;">Nova senha:</label>
-                    <input type="password" id="adm-new-password" class="date-input" placeholder="Nova senha (min. 6 letras)">
-                </div>
-                <div id="adm-pwd-msg" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 0.5rem;"></div>
-                <button id="adm-change-pwd-btn" class="secondary-btn" style="margin-top:0;">Atualizar Senha</button>
-            </div>
+                            <div class="menu-btn" onclick="openBottomSheet('sheet-reset-pwd')">
+                                <div class="menu-btn-left">
+                                    <div class="menu-btn-icon">🔑</div>
+                                    <div class="menu-btn-text">Resetar Senha</div>
+                                </div>
+                                <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                            </div>
 
-            <div class="adm-section" style="border-color: var(--primary-color);" id="hub-access">
-                <h4>🔒 Controle de Acessos</h4>
-                <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Aprove contas novas e defina quem é ADM ou Usuário comum.</p>
-                <div class="adm-participant-list" id="adm-access-list">
-                    <p style="text-align:center; color:var(--text-muted); font-size:0.85rem;">Carregando acessos...</p>
-                </div>
-            </div>
+                            <div class="menu-btn" onclick="openBottomSheet('sheet-logs')">
+                                <div class="menu-btn-left">
+                                    <div class="menu-btn-icon">📋</div>
+                                    <div class="menu-btn-text">Auditoria (Logs)</div>
+                                </div>
+                                <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="adm-section" style="border-color: #757575;" id="hub-reset-pwd">
-                <h4 style="color: #bdbdbd;">🔑 Resetar Senha de Usuário</h4>
-                <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Manda um link de redefinição para o e-mail de qualquer pessoa do grupo.</p>
-                <div class="inline-form">
-                    <input type="email" id="adm-reset-email" placeholder="e-mail do usuário (ex: leo@gmail.com)">
-                    <button id="adm-send-reset-btn">Enviar</button>
-                </div>
-                <div id="adm-reset-msg" style="font-size: 0.85rem; margin-top: 0.3rem;"></div>
-            </div>
-
-            <div class="logs-section" id="hub-logs">
-                <h4>📋 Logs de Auditoria (Últimas Ações)</h4>
-                <div class="log-list" id="adm-logs-list">
-                    <p style='color:var(--text-muted); font-size:0.85rem; text-align: center;'>Carregando logs...</p>
-                </div>
-            </div>
-
-                </div>
-            </div> <!-- FIM ABA PERFIL -->
+                    <div class="menu-group-title">Minha Conta</div>
+                    <div class="menu-list">
+                        <div class="menu-btn" onclick="openBottomSheet('sheet-change-pwd')">
+                            <div class="menu-btn-left">
+                                <div class="menu-btn-icon">🛡️</div>
+                                <div class="menu-btn-text">Trocar Minha Senha</div>
+                            </div>
+                            <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                        </div>
+                        <div class="menu-btn" id="logout-menu-btn" style="border-color: rgba(239, 83, 80, 0.3);">
+                            <div class="menu-btn-left">
+                                <div class="menu-btn-icon" style="background: rgba(239, 83, 80, 0.1);">🚪</div>
+                                <div class="menu-btn-text" style="color: var(--danger);">Sair da Conta</div>
+                            </div>
+                        </div>
+                    </div>
+ <!-- FIM ABA PERFIL -->
 
         </main>
     </div>
@@ -484,6 +498,76 @@
             Painel
         </div>
     </nav>
+
+    
+    <div id="sheet-participants" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 style="margin-bottom: 1.5rem;">👥 Participantes do Grupo</h3>
+            <div class="inline-form">
+                    <input type="text" id="new-participant-name" placeholder="Nome do novo membro">
+                    <button id="add-participant-btn">+</button>
+                </div>
+                <div class="adm-participant-list" id="adm-participant-list">
+                    <!-- Lista de participantes para remover -->
+                </div>
+            <button class="secondary-btn" onclick="closeBottomSheet('sheet-participants')" style="margin-top: 2rem;">FECHAR</button>
+        </div>
+    </div>
+
+    <div id="sheet-access" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 style="margin-bottom: 1.5rem;">🔒 Controle de Acessos</h3>
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Aprove contas novas e defina quem é ADM ou Usuário comum.</p>
+                <div class="adm-participant-list" id="adm-access-list">
+                    <p style="text-align:center; color:var(--text-muted); font-size:0.85rem;">Carregando acessos...</p>
+                </div>
+            <button class="secondary-btn" onclick="closeBottomSheet('sheet-access')" style="margin-top: 2rem;">FECHAR</button>
+        </div>
+    </div>
+
+    <div id="sheet-reset-pwd" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 style="margin-bottom: 1.5rem;">🔑 Resetar Senha</h3>
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Manda um link de redefinição para o e-mail de qualquer pessoa do grupo.</p>
+                <div class="inline-form">
+                    <input type="email" id="adm-reset-email" placeholder="e-mail do usuário (ex: leo@gmail.com)">
+                    <button id="adm-send-reset-btn">Enviar</button>
+                </div>
+                <div id="adm-reset-msg" style="font-size: 0.85rem; margin-top: 0.3rem;"></div>
+            <button class="secondary-btn" onclick="closeBottomSheet('sheet-reset-pwd')" style="margin-top: 2rem;">FECHAR</button>
+        </div>
+    </div>
+
+    <div id="sheet-logs" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 style="margin-bottom: 1.5rem;">📋 Logs de Auditoria</h3>
+            <div class="log-list" id="adm-logs-list">
+                    <p style='color:var(--text-muted); font-size:0.85rem; text-align: center;'>Carregando logs...</p>
+                </div>
+            </div>
+
+                </div>
+            <button class="secondary-btn" onclick="closeBottomSheet('sheet-logs')" style="margin-top: 2rem;">FECHAR</button>
+        </div>
+    </div>
+
+    <div id="sheet-change-pwd" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 style="margin-bottom: 1.5rem;">🛡️ Trocar Minha Senha</h3>
+            <div class="modal-field">
+                    <label style="color:#bdbdbd;">Senha atual (para confirmar identidade):</label>
+                    <input type="password" id="adm-current-password" class="date-input" placeholder="Digite sua senha atual">
+                </div>
+                <div class="modal-field">
+                    <label style="color:#bdbdbd;">Nova senha:</label>
+                    <input type="password" id="adm-new-password" class="date-input" placeholder="Nova senha (min. 6 letras)">
+                </div>
+                <div id="adm-pwd-msg" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 0.5rem;"></div>
+                <button id="adm-change-pwd-btn" class="secondary-btn" style="margin-top:0;">Atualizar Senha</button>
+            <button class="secondary-btn" onclick="closeBottomSheet('sheet-change-pwd')" style="margin-top: 2rem;">FECHAR</button>
+        </div>
+    </div>
+
 
     <!-- Modal de Explicação de Saldo -->
     <div id="statement-modal" class="modal-overlay hidden">
@@ -567,7 +651,7 @@
         const authResetBtn = document.getElementById("auth-reset-btn");
         const authMsg = document.getElementById("auth-msg");
         const userEmailDisplay = document.getElementById("user-email-display");
-        const logoutBtn = document.getElementById("logout-btn");
+        const logoutBtn = document.getElementById("logout-menu-btn");
         
         // Referências do DOM (ADM)
         const admModal = document.getElementById("adm-modal");
