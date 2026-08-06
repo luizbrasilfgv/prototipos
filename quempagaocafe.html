@@ -173,8 +173,11 @@
             display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;
         }
         
-        .modal-fullscreen { padding: 0 !important; width: 100vw; height: 100vh; }
-        .modal-fullscreen .modal-content { padding-bottom: 100px; min-height: 100vh; border-radius: 0; margin: 0; max-height: none; overflow-y: auto; }
+        .modal-fullscreen { padding: 0 !important; }
+        .modal-fullscreen .modal-content { 
+            padding-bottom: 100px; min-height: 100vh; border-radius: 0; 
+            margin: 0; max-height: none; overflow-y: auto; 
+        }
 
         .modal-content {
             background: var(--surface-color); border: 1px solid var(--primary-color); border-radius: 20px;
@@ -400,7 +403,6 @@
 
             <!-- ABA SALDOS -->
             <div id="tab-saldos" class="tab-content">
-                <div class="app-container">
                     <div class="stats-panel" style="margin-top:0; border-top:none; padding-top:0;">
                         <div class="stats-header">
                     <h3>Saldos (O VAR)</h3>
@@ -425,11 +427,9 @@
             </div>
 
                     </div>
-                </div>
 
             <!-- ABA HISTÓRICO -->
             <div id="tab-historico" class="tab-content">
-                <div class="app-container">
                     <div class="history-panel" style="margin-top:0; border-top:none; padding-top:0;">
                         <div class="history-header">
                     <h3>Histórico de Lançamentos</h3>
@@ -438,7 +438,6 @@
                     <!-- Extrato via JS -->
                 </div>
                     </div>
-                </div>
             </div> <!-- FIM ABA HISTÓRICO -->
 
             <!-- ABA PERFIL -->
@@ -481,6 +480,13 @@
 
                     <div class="menu-group-title">Minha Conta</div>
                     <div class="menu-list">
+                        <div class="menu-btn" onclick="openBottomSheet('sheet-logs')">
+                            <div class="menu-btn-left">
+                                <div class="menu-btn-icon">📋</div>
+                                <div class="menu-btn-text">Auditoria (Logs)</div>
+                            </div>
+                            <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                        </div>
 
                         <div class="menu-btn" id="logout-menu-btn" style="border-color: rgba(239, 83, 80, 0.3);">
                             <div class="menu-btn-left">
@@ -676,22 +682,7 @@
         </div>
     </div>
 
-    <div id="sheet-change-pwd" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 450px;">
-            <h3 style="margin-bottom: 1.5rem;">🛡️ Trocar Minha Senha</h3>
-            <div class="modal-field">
-                    <label style="color:#bdbdbd;">Senha atual (para confirmar identidade):</label>
-                    <input type="password" id="adm-current-password" class="date-input" placeholder="Digite sua senha atual">
-                </div>
-                <div class="modal-field">
-                    <label style="color:#bdbdbd;">Nova senha:</label>
-                    <input type="password" id="adm-new-password" class="date-input" placeholder="Nova senha (min. 6 letras)">
-                </div>
-                <div id="adm-pwd-msg" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 0.5rem;"></div>
-                <button id="adm-change-pwd-btn" class="secondary-btn" style="margin-top:0;">Atualizar Senha</button>
-            <button class="secondary-btn" onclick="closeBottomSheet('sheet-change-pwd')" style="margin-top: 2rem;">FECHAR</button>
-        </div>
-    </div>
+
 
 
     <!-- Modal de Explicação de Saldo -->
@@ -788,13 +779,15 @@
                 navItems.forEach(nav => nav.classList.remove('active'));
                 tabContents.forEach(tab => tab.classList.remove('active'));
                 
+                // Close all open modals when switching tabs
+                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
+                
                 item.classList.add('active');
                 document.getElementById(item.dataset.tab).classList.add('active');
                 
-                // Clear password fields on tab switch
-                document.getElementById("adm-current-password").value = "";
-                document.getElementById("adm-new-password").value = "";
-                document.getElementById("adm-pwd-msg").textContent = "";
+                const targetId = item.dataset.tab;
+                if(targetId === 'tab-saldos') { renderStats(); }
+                if(targetId === 'tab-dashboard') { renderDashboard(); }
             });
         });
 
@@ -825,16 +818,13 @@
         const newParticipantName = document.getElementById("new-participant-name");
         const addParticipantBtn = document.getElementById("add-participant-btn");
         const admParticipantList = document.getElementById("adm-participant-list");
-        const admCurrentPassword = document.getElementById("adm-current-password");
-        const admNewPassword = document.getElementById("adm-new-password");
-        const admPwdMsg = document.getElementById("adm-pwd-msg");
-        const admChangePwdBtn = document.getElementById("adm-change-pwd-btn");
+
 
         // Referências do DOM (App Principal)
         const dateInput = document.getElementById("coffee-date");
         const listEl = document.getElementById("participants-list");
         const calcBtn = document.getElementById("calculate-btn");
-        const bonusBtn = document.getElementById("bonus-btn");
+
         const resultContainer = document.getElementById("result-container");
         const spinner = document.getElementById("spinner");
         const winnerName = document.getElementById("winner-name");
@@ -948,6 +938,97 @@
         function showAuthMsg(msg) {
             authMsg.textContent = msg;
         }
+
+        // =====================================
+        // BONUS MODAL LOGIC
+        // =====================================
+        function openBonusModal() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bonus-date-input').value = today;
+            const list = document.getElementById('bonus-participants-checklist');
+            list.innerHTML = '';
+            participantNames.forEach(p => {
+                const isElegible = true; // Futuro: regra de elegibilidade aqui
+                const item = document.createElement('label');
+                item.className = 'check-item';
+                if(!isElegible) item.style.opacity = '0.5';
+                item.innerHTML = `
+                    <div style="display:flex; align-items:center;">
+                        <input type="checkbox" class="bonus-present-checkbox" value="${p}" ${!isElegible ? 'disabled' : ''}>
+                        <span style="${!isElegible ? 'text-decoration: line-through;' : ''}">${p}</span>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+            openBottomSheet('sheet-bonus-form');
+        }
+        window.openBonusModal = openBonusModal;
+
+        document.getElementById('save-bonus-btn')?.addEventListener('click', async () => {
+            const date = document.getElementById('bonus-date-input').value;
+            const checkboxes = document.querySelectorAll('.bonus-present-checkbox:checked');
+            const present = Array.from(checkboxes).map(cb => cb.value);
+            if (present.length === 0) { alert("Selecione pelo menos uma pessoa!"); return; }
+            const newEvent = {
+                id: Date.now().toString(),
+                date: date,
+                isBonus: true,
+                payer: 'Kop Club',
+                present: present,
+                timestamp: new Date().toISOString()
+            };
+            const updatedEvents = [...events, newEvent];
+            try {
+                await setDoc(coffeeDocRef, { events: updatedEvents });
+                registrarLog("CRIOU", "criou", `Rodada Bônus em <strong>${date}</strong> para ${present.join(', ')}`);
+                closeBottomSheet('sheet-bonus-form');
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao salvar a rodada bônus.");
+            }
+        });
+
+        // =====================================
+        // DASHBOARD LOGIC
+        // =====================================
+        function renderDashboard() {
+            const period = document.getElementById('dash-period')?.value || 'all';
+            const container = document.getElementById('dashboard-render-area');
+            if(!container) return;
+            const now = new Date(); now.setHours(0,0,0,0);
+            const filteredEvents = events.filter(ev => {
+                if(period === 'all') return true;
+                const evDate = new Date(ev.date + 'T00:00:00');
+                const diffDays = Math.ceil(Math.abs(now - evDate) / (1000 * 60 * 60 * 24));
+                return diffDays <= parseInt(period);
+            });
+            let stats = {};
+            participantNames.forEach(p => { stats[p] = { pago: 0, presente: 0, bonus: 0 }; });
+            filteredEvents.forEach(ev => {
+                if (ev.isBonus) {
+                    ev.present.forEach(p => { if(!stats[p]) stats[p]={pago:0,presente:0,bonus:0}; stats[p].bonus++; });
+                } else {
+                    if(!stats[ev.payer]) stats[ev.payer]={pago:0,presente:0,bonus:0};
+                    stats[ev.payer].pago += ev.present.length;
+                    ev.present.forEach(p => { if(!stats[p]) stats[p]={pago:0,presente:0,bonus:0}; stats[p].presente++; });
+                }
+            });
+            let maxPago=-1, reiCafe="-", reiPagoQtd=0;
+            let maxSang=-1, sanguessuga="-", sangQtd=0;
+            let maxBonus=-1, reiBonus="-", reiBonusQtd=0;
+            Object.keys(stats).forEach(p => {
+                if(stats[p].pago>maxPago){maxPago=stats[p].pago;reiCafe=p;reiPagoQtd=stats[p].pago;}
+                const ls=stats[p].presente-stats[p].pago;
+                if(ls>maxSang){maxSang=ls;sanguessuga=p;sangQtd=ls;}
+                if(stats[p].bonus>maxBonus){maxBonus=stats[p].bonus;reiBonus=p;reiBonusQtd=stats[p].bonus;}
+            });
+            container.innerHTML = `
+                <div class="dash-card king"><div class="dash-icon">👑</div><div class="dash-info"><div class="dash-title">Rei do Café (Pagador)</div><div class="dash-name">${reiCafe}</div><div class="dash-stats">Pagou <strong>${reiPagoQtd}</strong> cafés</div></div></div>
+                <div class="dash-card leech"><div class="dash-icon">🧛</div><div class="dash-info"><div class="dash-title">Maior Sanguessuga</div><div class="dash-name">${sanguessuga}</div><div class="dash-stats">Tomou <strong>${sangQtd}</strong> cafés de graça</div></div></div>
+                <div class="dash-card bonus"><div class="dash-icon">🎁</div><div class="dash-info"><div class="dash-title">Rei do Kop Club</div><div class="dash-name">${reiBonus}</div><div class="dash-stats">Participou <strong>${reiBonusQtd}</strong> vezes</div></div></div>
+            `;
+        }
+        document.getElementById('dash-period')?.addEventListener('change', renderDashboard);
 
         // =====================================
         // INICIALIZAÇÃO DO APP
@@ -1107,39 +1188,7 @@
 
         
 
-        admChangePwdBtn.addEventListener("click", async () => {
-            const currentPwd = admCurrentPassword.value;
-            const newPwd = admNewPassword.value;
-            admPwdMsg.textContent = "";
 
-            if(!currentPwd) { admPwdMsg.textContent = "⚠️ Digite sua senha atual para confirmar."; return; }
-            if(newPwd.length < 6) { admPwdMsg.textContent = "⚠️ A nova senha precisa ter pelo menos 6 caracteres."; return; }
-            if(currentPwd === newPwd) { admPwdMsg.textContent = "⚠️ A nova senha deve ser diferente da atual."; return; }
-
-            admChangePwdBtn.disabled = true;
-            admChangePwdBtn.textContent = "Aguarde...";
-
-            try {
-                const user = auth.currentUser;
-                const credential = EmailAuthProvider.credential(user.email, currentPwd);
-                await reauthenticateWithCredential(user, credential);
-                await updatePassword(user, newPwd);
-                admPwdMsg.style.color = "var(--success)";
-                admPwdMsg.textContent = "✅ Senha alterada com sucesso!";
-                admCurrentPassword.value = "";
-                admNewPassword.value = "";
-            } catch(err) {
-                admPwdMsg.style.color = "var(--danger)";
-                if(err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
-                    admPwdMsg.textContent = "❌ Senha atual incorreta. Tente novamente.";
-                } else {
-                    admPwdMsg.textContent = "❌ Erro: " + err.message;
-                }
-            } finally {
-                admChangePwdBtn.disabled = false;
-                admChangePwdBtn.textContent = "Atualizar Senha";
-            }
-        });
 
 
         function updateConfigCloud() {
