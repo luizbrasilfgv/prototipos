@@ -114,7 +114,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* Tabela de Estatísticas */
+        /* Tabela de Ranking */
         .stats-panel { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
         .stats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .stats-header h3 { font-size: 1.1rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px; }
@@ -1141,35 +1141,6 @@
             }
         });
 
-        // Reset de senha de qualquer usuário (pelo admin)
-        const admResetEmail = document.getElementById("adm-reset-email");
-        const admSendResetBtn = document.getElementById("adm-send-reset-btn");
-        const admResetMsg = document.getElementById("adm-reset-msg");
-
-        admSendResetBtn.addEventListener("click", async () => {
-            const email = admResetEmail.value.trim();
-            admResetMsg.textContent = "";
-            if (!email) { admResetMsg.style.color = "var(--danger)"; admResetMsg.textContent = "⚠️ Digite o e-mail do usuário."; return; }
-
-            admSendResetBtn.disabled = true;
-            admSendResetBtn.textContent = "...";
-            try {
-                await sendPasswordResetEmail(auth, email);
-                admResetMsg.style.color = "var(--success)";
-                admResetMsg.textContent = `✅ Link enviado para ${email}! Avisa pra checar o spam.`;
-                admResetEmail.value = "";
-            } catch(err) {
-                admResetMsg.style.color = "var(--danger)";
-                if (err.code === "auth/user-not-found") {
-                    admResetMsg.textContent = "❌ E-mail não encontrado no sistema.";
-                } else {
-                    admResetMsg.textContent = "❌ Erro: " + err.message;
-                }
-            } finally {
-                admSendResetBtn.disabled = false;
-                admSendResetBtn.textContent = "Enviar";
-            }
-        });
 
         function updateConfigCloud() {
             setDoc(configDocRef, { participants: participantNames }).catch(console.error);
