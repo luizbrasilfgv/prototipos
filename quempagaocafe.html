@@ -1513,30 +1513,33 @@
 
             sortedEvents.forEach(ev => {
                 const div = document.createElement("div");
-                div.className = "history-item";
+                div.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
                 
                 const dataBr = ev.date.split('-').reverse().join('/');
                 
                 let actionBtns = "";
                 if (currentUserRoles.includes('admin')) {
                     actionBtns = `
-                        <div class="action-btns" style="display:flex; gap: 5px;">
-                            <button class="crud-btn edit-btn" data-id="${ev.id}" title="Editar este lançamento" onclick="event.stopPropagation()">✏️</button>
-                            <button class="crud-btn delete-btn" data-id="${ev.id}" title="Apagar este lançamento" onclick="event.stopPropagation()">🗑️</button>
+                        <div style="display:flex; gap: 8px;">
+                            <button class="crud-btn edit-btn" data-id="${ev.id}" title="Editar" onclick="event.stopPropagation()" style="background:none; border:none; padding:0; cursor:pointer;">✏️</button>
+                            <button class="crud-btn delete-btn" data-id="${ev.id}" title="Apagar" onclick="event.stopPropagation()" style="background:none; border:none; padding:0; cursor:pointer;">🗑️</button>
                         </div>
                     `;
                 }
 
                 div.innerHTML = `
-                    <div class="history-info" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);" onclick="const det = this.nextElementSibling; if(det.style.display==='none'){det.style.display='block';}else{det.style.display='none';}">
-                        <div style="font-size: 1.1rem;"><strong>${dataBr}</strong> <span style="color:var(--text-muted); font-size: 0.9rem;">- ${ev.payer}</span></div>
-                        <div style="display:flex; align-items:center; gap: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; cursor: pointer;" onclick="const det = this.nextElementSibling; det.style.display = det.style.display === 'none' ? 'block' : 'none';">
+                        <div style="display: flex; flex-grow: 1; align-items: center;">
+                            <span style="color: var(--primary-color); font-weight: bold; width: 50px; font-size: 0.9rem;">${dataBr.substring(0,5)}</span>
+                            <span style="color: var(--text-main); font-size: 0.95rem; margin-left: 10px;">${ev.payer}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
                             ${actionBtns}
-                            <span style="font-size: 0.8rem; color: var(--primary-color);">▼</span>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">▼</span>
                         </div>
                     </div>
-                    <div class="history-details" style="display: none; padding: 15px; color: var(--text-muted); background: rgba(0,0,0,0.3); border-radius: 0 0 10px 10px; margin-top: -5px; border: 1px solid rgba(255,255,255,0.05); border-top: none;">
-                        <strong style="color: var(--primary-color);">Galera:</strong> ${ev.present.join(', ')}
+                    <div class="history-details" style="display: none; padding: 10px 5px 15px 5px; color: var(--text-muted); font-size: 0.85rem; background: rgba(0,0,0,0.15);">
+                        <strong style="color: var(--text-main);">Participantes:</strong> ${ev.present.join(', ')}
                     </div>
                 `;
                 historyList.appendChild(div);
