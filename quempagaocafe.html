@@ -3,19 +3,7 @@
 <head>
     <script>
         if (window.location.hostname === "luizbrasilfgv.github.io") {
-            document.write(`
-                <html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-                <body style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; background:#1a100c; color:#fdf5e6; font-family:sans-serif; text-align:center; padding: 20px; margin:0;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">☕</div>
-                    <h1 style="color:#FFD54F; margin-bottom: 20px;">O App Mudou de Casa!</h1>
-                    <p style="font-size: 1.1rem; margin-bottom: 30px; max-width: 400px; line-height: 1.5; color: #d7ccc8;">O <strong>Quem Paga o Café</strong> agora está em um novo endereço, mais rápido e seguro.</p>
-                    <a href="https://quempagacafe.web.app/" style="background:#81c784; color:#000; padding:15px 30px; text-decoration:none; border-radius:12px; font-weight:bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(129, 199, 132, 0.3);">ACESSAR NOVO APP</a>
-                    <p style="margin-top:25px; font-size:0.85rem; color:rgba(255,255,255,0.4);">Você será redirecionado automaticamente...</p>
-                </body></html>
-            `);
-            document.close();
-            setTimeout(function(){ window.location.replace("https://quempagacafe.web.app/"); }, 5000);
-            window.stop();
+            window.location.replace("https://quempagacafe.web.app/");
         }
     </script>
     <meta charset="UTF-8">
