@@ -53,7 +53,7 @@
         header p { color: var(--text-muted); font-size: 0.9rem; }
 
         .auth-bar { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); align-items: center;}
-        .auth-bar button { background: none; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 8px; cursor: pointer; font-size: 0.75rem;}
+        .auth-bar button { background: none; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 8px; cursor: pointer; font-size: 0.65rem;}
         .auth-bar button:hover { background: var(--primary-color); color: #000; }
         
         .adm-btn { border-color: var(--success) !important; color: var(--success) !important; margin-right: 0.5rem;}
@@ -172,6 +172,10 @@
             background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
             display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;
         }
+        
+        .modal-fullscreen { padding: 0 !important; width: 100vw; height: 100vh; }
+        .modal-fullscreen .modal-content { padding-bottom: 100px; min-height: 100vh; border-radius: 0; margin: 0; max-height: none; overflow-y: auto; }
+
         .modal-content {
             background: var(--surface-color); border: 1px solid var(--primary-color); border-radius: 20px;
             padding: 1.5rem; width: 100%; max-width: 400px;
@@ -246,7 +250,7 @@
         .nav-item {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: var(--text-muted); cursor: pointer; font-size: 0.75rem; text-transform: uppercase;
-            letter-spacing: 0.5px; transition: all 0.3s; position: relative; width: 20%;
+            letter-spacing: 0.5px; transition: all 0.3s; position: relative; flex: 1; min-width: 0;
         }
         .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
         .nav-item.active { color: var(--primary-color); }
@@ -375,7 +379,7 @@
             </div>
 
             <button id="calculate-btn" class="primary-btn">Descobrir quem paga</button>
-            <button id="bonus-btn" class="primary-btn" style="background: rgba(129, 199, 132, 0.2); color: var(--success); border: 1px solid var(--success); margin-top: 10px; font-size: 0.95rem;">🎁 Registrar Rodada Bônus (Grátis)</button>
+            <button onclick="openBonusModal()" class="primary-btn" style="background: rgba(129, 199, 132, 0.2); color: var(--success); border: 1px solid var(--success); margin-top: 10px; font-size: 0.95rem;">🎁 Registrar Rodada Bônus (Grátis)</button>
 
             <div id="result-container" class="result-container hidden">
                 <div class="spinner" id="spinner"></div>
@@ -469,33 +473,15 @@
                                 <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
                             </div>
 
-                            <div class="menu-btn" onclick="openBottomSheet('sheet-reset-pwd')">
-                                <div class="menu-btn-left">
-                                    <div class="menu-btn-icon">🔑</div>
-                                    <div class="menu-btn-text">Resetar Senha</div>
-                                </div>
-                                <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
-                            </div>
 
-                            <div class="menu-btn" onclick="openBottomSheet('sheet-logs')">
-                                <div class="menu-btn-left">
-                                    <div class="menu-btn-icon">📋</div>
-                                    <div class="menu-btn-text">Auditoria (Logs)</div>
-                                </div>
-                                <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
-                            </div>
+
+
                         </div>
                     </div>
 
                     <div class="menu-group-title">Minha Conta</div>
                     <div class="menu-list">
-                        <div class="menu-btn" onclick="openBottomSheet('sheet-change-pwd')">
-                            <div class="menu-btn-left">
-                                <div class="menu-btn-icon">🛡️</div>
-                                <div class="menu-btn-text">Trocar Minha Senha</div>
-                            </div>
-                            <svg class="menu-chevron" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
-                        </div>
+
                         <div class="menu-btn" id="logout-menu-btn" style="border-color: rgba(239, 83, 80, 0.3);">
                             <div class="menu-btn-left">
                                 <div class="menu-btn-icon" style="background: rgba(239, 83, 80, 0.1);">🚪</div>
@@ -504,6 +490,22 @@
                         </div>
                     </div>
  <!-- FIM ABA PERFIL -->
+
+        
+            <!-- DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content">
+                <div class="app-container">
+                    <h2 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;">Estatísticas Gerais</h2>
+                    <select id="dash-period" class="dash-filter">
+                        <option value="30">Últimos 30 Dias</option>
+                        <option value="180">Últimos 6 Meses</option>
+                        <option value="all">Todo o Histórico</option>
+                    </select>
+                    <div id="dashboard-render-area" class="dashboard-container">
+                        <!-- Renderizado via JS -->
+                    </div>
+                </div>
+            </div>
 
         </main>
     </div>
@@ -560,19 +562,6 @@
         </div>
     </div>
 
-    <div id="sheet-reset-pwd" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 450px;">
-            <h3 style="margin-bottom: 1.5rem;">🔑 Resetar Senha</h3>
-            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Manda um link de redefinição para o e-mail de qualquer pessoa do grupo.</p>
-                <div class="inline-form">
-                    <input type="email" id="adm-reset-email" placeholder="e-mail do usuário (ex: leo@gmail.com)">
-                    <button id="adm-send-reset-btn">Enviar</button>
-                </div>
-                <div id="adm-reset-msg" style="font-size: 0.85rem; margin-top: 0.3rem;"></div>
-            <button class="secondary-btn" onclick="closeBottomSheet('sheet-reset-pwd')" style="margin-top: 2rem;">FECHAR</button>
-        </div>
-    </div>
-
     
     <!-- Modal de Regras do Bônus -->
     <div id="sheet-bonus-rules" class="modal-overlay hidden modal-fullscreen">
@@ -605,6 +594,38 @@
             </div>
             
             <button class="secondary-btn" onclick="closeBottomSheet('sheet-bonus-rules')" style="margin-top: 2rem;">FECHAR</button>
+        </div>
+    </div>
+
+    
+    <!-- Modal de Bônus -->
+    <div id="sheet-bonus-form" class="modal-overlay hidden modal-fullscreen">
+        <div class="modal-content" style="border-top: 4px solid var(--success);">
+            <h3 style="margin-bottom: 1.5rem; color: var(--success); text-align: center;">🎁 Rodada Bônus</h3>
+            
+                                <div class="rules-box clickable-row" onclick="openBottomSheet('sheet-bonus-rules')" style="cursor:pointer; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-color: var(--success); background: rgba(129, 199, 132, 0.05);">
+                        <div style="display:flex; align-items:center; gap: 10px;">
+                            <span style="font-size: 1.5rem;">🗳️</span>
+                            <div>
+                                <h4 style="margin:0; color: var(--success);">Regras do Bônus (Em Votação)</h4>
+                                <span style="color:var(--text-muted); font-size:0.8rem;">Clique para ver as propostas</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--success);">➜</span>
+                    </div>
+
+            <div style="margin-top: 2rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Data do Bônus</label>
+                <input type="date" id="bonus-date-input" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--success); color: white; border-radius: 8px; margin-bottom: 1.5rem;" />
+            </div>
+
+            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Quem participou desta rodada grátis?</label>
+            <div class="checklist" id="bonus-participants-checklist">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <button id="save-bonus-btn" class="primary-btn" style="background: var(--success); color: #000; font-weight: bold; margin-top: 1.5rem;">SALVAR RODADA BÔNUS</button>
+            <button class="secondary-btn" onclick="closeBottomSheet('sheet-bonus-form')" style="margin-top: 1rem;">CANCELAR</button>
         </div>
     </div>
 
