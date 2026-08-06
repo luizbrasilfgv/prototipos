@@ -543,8 +543,8 @@
     </nav>
 
     
-    <div id="sheet-participants" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 450px;">
+    <div id="sheet-participants" class="modal-overlay hidden modal-fullscreen">
+        <div class="modal-content">
             <h3 style="margin-bottom: 1.5rem;">👥 Participantes do Grupo</h3>
             <div class="inline-form">
                     <input type="text" id="new-participant-name" placeholder="Nome do novo membro">
@@ -557,8 +557,8 @@
         </div>
     </div>
 
-    <div id="sheet-access" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 450px;">
+    <div id="sheet-access" class="modal-overlay hidden modal-fullscreen">
+        <div class="modal-content">
             <h3 style="margin-bottom: 1.5rem;">🔒 Controle de Acessos</h3>
             <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Aprove contas novas e defina quem é ADM ou Usuário comum.</p>
                 <div class="adm-participant-list" id="adm-access-list">
@@ -609,7 +609,7 @@
         <div class="modal-content" style="border-top: 4px solid var(--success);">
             <h3 style="margin-bottom: 1.5rem; color: var(--success); text-align: center;">🎁 Rodada Bônus</h3>
             
-                                <div class="rules-box clickable-row" onclick="openBottomSheet('sheet-bonus-rules')" style="cursor:pointer; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-color: var(--success); background: rgba(129, 199, 132, 0.05);">
+                                <div class="rules-box clickable-row" onclick="closeBottomSheet('sheet-bonus-form'); openBottomSheet('sheet-bonus-rules');" style="cursor:pointer; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-color: var(--success); background: rgba(129, 199, 132, 0.05);">
                         <div style="display:flex; align-items:center; gap: 10px;">
                             <span style="font-size: 1.5rem;">🗳️</span>
                             <div>
@@ -672,8 +672,8 @@
         </div>
     </div>
 
-    <div id="sheet-logs" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 450px;">
+    <div id="sheet-logs" class="modal-overlay hidden modal-fullscreen">
+        <div class="modal-content">
             <h3 style="margin-bottom: 1.5rem;">📋 Logs de Auditoria</h3>
             <div class="log-list" id="adm-logs-list">
                     <p style='color:var(--text-muted); font-size:0.85rem; text-align: center;'>Carregando logs...</p>
@@ -686,8 +686,8 @@
 
 
     <!-- Modal de Explicação de Saldo -->
-    <div id="statement-modal" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 450px;">
+    <div id="statement-modal" class="modal-overlay hidden modal-fullscreen">
+        <div class="modal-content">
             <h3 id="statement-title">Extrato</h3>
             <div id="statement-body">
                 <!-- Preenchido via JS -->
@@ -697,7 +697,7 @@
     </div>
 
     <!-- Modal de Edição (CRUD) -->
-    <div id="edit-modal" class="modal-overlay hidden">
+    <div id="edit-modal" class="modal-overlay hidden modal-fullscreen">
         <div class="modal-content">
             <h3>Editar Lançamento</h3>
             
@@ -1739,31 +1739,7 @@
             }, 1200);
         });
 
-        bonusBtn.addEventListener("click", () => {
-            if (!dateInput.value) { alert("Por favor, selecione a data!"); return; }
-            if (events.some(e => e.date === dateInput.value)) { alert("Já existe um café registrado para esta data!"); return; }
 
-            const checkboxes = document.querySelectorAll(".participant-checkbox:checked");
-            currentPresent = Array.from(checkboxes).map(cb => cb.value);
-            
-            if (currentPresent.length === 0) { alert("Selecione pelo menos uma pessoa para a rodada bônus!"); return; }
-            
-            if (confirm(`Tem certeza que deseja registrar uma Rodada Bônus (Kop Club) para ${currentPresent.length} pessoa(s)? Isso não afetará a dívida de ninguém.`)) {
-                const newEvent = {
-                    id: Date.now(),
-                    date: dateInput.value,
-                    present: currentPresent,
-                    payer: "BÔNUS (Kop Club)",
-                    isBonus: true
-                };
-                
-                events.push(newEvent);
-                updateCloudData();
-                registrarLog("CRIOU", "config", `Rodada Bônus (Kop Club) registrada no dia <strong>${dateInput.value.split('-').reverse().join('/')}</strong> para ${currentPresent.length} pessoa(s)`);
-                
-                alert(`🎁 Rodada Bônus registrada com sucesso!`);
-            }
-        });
 
         confirmBtn.addEventListener("click", () => {
             if (!currentWinner || !coffeeDocRef) return;
