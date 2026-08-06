@@ -1048,81 +1048,66 @@
             html += `
             <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px;">
                 <div style="font-weight: bold; font-size: 1.1rem; color: var(--success); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">☕ Pagou a rodada</div>
-                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 0.9rem; color: var(--text-muted);">
+                <div style="display: flex; flex-direction: column; font-size: 0.9rem; color: var(--text-muted);">
             `;
-            let hasPago = false;
-            [...activeUsers].sort((a,b) => stats[b].vezes_pagou - stats[a].vezes_pagou).forEach(p => {
-                if(stats[p].vezes_pagou > 0) {
-                    hasPago = true;
-                    html += `<div><strong style="color:var(--text-main);">${p}</strong>: ${stats[p].vezes_pagou} vez(es)</div>`;
-                }
+            [...activeUsers].sort((a,b) => stats[b].vezes_pagou - stats[a].vezes_pagou).forEach((p, idx) => {
+                const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${stats[p].vezes_pagou} vez(es)</span></div>`;
             });
-            if(!hasPago) html += `<div>Nenhuma rodada paga neste período.</div>`;
+            if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
 
             // Cafés efetivamente bancados
             html += `
             <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px;">
                 <div style="font-weight: bold; font-size: 1.1rem; color: var(--success); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">☕ Total de cafés bancados</div>
-                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 0.9rem; color: var(--text-muted);">
+                <div style="display: flex; flex-direction: column; font-size: 0.9rem; color: var(--text-muted);">
             `;
-            let hasCafes = false;
-            [...activeUsers].sort((a,b) => stats[b].pago - stats[a].pago).forEach(p => {
-                if(stats[p].pago > 0) {
-                    hasCafes = true;
-                    html += `<div><strong style="color:var(--text-main);">${p}</strong>: ${stats[p].pago} café(s) no total</div>`;
-                }
+            [...activeUsers].sort((a,b) => stats[b].pago - stats[a].pago).forEach((p, idx) => {
+                const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${stats[p].pago} café(s)</span></div>`;
             });
-            if(!hasCafes) html += `<div>Nenhum café pago neste período.</div>`;
+            if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
 
             // Tomou de graça
             html += `
             <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px;">
                 <div style="font-weight: bold; font-size: 1.1rem; color: var(--danger); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">🧛 Tomou de graça</div>
-                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 0.9rem; color: var(--text-muted);">
+                <div style="display: flex; flex-direction: column; font-size: 0.9rem; color: var(--text-muted);">
             `;
-            let hasGraca = false;
-            [...activeUsers].sort((a,b) => (stats[b].presente - stats[b].vezes_pagou) - (stats[a].presente - stats[a].vezes_pagou)).forEach(p => {
+            [...activeUsers].sort((a,b) => (stats[b].presente - stats[b].vezes_pagou) - (stats[a].presente - stats[a].vezes_pagou)).forEach((p, idx) => {
                 const tomouDeGraca = stats[p].presente - stats[p].vezes_pagou;
-                if(tomouDeGraca > 0) {
-                    hasGraca = true;
-                    html += `<div><strong style="color:var(--text-main);">${p}</strong>: ${tomouDeGraca} vez(es)</div>`;
-                }
+                const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${tomouDeGraca > 0 ? tomouDeGraca : 0} vez(es)</span></div>`;
             });
-            if(!hasGraca) html += `<div>Ninguém tomou de graça neste período.</div>`;
+            if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
 
             // Marcou presença
             html += `
             <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px;">
                 <div style="font-weight: bold; font-size: 1.1rem; color: var(--text-main); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">👋 Marcou presença</div>
-                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 0.9rem; color: var(--text-muted);">
+                <div style="display: flex; flex-direction: column; font-size: 0.9rem; color: var(--text-muted);">
             `;
-            let hasPresenca = false;
-            [...activeUsers].sort((a,b) => stats[b].presente - stats[a].presente).forEach(p => {
-                if(stats[p].presente > 0) {
-                    hasPresenca = true;
-                    html += `<div><strong style="color:var(--text-main);">${p}</strong>: ${stats[p].presente} vez(es)</div>`;
-                }
+            [...activeUsers].sort((a,b) => stats[b].presente - stats[a].presente).forEach((p, idx) => {
+                const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${stats[p].presente} vez(es)</span></div>`;
             });
-            if(!hasPresenca) html += `<div>Sem presenças registradas.</div>`;
+            if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
 
             // Rodadas Kop Club
             html += `
             <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px;">
                 <div style="font-weight: bold; font-size: 1.1rem; color: var(--primary-color); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">🎁 Rodadas Kop Club</div>
-                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 0.9rem; color: var(--text-muted);">
+                <div style="display: flex; flex-direction: column; font-size: 0.9rem; color: var(--text-muted);">
             `;
-            let hasBonus = false;
-            [...activeUsers].sort((a,b) => stats[b].bonus - stats[a].bonus).forEach(p => {
-                if(stats[p].bonus > 0) {
-                    hasBonus = true;
-                    html += `<div><strong style="color:var(--text-main);">${p}</strong>: ${stats[p].bonus} vez(es)</div>`;
-                }
+            [...activeUsers].sort((a,b) => stats[b].bonus - stats[a].bonus).forEach((p, idx) => {
+                const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${stats[p].bonus} vez(es)</span></div>`;
             });
-            if(!hasBonus) html += `<div>Nenhum bônus foi usado neste período.</div>`;
+            if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
 
             html += `</div>`;
