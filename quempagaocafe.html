@@ -432,8 +432,9 @@
             <div id="tab-historico" class="tab-content">
                     <div class="history-panel" style="margin-top:0; border-top:none; padding-top:0;">
                         <div class="history-header">
-                    <h3>Histórico de Lançamentos</h3>
-                </div>
+                            <h3 style="margin-bottom: 1rem;">Histórico de Lançamentos</h3>
+                            <input type="text" id="history-filter" class="date-input" style="padding: 10px; margin-bottom: 15px; width: 100%; box-sizing: border-box; font-size: 0.9rem; border-color: rgba(255,255,255,0.2);" placeholder="Buscar pagador ou data (ex: Luiz ou 25/12)...">
+                        </div>
                 <div class="history-list" id="history-list">
                     <!-- Extrato via JS -->
                 </div>
@@ -778,6 +779,8 @@
                 
                 // Close all open modals when switching tabs
                 document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 
                 item.classList.add('active');
                 document.getElementById(item.dataset.tab).classList.add('active');
@@ -1504,12 +1507,25 @@
 
         function renderHistory() {
             historyList.innerHTML = "";
-            if (events.length === 0) {
-                historyList.innerHTML = `<p class="empty-msg">Nenhum café registrado ainda.</p>`;
+            const filterText = document.getElementById('history-filter')?.value.toLowerCase().trim() || '';
+
+            let filteredEvents = events;
+            if (filterText) {
+                filteredEvents = events.filter(ev => {
+                    const dataBr = ev.date.split('-').reverse().join('/');
+                    const dataBrNoYear = dataBr.substring(0, 5);
+                    const isBonusStr = ev.isBonus ? "kop club bônus bonus" : "";
+                    const searchStr = `${ev.payer} ${dataBr} ${dataBrNoYear} ${isBonusStr}`.toLowerCase();
+                    return searchStr.includes(filterText);
+                });
+            }
+
+            if (filteredEvents.length === 0) {
+                historyList.innerHTML = `<p class="empty-msg">Nenhum café encontrado.</p>`;
                 return;
             }
 
-            const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const sortedEvents = [...filteredEvents].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedEvents.forEach(ev => {
                 const div = document.createElement("div");
@@ -1566,6 +1582,8 @@
                 });
             });
         }
+        
+        document.getElementById('history-filter')?.addEventListener('input', renderHistory);
 
         // =====================================
         // EDIÇÃO CRUD MODAL
