@@ -344,7 +344,7 @@
     </div>
 
     <!-- TELA PRINCIPAL (APP) -->
-    <div class="hidden" id="main-app" style="background: transparent; border: none; box-shadow: none; max-width: 600px; padding: 1rem 0; margin: auto; width: 100%; display: block;">
+    <div class="hidden" id="main-app" style="background: transparent; border: none; box-shadow: none; max-width: 600px; padding: 1rem 0; margin: 0 auto; width: 100%; display: block;">
         
         
 
@@ -1001,30 +1001,59 @@
                 return diffDays <= parseInt(period);
             });
             let stats = {};
-            participantNames.forEach(p => { stats[p] = { pago: 0, presente: 0, bonus: 0 }; });
+            participantNames.forEach(p => { stats[p] = { pago: 0, vezes_pagou: 0, presente: 0, bonus: 0 }; });
             filteredEvents.forEach(ev => {
                 if (ev.isBonus) {
-                    ev.present.forEach(p => { if(!stats[p]) stats[p]={pago:0,presente:0,bonus:0}; stats[p].bonus++; });
+                    ev.present.forEach(p => { if(!stats[p]) stats[p]={pago:0, vezes_pagou:0, presente:0, bonus:0}; stats[p].bonus++; });
                 } else {
-                    if(!stats[ev.payer]) stats[ev.payer]={pago:0,presente:0,bonus:0};
+                    if(!stats[ev.payer]) stats[ev.payer]={pago:0, vezes_pagou:0, presente:0, bonus:0};
                     stats[ev.payer].pago += ev.present.length;
-                    ev.present.forEach(p => { if(!stats[p]) stats[p]={pago:0,presente:0,bonus:0}; stats[p].presente++; });
+                    stats[ev.payer].vezes_pagou += 1;
+                    ev.present.forEach(p => { if(!stats[p]) stats[p]={pago:0, vezes_pagou:0, presente:0, bonus:0}; stats[p].presente++; });
                 }
             });
-            let maxPago=-1, reiCafe="-", reiPagoQtd=0;
-            let maxSang=-1, sanguessuga="-", sangQtd=0;
-            let maxBonus=-1, reiBonus="-", reiBonusQtd=0;
+            
+            let maxPago=0, reiCafe="-", reiPagoQtd=0;
+            let maxSang=0, sanguessuga="-", sangQtd=0;
+            let maxBonus=0, reiBonus="-", reiBonusQtd=0;
+            
             Object.keys(stats).forEach(p => {
-                if(stats[p].pago>maxPago){maxPago=stats[p].pago;reiCafe=p;reiPagoQtd=stats[p].pago;}
-                const ls=stats[p].presente-stats[p].pago;
-                if(ls>maxSang){maxSang=ls;sanguessuga=p;sangQtd=ls;}
-                if(stats[p].bonus>maxBonus){maxBonus=stats[p].bonus;reiBonus=p;reiBonusQtd=stats[p].bonus;}
+                if(stats[p].pago > maxPago){maxPago=stats[p].pago; reiCafe=p; reiPagoQtd=stats[p].pago;}
+                const ls = stats[p].presente - stats[p].vezes_pagou;
+                if(ls > maxSang){maxSang=ls; sanguessuga=p; sangQtd=ls;}
+                if(stats[p].bonus > maxBonus){maxBonus=stats[p].bonus; reiBonus=p; reiBonusQtd=stats[p].bonus;}
             });
-            container.innerHTML = `
-                <div class="dash-card king"><div class="dash-icon">👑</div><div class="dash-info"><div class="dash-title">Rei do Café (Pagador)</div><div class="dash-name">${reiCafe}</div><div class="dash-stats">Pagou <strong>${reiPagoQtd}</strong> cafés</div></div></div>
+            
+            if(reiCafe === "-") reiCafe = "Ninguém";
+            if(sanguessuga === "-") sanguessuga = "Ninguém";
+            if(reiBonus === "-") reiBonus = "Ninguém";
+            
+            let html = `
+                <div class="dash-card king"><div class="dash-icon">👑</div><div class="dash-info"><div class="dash-title">Rei do Café (Pagador)</div><div class="dash-name">${reiCafe}</div><div class="dash-stats">Pagou <strong>${reiPagoQtd}</strong> cafés na rodada</div></div></div>
                 <div class="dash-card leech"><div class="dash-icon">🧛</div><div class="dash-info"><div class="dash-title">Maior Sanguessuga</div><div class="dash-name">${sanguessuga}</div><div class="dash-stats">Tomou <strong>${sangQtd}</strong> cafés de graça</div></div></div>
-                <div class="dash-card bonus"><div class="dash-icon">🎁</div><div class="dash-info"><div class="dash-title">Rei do Kop Club</div><div class="dash-name">${reiBonus}</div><div class="dash-stats">Participou <strong>${reiBonusQtd}</strong> vezes</div></div></div>
+                <div class="dash-card bonus"><div class="dash-icon">🎁</div><div class="dash-info"><div class="dash-title">Rei do Kop Club</div><div class="dash-name">${reiBonus}</div><div class="dash-stats">Ganhou <strong>${reiBonusQtd}</strong> bônus</div></div></div>
             `;
+
+            html += `<h3 style="color: var(--primary-color); margin-top: 2rem; margin-bottom: 1rem; text-align: center;">Consolidado Individual</h3>`;
+            html += `<div style="display: flex; flex-direction: column; gap: 1rem;">`;
+            
+            Object.keys(stats).sort((a,b) => stats[b].pago - stats[a].pago).forEach(p => {
+                if(stats[p].presente === 0 && stats[p].vezes_pagou === 0 && stats[p].bonus === 0) return;
+                const tomouDeGraca = stats[p].presente - stats[p].vezes_pagou;
+                html += `
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px;">
+                    <div style="font-weight: bold; font-size: 1.2rem; color: var(--text-main); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">${p}</div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 8px; font-size: 0.85rem; color: var(--text-muted);">
+                        <div>☕ <strong>Pagou a conta:</strong> <span style="color: var(--success);">${stats[p].vezes_pagou} rodadas</span> (Bancou ${stats[p].pago} cafés)</div>
+                        <div>🧛 <strong>Tomou de graça:</strong> <span style="color: var(--danger);">${tomouDeGraca > 0 ? tomouDeGraca : 0} vezes</span></div>
+                        <div>👋 <strong>Marcou presença:</strong> ${stats[p].presente} vezes</div>
+                        <div>🎁 <strong>Rodadas Kop Club:</strong> <span style="color: var(--primary-color);">${stats[p].bonus} vezes</span></div>
+                    </div>
+                </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
         }
         document.getElementById('dash-period')?.addEventListener('change', renderDashboard);
 
