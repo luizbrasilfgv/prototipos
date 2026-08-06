@@ -1,0 +1,17 @@
+{
+  "name": "Quem Paga o Café?",
+  "short_name": "Quem Paga?",
+  "description": "O tribunal oficial da Kopenhagen",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a100c",
+  "theme_color": "#1a100c",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

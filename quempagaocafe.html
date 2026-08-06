@@ -2,7 +2,12 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#1a100c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <title>Quem Paga o Café?</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -283,14 +288,10 @@
             <p>Acesso Restrito</p>
         </header>
         <div class="auth-container">
-            <input type="email" id="auth-email" placeholder="E-mail">
-            <input type="password" id="auth-password" placeholder="Senha">
-            <button id="auth-login-btn" class="primary-btn">Entrar</button>
-            
-            <div class="auth-links">
-                <a id="auth-register-btn">Não tem conta? Criar conta</a>
-                <a id="auth-reset-btn">Esqueci minha senha</a>
-            </div>
+            <button id="auth-google-btn" class="primary-btn" style="background: white; color: #444; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/><path fill="none" d="M1 1h22v22H1z"/></svg>
+                Entrar com Google
+            </button>
             <div id="auth-msg" style="color: var(--danger); margin-top: 1rem; font-size: 0.9rem;"></div>
         </div>
     </div>
@@ -324,15 +325,16 @@
         </header>
 
                 <div class="app-container" style="padding: 1.5rem 1rem; margin-bottom: 2rem;">
-                    <div class="rules-box">
-                <h4>📜 Regras da Caverna (Para entender fácil)</h4>
-                <ul>
-                    <li>Toma café e NÃO paga? <strong>Dívida sobe (+1)</strong>.</li>
-                    <li>Paga a conta? <strong>Dívida desce (menos o número de pessoas presentes)</strong>.</li>
-                    <li>Quem paga hoje? <strong>SEMPRE QUEM TIVER A MAIOR DÍVIDA</strong>.</li>
-                    <li>Empatou a maior dívida? A roleta decide quem morre!</li>
-                </ul>
-            </div>
+                    <div class="rules-box clickable-row" onclick="openBottomSheet('sheet-rules')" style="cursor:pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display:flex; align-items:center; gap: 10px;">
+                            <span style="font-size: 1.5rem;">📜</span>
+                            <div>
+                                <h4 style="margin:0;">Regras Oficiais do Tribunal</h4>
+                                <span style="color:var(--text-muted); font-size:0.8rem;">Clique para ler o regulamento completo</span>
+                            </div>
+                        </div>
+                        <svg viewBox="0 0 24 24" style="width:24px; height:24px; fill:var(--text-muted)"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                    </div>
 
             <div class="date-container">
                 <p class="instruction-text">1. Informe a data do café:</p>
@@ -347,6 +349,7 @@
             </div>
 
             <button id="calculate-btn" class="primary-btn">Descobrir quem paga</button>
+            <button id="bonus-btn" class="primary-btn" style="background: rgba(129, 199, 132, 0.2); color: var(--success); border: 1px solid var(--success); margin-top: 10px; font-size: 0.95rem;">🎁 Registrar Rodada Bônus (Grátis)</button>
 
             <div id="result-container" class="result-container hidden">
                 <div class="spinner" id="spinner"></div>
@@ -381,6 +384,7 @@
                             <th>Saldo<br>(Dívida)</th>
                             <th title="Vezes presente nos últimos 30 dias">Idas<br>(30d)</th>
                             <th title="Cafés pagos nos últimos 30 dias">Pagou<br>(30d)</th>
+                            <th title="Rodadas Bônus (Kop Club) consumidas nos últimos 30 dias">Bônus<br>(30d)</th>
                             <th title="Créditos de proteção adquiridos há mais de 23 dias que expirarão em menos de 1 semana">Expira<br>(7d)</th>
                         </tr>
                     </thead>
@@ -538,6 +542,46 @@
         </div>
     </div>
 
+    <!-- Modal de Regras Detalhadas -->
+    <div id="sheet-rules" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 style="margin-bottom: 1.5rem; display: flex; align-items:center; justify-content:center; gap: 10px;">📜 Regulamento Oficial</h3>
+            
+            <div style="color: var(--text-main); font-size: 0.9rem; line-height: 1.6; text-align: left; padding: 0 0.5rem;">
+                <p style="margin-bottom: 1rem;">O <strong>Tribunal do Café</strong> é um sistema inviolável de justiça matemática criado para garantir que ninguém pague mais do que deveria (ou tome café nas costas dos outros). Entenda como a sua dívida é calculada:</p>
+                
+                <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">1. O VAR (Como o Saldo funciona)</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li><strong>Tomou e NÃO pagou:</strong> Sua dívida aumenta em <strong>+1</strong>.</li>
+                    <li><strong>Você pagou a conta:</strong> Sua dívida cai com base em quantos cafés você pagou (Ex: pagou para 4? <strong>-4</strong> no seu saldo).</li>
+                </ul>
+
+                <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">2. Quem paga hoje? (A Guilhotina)</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li>Paga quem tiver o <strong>Maior Saldo Devedor</strong> no momento, sem choro.</li>
+                </ul>
+
+                <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">3. Trava de Repetição (Nova)</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li>Quem pagou a última rodada <strong>está blindado</strong> e NÃO pode ser escolhido hoje (mesmo se for o maior devedor). O sistema pula automaticamente para o segundo maior devedor.</li>
+                </ul>
+
+                <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">4. Desempate do Leo (Novo)</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li>Duas ou mais pessoas empataram na liderança da dívida? O desempate agora pune quem pagou menos cafés (vezes abriu a carteira) nos <strong>últimos 7 dias</strong>. Paga o "mais pão-duro da semana".</li>
+                    <li><strong>A Roleta</strong> só entra em ação se houver empate até nisso!</li>
+                </ul>
+
+                <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">5. Rodadas Bônus Kop Club (Nova)</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li>As rodadas resgatadas não alteram a dívida de ninguém (pois foi de graça). Contudo, o sistema contabiliza quem participou e você pode consultar os "Bônus Consumidos" na aba de Saldos!</li>
+                </ul>
+            </div>
+            
+            <button class="secondary-btn" onclick="closeBottomSheet('sheet-rules')" style="margin-top: 2rem;">ENTENDI AS REGRAS</button>
+        </div>
+    </div>
+
     <div id="sheet-logs" class="modal-overlay hidden">
         <div class="modal-content" style="max-width: 450px;">
             <h3 style="margin-bottom: 1.5rem;">📋 Logs de Auditoria</h3>
@@ -611,7 +655,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCgvPP1pD5z7ew2r3UQNPWW1biT6EwO750",
@@ -641,11 +685,7 @@
         const admAccessList = document.getElementById("adm-access-list");
         
         pendingLogoutBtn.addEventListener("click", () => signOut(auth));
-        const authEmail = document.getElementById("auth-email");
-        const authPassword = document.getElementById("auth-password");
-        const authLoginBtn = document.getElementById("auth-login-btn");
-        const authRegisterBtn = document.getElementById("auth-register-btn");
-        const authResetBtn = document.getElementById("auth-reset-btn");
+        const authGoogleBtn = document.getElementById("auth-google-btn");
         const authMsg = document.getElementById("auth-msg");
         const userEmailDisplay = document.getElementById("user-email-display");
         const logoutBtn = document.getElementById("logout-menu-btn");
@@ -710,6 +750,7 @@
         const dateInput = document.getElementById("coffee-date");
         const listEl = document.getElementById("participants-list");
         const calcBtn = document.getElementById("calculate-btn");
+        const bonusBtn = document.getElementById("bonus-btn");
         const resultContainer = document.getElementById("result-container");
         const spinner = document.getElementById("spinner");
         const winnerName = document.getElementById("winner-name");
@@ -810,39 +851,10 @@
             }
         });
 
-        authLoginBtn.addEventListener("click", () => {
-            const email = authEmail.value;
-            const pass = authPassword.value;
-            if(!email || !pass) return showAuthMsg("Preencha e-mail e senha.");
-            signInWithEmailAndPassword(auth, email, pass)
-                .catch(err => showAuthMsg("Erro ao entrar: " + err.message));
-        });
-
-        authRegisterBtn.addEventListener("click", () => {
-            const email = authEmail.value;
-            const pass = authPassword.value;
-            if(!email || !pass) return showAuthMsg("Preencha e-mail e senha para registrar.");
-            createUserWithEmailAndPassword(auth, email, pass)
-                .then(async (userCred) => {
-                    const isMaster = email === 'luizbrasil.rj@gmail.com';
-                    
-                    await setDoc(doc(db, 'users', userCred.user.uid), {
-                        email: email,
-                        status: isMaster ? 'approved' : 'pending',
-                        roles: isMaster ? ['member', 'admin'] : ['member']
-                    }).catch(e => console.error("Erro ao salvar perfil:", e));
-                    
-                    alert(isMaster ? "Você é o ADM Master, acesso liberado!" : "Conta criada! Aguarde a aprovação de um Gestor.");
-                })
-                .catch(err => showAuthMsg("Erro ao criar: " + err.message));
-        });
-
-        authResetBtn.addEventListener("click", () => {
-            const email = authEmail.value;
-            if(!email) return showAuthMsg("Preencha o e-mail para recuperar a senha.");
-            sendPasswordResetEmail(auth, email)
-                .then(() => showAuthMsg("Link de redefinição enviado para o e-mail!"))
-                .catch(err => showAuthMsg("Erro ao recuperar: " + err.message));
+        authGoogleBtn.addEventListener("click", () => {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider)
+                .catch(err => showAuthMsg("Erro ao entrar com Google: " + err.message));
         });
 
         logoutBtn.addEventListener("click", () => {
@@ -1124,8 +1136,8 @@
             globalAggregates = {};
             
             participantNames.forEach(p => {
-                currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0 };
-                globalAggregates[p] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [] };
+                currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0, bonus_tomados: 0 };
+                globalAggregates[p] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [], bonus_tomados: 0 };
             });
 
             const today = new Date();
@@ -1137,8 +1149,16 @@
                 const numPresent = ev.present.length;
                 const evDate = new Date(ev.date + 'T00:00:00');
                 
+                if (ev.isBonus) {
+                    ev.present.forEach(p => {
+                        if(!globalAggregates[p]) globalAggregates[p] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [], bonus_tomados: 0 };
+                        globalAggregates[p].bonus_tomados += 1;
+                    });
+                    return;
+                }
+                
                 ev.present.forEach(p => {
-                    if(!globalAggregates[p]) globalAggregates[p] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [] };
+                    if(!globalAggregates[p]) globalAggregates[p] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [], bonus_tomados: 0 };
                     globalAggregates[p].saldo_geral += 1;
                     
                     if (p !== ev.payer) {
@@ -1150,7 +1170,7 @@
                     }
                 });
 
-                if(!globalAggregates[ev.payer]) globalAggregates[ev.payer] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [] };
+                if(!globalAggregates[ev.payer]) globalAggregates[ev.payer] = { saldo_geral: 0, creditos_perdidos: 0, all_credits: [], bonus_tomados: 0 };
                 globalAggregates[ev.payer].saldo_geral -= numPresent;
                 
                 const netCredit = ev.present.includes(ev.payer) ? numPresent - 1 : numPresent;
@@ -1181,14 +1201,22 @@
                 const diffTime = Math.abs(today - evDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+                if (ev.isBonus) {
+                    ev.present.forEach(p => {
+                        if(!currentAggregates[p]) currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0, bonus_tomados: 0 };
+                        currentAggregates[p].bonus_tomados += 1;
+                    });
+                    return;
+                }
+
                 ev.present.forEach(p => {
-                    if(!currentAggregates[p]) currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0 };
+                    if(!currentAggregates[p]) currentAggregates[p] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0, bonus_tomados: 0 };
                     
                     currentAggregates[p].saldo += 1;
                     currentAggregates[p].vezes_presente += 1;
                 });
                 
-                if(!currentAggregates[ev.payer]) currentAggregates[ev.payer] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0 };
+                if(!currentAggregates[ev.payer]) currentAggregates[ev.payer] = { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0, creditos_expirando: 0, bonus_tomados: 0 };
                 currentAggregates[ev.payer].saldo -= numPresent;
                 currentAggregates[ev.payer].vezes_pagou += 1;
                 currentAggregates[ev.payer].cafes_pagos += numPresent;
@@ -1257,6 +1285,7 @@
                     <td class="${valClass}">${displayBal}</td>
                     <td>${data.vezes_presente}</td>
                     <td>${data.vezes_pagou}</td>
+                    <td>${data.bonus_tomados || 0}</td>
                     <td>${expiraHTML}</td>
                 `;
                 tr.className = "clickable-row";
@@ -1271,11 +1300,14 @@
                 const accordionTr = document.createElement("tr");
                 accordionTr.className = "accordion-row";
                 accordionTr.innerHTML = `
-                    <td colspan="5" style="padding: 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td colspan="6" style="padding: 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                         <div class="accordion-content">
-                            <div style="display:flex; justify-content: space-between; align-items:center;">
+                            <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 5px;">
                                 <span>🏆 Saldo Histórico: <strong class="${globalValClass}">${globalBal}</strong></span>
                                 <span>💔 Pontos Perdidos: <strong>${globalData.creditos_perdidos}</strong></span>
+                            </div>
+                            <div style="display:flex; justify-content: flex-start; align-items:center;">
+                                <span>🎁 Bônus Tomados (Total): <strong>${globalData.bonus_tomados || 0}</strong></span>
                             </div>
                             <button class="extrato-btn" data-name="${name}">📄 Ver Extrato Detalhado</button>
                         </div>
@@ -1323,6 +1355,17 @@
                     if (isPayer || isPresent) {
                         const dataBr = ev.date.split('-').reverse().join('/');
                         
+                        if (ev.isBonus) {
+                            if (isPresent) {
+                                extratoHTML += `
+                                 <div class="extrato-item" style="border-left-color: #81c784; background: rgba(129, 199, 132, 0.1);">
+                                    <span class="extrato-item-text">🎁 <strong>${dataBr}</strong> - Rodada Bônus</span>
+                                    <span class="extrato-item-score pos" style="color: #81c784;">[0]</span>
+                                 </div>`;
+                            }
+                            return;
+                        }
+
                         if (isPresent) {
                              const text = isPayer ? `Tomou café (Você pagou)` : `Tomou café (${ev.payer} pagou)`;
                              extratoHTML += `
@@ -1510,21 +1553,71 @@
             calcBtn.disabled = true;
             
             setTimeout(() => {
+                let eligiblePresent = [...currentPresent];
+                let lastPayer = null;
+
+                // 1. Trava de repetição: Quem pagou o último café não pode pagar hoje (exceto se for o único no grupo)
+                if (events.length > 0) {
+                    const sortedEvents = [...events].sort((a, b) => new Date(b.date + 'T00:00:00') - new Date(a.date + 'T00:00:00'));
+                    lastPayer = sortedEvents[0].payer;
+                }
+                
+                if (currentPresent.length > 1 && lastPayer && currentPresent.includes(lastPayer)) {
+                    eligiblePresent = eligiblePresent.filter(p => p !== lastPayer);
+                }
+
                 let maxBalance = -Infinity;
-                currentPresent.forEach(p => {
+                eligiblePresent.forEach(p => {
                     const s = currentAggregates[p].saldo;
                     if (s > maxBalance) maxBalance = s;
                 });
                 
-                const tied = currentPresent.filter(p => currentAggregates[p].saldo === maxBalance);
-                currentWinner = tied[Math.floor(Math.random() * tied.length)];
+                let tied = eligiblePresent.filter(p => currentAggregates[p].saldo === maxBalance);
                 
                 let reasonText = "";
-                if (tied.length === 1) {
-                    reasonText = `UGA UGA! 🦍 VOCÊ TER MAIOR DÍVIDA NA TRIBO (+${maxBalance})! VOCÊ SER ESCOLHIDO PARA PAGAR!`;
+                
+                // 2. Desempate do Leo: Quem pagou menos cafés nos últimos 7 dias
+                if (tied.length > 1) {
+                    const todayDate = new Date();
+                    todayDate.setHours(0, 0, 0, 0);
+                    
+                    const last7DaysEvents = events.filter(ev => {
+                        if (ev.isBonus) return false;
+                        const evDate = new Date(ev.date + 'T00:00:00');
+                        const diffDays = Math.ceil(Math.abs(todayDate - evDate) / (1000 * 60 * 60 * 24));
+                        return diffDays <= 7;
+                    });
+                    
+                    const paidCounts = {};
+                    tied.forEach(c => paidCounts[c] = 0);
+                    last7DaysEvents.forEach(ev => {
+                        if (tied.includes(ev.payer)) {
+                            paidCounts[ev.payer] += ev.present.length; // Quantos cafés a pessoa pagou
+                        }
+                    });
+                    
+                    const minPaid = Math.min(...Object.values(paidCounts));
+                    const tiedAfterLeo = tied.filter(c => paidCounts[c] === minPaid);
+                    
+                    if (tiedAfterLeo.length === 1) {
+                        tied = tiedAfterLeo;
+                        reasonText = `UGA UGA! 🦍 EMPATE DE DÍVIDA (+${maxBalance})! MAS A REGRA DO LEO MANDOU AVISAR QUE **${tied[0].toUpperCase()}** PAGOU MENOS CAFÉS NOS ÚLTIMOS 7 DIAS. VOCÊ PAGAR HOJE!`;
+                    } else if (tiedAfterLeo.length > 1 && tiedAfterLeo.length < tied.length) {
+                        tied = tiedAfterLeo;
+                        const tiedNames = tied.join(" E ");
+                        reasonText = `UGA UGA! 🦍 EMPATE ATÉ NO CRITÉRIO DO LEO! ROLETA DE DESEMPATE FINAL ENTRE: ${tiedNames.toUpperCase()}! VOCÊ PERDER!`;
+                    } else {
+                        const tiedNames = tied.join(" E ");
+                        reasonText = `UGA UGA! 🦍 EMPATE DE MAIOR DÍVIDA (+${maxBalance}) ENTRE: ${tiedNames.toUpperCase()}! NADA DEU JEITO, ENTÃO ROLETA GIRAR E VOCÊ PERDER! VOCÊ PAGAR HOJE!`;
+                    }
                 } else {
-                    const tiedNames = tied.join(" E ");
-                    reasonText = `UGA UGA! 🦍 EMPATE DE MAIOR DÍVIDA (+${maxBalance}) ENTRE: ${tiedNames.toUpperCase()}! ROLETA GIRAR E VOCÊ PERDER! VOCÊ PAGAR HOJE!`;
+                    reasonText = `UGA UGA! 🦍 VOCÊ TER MAIOR DÍVIDA NA TRIBO (+${maxBalance})! VOCÊ SER ESCOLHIDO PARA PAGAR!`;
+                }
+                
+                currentWinner = tied[Math.floor(Math.random() * tied.length)];
+                
+                if (lastPayer && !tied.includes(lastPayer) && currentPresent.includes(lastPayer) && currentAggregates[lastPayer].saldo >= maxBalance) {
+                     reasonText += ` (OBS: O último pagador foi blindado pela Trava de Repetição!)`;
                 }
                 
                 spinner.classList.add("hidden");
@@ -1540,6 +1633,32 @@
                 confirmBtn.classList.remove("hidden");
                 calcBtn.disabled = false;
             }, 1200);
+        });
+
+        bonusBtn.addEventListener("click", () => {
+            if (!dateInput.value) { alert("Por favor, selecione a data!"); return; }
+            if (events.some(e => e.date === dateInput.value)) { alert("Já existe um café registrado para esta data!"); return; }
+
+            const checkboxes = document.querySelectorAll(".participant-checkbox:checked");
+            currentPresent = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (currentPresent.length === 0) { alert("Selecione pelo menos uma pessoa para a rodada bônus!"); return; }
+            
+            if (confirm(`Tem certeza que deseja registrar uma Rodada Bônus (Kop Club) para ${currentPresent.length} pessoa(s)? Isso não afetará a dívida de ninguém.`)) {
+                const newEvent = {
+                    id: Date.now(),
+                    date: dateInput.value,
+                    present: currentPresent,
+                    payer: "BÔNUS (Kop Club)",
+                    isBonus: true
+                };
+                
+                events.push(newEvent);
+                updateCloudData();
+                registrarLog("CRIOU", "config", `Rodada Bônus (Kop Club) registrada no dia <strong>${dateInput.value.split('-').reverse().join('/')}</strong> para ${currentPresent.length} pessoa(s)`);
+                
+                alert(`🎁 Rodada Bônus registrada com sucesso!`);
+            }
         });
 
         confirmBtn.addEventListener("click", () => {
@@ -1562,6 +1681,13 @@
             currentWinner = null;
         });
 
+    </script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("sw.js").catch(() => {});
+            });
+        }
     </script>
 </body>
 </html>
