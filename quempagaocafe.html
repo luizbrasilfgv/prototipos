@@ -175,7 +175,11 @@
         .modal-content {
             background: var(--surface-color); border: 1px solid var(--primary-color); border-radius: 20px;
             padding: 1.5rem; width: 100%; max-width: 400px;
-            max-height: 90vh; overflow-y: auto;
+            max-height: 90vh; overflow-y: auto; padding-bottom: 80px;
+        }
+        .modal-fullscreen .modal-content {
+            max-width: 100%; height: 100%; max-height: 100vh; border-radius: 0;
+            border: none; padding-top: 2rem;
         }
         .modal-content h3 { color: var(--primary-color); margin-bottom: 1.5rem; font-size: 1.3rem; text-align: center; }
         .modal-field { margin-bottom: 1.5rem; }
@@ -237,12 +241,12 @@
             position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
             background: rgba(26, 16, 12, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border-top: 1px solid var(--surface-border); display: flex; justify-content: space-around;
-            align-items: center; z-index: 900; padding: 0 10px;
+            align-items: center; z-index: 1100; padding: 0 10px;
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: var(--text-muted); cursor: pointer; font-size: 0.75rem; text-transform: uppercase;
-            letter-spacing: 0.5px; transition: all 0.3s; position: relative; width: 25%;
+            letter-spacing: 0.5px; transition: all 0.3s; position: relative; width: 20%;
         }
         .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
         .nav-item.active { color: var(--primary-color); }
@@ -254,6 +258,28 @@
         }
         
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
+
+        /* Dashboard CSS */
+        .dash-filter {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--primary-color);
+            color: white; padding: 10px; border-radius: 8px; width: 100%;
+            font-size: 1rem; margin-bottom: 15px; outline: none;
+        }
+        .dashboard-container { display: flex; flex-direction: column; gap: 15px; }
+        .dash-card {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--surface-border);
+            border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .dash-card.king { border-color: var(--primary-color); background: rgba(255, 213, 79, 0.05); }
+        .dash-card.leech { border-color: var(--danger); background: rgba(239, 83, 80, 0.05); }
+        .dash-card.bonus { border-color: var(--success); background: rgba(129, 199, 132, 0.05); }
+        .dash-icon { font-size: 2.5rem; margin-right: 15px; }
+        .dash-info { flex: 1; text-align: left; }
+        .dash-title { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .dash-name { font-size: 1.4rem; font-weight: bold; color: white; margin-bottom: 2px; }
+        .dash-stats { font-size: 0.9rem; color: var(--text-main); }
+        .dash-stats strong { color: var(--primary-color); }
+
         .tab-content.active { display: block; }
         
         /* Modais Bottom Sheet */
@@ -496,6 +522,11 @@
             <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
             Histórico
         </div>
+        
+        <div class="nav-item" data-tab="tab-dashboard">
+            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            Estatísticas
+        </div>
         <div class="nav-item" data-tab="tab-perfil">
             <div class="badge-notification" id="pending-badge"></div>
             <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -542,9 +573,44 @@
         </div>
     </div>
 
+    
+    <!-- Modal de Regras do Bônus -->
+    <div id="sheet-bonus-rules" class="modal-overlay hidden modal-fullscreen">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1.5rem; display: flex; align-items:center; justify-content:center; gap: 10px; color: var(--success);">🗳️ Regras do Bônus</h3>
+            
+            <div style="color: var(--text-main); font-size: 0.9rem; line-height: 1.6; text-align: left; padding: 0 0.5rem;">
+                <p style="margin-bottom: 1rem;">O bônus do Kop Club é um patrimônio de todos, gerado por quem pagou contas nos últimos 6 meses. Quem deve tomar o café de graça?</p>
+                <div style="background: rgba(239, 83, 80, 0.1); border-left: 4px solid var(--danger); padding: 10px; margin-bottom: 1.5rem; border-radius: 4px;">
+                    <strong style="color:var(--danger)">As regras definitivas estão em votação pela equipe!</strong> Por enquanto, o cadastro de bônus está <strong>totalmente liberado</strong> para todos os nomes.
+                </div>
+                
+                <h4 style="color: var(--success); margin-top: 1.5rem; margin-bottom: 0.5rem;">Proposta 1: Justiça Histórica</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li><strong>Filosofia:</strong> O bônus pertence a quem financiou o bônus.</li>
+                    <li><strong>A Regra:</strong> Só toma bônus quem estiver no Top 50% de maiores pagadores dos últimos 6 meses.</li>
+                </ul>
+
+                <h4 style="color: var(--success); margin-top: 1.5rem; margin-bottom: 0.5rem;">Proposta 2: Catraca do Devedor</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li><strong>Filosofia:</strong> O bônus é de todos, menos de quem deve muito.</li>
+                    <li><strong>A Regra:</strong> Todo mundo toma bônus, exceto inadimplentes crônicos (saldo alto ou que não pagaram nada há 30 dias).</li>
+                </ul>
+
+                <h4 style="color: var(--success); margin-top: 1.5rem; margin-bottom: 0.5rem;">Proposta 3: Socialismo do Café</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li><strong>Filosofia:</strong> Ninguém pode monopolizar.</li>
+                    <li><strong>A Regra:</strong> Quem atingir uma cota (ex: 2 bônus em 3 meses) fica bloqueado temporariamente até os outros terem a chance de tomar.</li>
+                </ul>
+            </div>
+            
+            <button class="secondary-btn" onclick="closeBottomSheet('sheet-bonus-rules')" style="margin-top: 2rem;">FECHAR</button>
+        </div>
+    </div>
+
     <!-- Modal de Regras Detalhadas -->
-    <div id="sheet-rules" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 450px;">
+    <div id="sheet-rules" class="modal-overlay hidden modal-fullscreen">
+        <div class="modal-content">
             <h3 style="margin-bottom: 1.5rem; display: flex; align-items:center; justify-content:center; gap: 10px;">📜 Regulamento Oficial</h3>
             
             <div style="color: var(--text-main); font-size: 0.9rem; line-height: 1.6; text-align: left; padding: 0 0.5rem;">
@@ -554,6 +620,7 @@
                 <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
                     <li><strong>Tomou e NÃO pagou:</strong> Sua dívida aumenta em <strong>+1</strong>.</li>
                     <li><strong>Você pagou a conta:</strong> Sua dívida cai com base em quantos cafés você pagou (Ex: pagou para 4? <strong>-4</strong> no seu saldo).</li>
+                    <li><strong>Validade de 30 dias:</strong> Os créditos que você ganha ao pagar cafés para os outros têm validade de 30 dias corridos. Se você não usar esses créditos tomando café grátis nesse período, eles expiram e você os perde!</li>
                 </ul>
 
                 <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">2. Quem paga hoje? (A Guilhotina)</h4>
@@ -572,10 +639,6 @@
                     <li><strong>A Roleta</strong> só entra em ação se houver empate até nisso!</li>
                 </ul>
 
-                <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">5. Rodadas Bônus Kop Club (Nova)</h4>
-                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
-                    <li>As rodadas resgatadas não alteram a dívida de ninguém (pois foi de graça). Contudo, o sistema contabiliza quem participou e você pode consultar os "Bônus Consumidos" na aba de Saldos!</li>
-                </ul>
             </div>
             
             <button class="secondary-btn" onclick="closeBottomSheet('sheet-rules')" style="margin-top: 2rem;">ENTENDI AS REGRAS</button>
