@@ -10,26 +10,36 @@
 
 ---
 
-### 2. Rodadas Bônus (Kop Club)
-O app suporta rodadas de café em que o pagamento não sai do bolso de ninguém, mas sim de pontos acumulados (ex: pontos no Kop Club da Starbucks). 
+### 2. Rodadas Bônus (Kop Club) — Regra Aprovada: Catraca do Devedor
 
-**Regras estritas da rodada bônus:**
-- **Público Alvo:** Apenas quem pagou alguma conta com seu próprio dinheiro nos **últimos 6 meses (180 dias)** pode participar e tomar esse café de graça. Quem é "sanguessuga puro" não entra na conta do bônus.
-- **Validade do Saldo de Bônus:** Cada rodada bônus tem uma validade (tipicamente 6 meses a partir da inserção). Se não for consumida pelo grupo ativo, o saldo se perde (expira).
-- **Sem impacto financeiro:** Quem toma café na rodada bônus marca presença (para fins de histórico e confraternização), mas isso NÃO diminui seu saldo de caixa e não afeta o cálculo do próximo "sorteado" para pagar com dinheiro real.
+O app suporta rodadas de café em que o pagamento não sai do bolso de ninguém, mas sim de pontos acumulados (ex: pontos no Kop Club da Starbucks).
+
+**Filosofia:** O bônus é de **todos**, menos de quem deve muito. Café grátis é um privilégio para quem está em dia com a galera.
+
+**Regra de Elegibilidade (implementada no app):**
+- Todo mundo é **elegível por padrão**.
+- Você é **bloqueado** se:
+  - Seu saldo devedor (últimos 30 dias) estiver **acima de +3** (ou seja, você está devendo muito para a galera).
+  - **OU** não pagou **nenhuma conta** nos últimos **30 dias**.
+
+**O Argumento:** Se o sistema diz que você é o maior devedor e está fugindo da roleta, você perde o direito de beber na faixa quando o bônus chega. Pague o que deve primeiro!
+
+**Comportamento na interface:**
+- Na tela de cadastro da rodada bônus, quem estiver bloqueado aparece com o nome **riscado**, checkbox desabilitado e uma mensagem indicando o motivo do bloqueio.
+- Sem impacto financeiro: rodadas bônus NÃO afetam o saldo de caixa e não influenciam quem será sorteado para pagar com dinheiro real.
 
 ---
 
 ### 3. Estatísticas e Justiça (Leaderboards)
-Para manter o ambiente divertido, o app ranqueia a galera em:
-* **☕ Pagou a rodada:** Quantas vezes foi a pessoa selecionada pela roleta (oficial).
-* **☕ Total de cafés bancados:** A métrica financeira real de quantos cafés exatos saíram do bolso.
+Para manter o ambiente divertido e transparente, o app ranqueia a galera em categorias:
+* **☕ Pagou a rodada:** Quantas vezes foi a pessoa selecionada pela roleta (pagador oficial).
+* **☕ Total de cafés bancados:** A métrica financeira real — quantos cafés exatos saíram do bolso (pondera pelo tamanho da rodada: pagar para 5 pesa mais que pagar para 2).
 * **🧛 Tomou de graça:** Maior volume consumido sem o próprio pagamento.
 * **👋 Marcou presença:** Engajamento puro no café.
-* **🎁 Rodadas Kop Club:** Oportunistas do café grátis via bônus.
+* **🎁 Rodadas Kop Club:** Quem mais aproveitou os bônus.
 
 ---
 
 ### Diagnóstico de QA (Futuro: Expiração de 30 dias)
 * *Reflexão passada:* Fazer tanto débitos quanto créditos expirarem após 30 dias (histórico rolável de 30 dias) poderia ser uma ideia para resolver o problema de acúmulo excessivo.
-* A implementação atual mantém a dívida "eterna", pois as estatísticas completas, juntas às rodadas Kop Club exclusivas para pagadores recentes, já resolvem bem a dinâmica!
+* A implementação atual usa uma **janela de 30 dias** para o cálculo do saldo corrente. As estatísticas completas, juntas às rodadas Kop Club com a regra da Catraca do Devedor, já resolvem bem a dinâmica!

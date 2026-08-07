@@ -575,31 +575,35 @@
     <!-- Modal de Regras do Bônus -->
     <div id="sheet-bonus-rules" class="modal-overlay hidden modal-fullscreen">
         <div class="modal-content">
-            <h3 style="margin-bottom: 1.5rem; display: flex; align-items:center; justify-content:center; gap: 10px; color: var(--success);">🗳️ Regras do Bônus</h3>
+            <h3 style="margin-bottom: 1.5rem; display: flex; align-items:center; justify-content:center; gap: 10px; color: var(--success);">🗳️ Regras do Bônus Kop Club</h3>
             
             <div style="color: var(--text-main); font-size: 0.9rem; line-height: 1.6; text-align: left; padding: 0 0.5rem;">
-                <p style="margin-bottom: 1rem;">O bônus do Kop Club é um patrimônio de todos, gerado por quem pagou contas nos últimos 6 meses. Quem deve tomar o café de graça?</p>
-                <div style="background: rgba(239, 83, 80, 0.1); border-left: 4px solid var(--danger); padding: 10px; margin-bottom: 1.5rem; border-radius: 4px;">
-                    <strong style="color:var(--danger)">As regras definitivas estão em votação pela equipe!</strong> Por enquanto, o cadastro de bônus está <strong>totalmente liberado</strong> para todos os nomes.
-                </div>
+                <p style="margin-bottom: 1rem;">O bônus do Kop Club é um patrimônio coletivo. A regra aprovada pela equipe é a <strong style="color: var(--success);">Catraca do Devedor</strong>.</p>
                 
-                <h4 style="color: var(--success); margin-top: 1.5rem; margin-bottom: 0.5rem;">Proposta 1: Justiça Histórica</h4>
+                <div style="background: rgba(129, 199, 132, 0.1); border-left: 4px solid var(--success); padding: 12px; margin-bottom: 1.5rem; border-radius: 4px;">
+                    <strong style="color:var(--success)">✅ Regra Aprovada: Catraca do Devedor</strong>
+                </div>
+
+                <h4 style="color: var(--primary-color); margin-top: 1rem; margin-bottom: 0.5rem;">💡 A Filosofia</h4>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">O bônus é de <strong>todos</strong>, menos de quem deve muito. Café grátis é um privilégio para quem está em dia com a galera.</p>
+
+                <h4 style="color: var(--primary-color); margin-top: 1rem; margin-bottom: 0.5rem;">📋 Como Funciona</h4>
                 <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
-                    <li><strong>Filosofia:</strong> O bônus pertence a quem financiou o bônus.</li>
-                    <li><strong>A Regra:</strong> Só toma bônus quem estiver no Top 50% de maiores pagadores dos últimos 6 meses.</li>
+                    <li>Todo mundo é <strong>elegível por padrão</strong>.</li>
+                    <li style="margin-top: 0.5rem;">Você é <strong style="color: var(--danger);">bloqueado</strong> se:
+                        <ul style="padding-left: 1.2rem; margin-top: 0.3rem;">
+                            <li>Seu saldo devedor estiver <strong>acima de +3</strong> (ou seja, você está devendo muito).</li>
+                            <li><strong>OU</strong> não pagou <strong>nenhuma conta</strong> nos últimos <strong>30 dias</strong>.</li>
+                        </ul>
+                    </li>
                 </ul>
 
-                <h4 style="color: var(--success); margin-top: 1.5rem; margin-bottom: 0.5rem;">Proposta 2: Catraca do Devedor</h4>
-                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
-                    <li><strong>Filosofia:</strong> O bônus é de todos, menos de quem deve muito.</li>
-                    <li><strong>A Regra:</strong> Todo mundo toma bônus, exceto inadimplentes crônicos (saldo alto ou que não pagaram nada há 30 dias).</li>
-                </ul>
+                <h4 style="color: var(--primary-color); margin-top: 1rem; margin-bottom: 0.5rem;">🎯 O Argumento</h4>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Se o sistema diz que você é o maior devedor e está fugindo da roleta, você perde o direito de beber na faixa quando o bônus chega. <strong>Pague o que deve primeiro!</strong></p>
 
-                <h4 style="color: var(--success); margin-top: 1.5rem; margin-bottom: 0.5rem;">Proposta 3: Socialismo do Café</h4>
-                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
-                    <li><strong>Filosofia:</strong> Ninguém pode monopolizar.</li>
-                    <li><strong>A Regra:</strong> Quem atingir uma cota (ex: 2 bônus em 3 meses) fica bloqueado temporariamente até os outros terem a chance de tomar.</li>
-                </ul>
+                <div style="background: rgba(255, 213, 79, 0.1); border-left: 4px solid var(--primary-color); padding: 10px; margin-top: 1rem; border-radius: 4px;">
+                    <span style="color: var(--primary-color);">💡</span> <span style="color: var(--text-muted);">Na tela de cadastro do bônus, quem estiver bloqueado aparece com o nome <strong>riscado</strong> e não pode ser selecionado.</span>
+                </div>
             </div>
             
             <button class="secondary-btn" onclick="closeBottomSheet('sheet-bonus-rules'); openBottomSheet('sheet-bonus-form');" style="margin-top: 2rem;">FECHAR</button>
@@ -947,19 +951,44 @@
         // =====================================
         // BONUS MODAL LOGIC
         // =====================================
+        function checkBonusEligibility(person) {
+            // Regra 2: Catraca do Devedor
+            // Bloqueado se: saldo > +3 OU não pagou nenhuma conta nos últimos 30 dias
+            const agg = currentAggregates[person];
+            if (!agg) return { eligible: false, reason: 'Sem dados de atividade' };
+            
+            // Critério 1: Saldo devedor acima de +3
+            if (agg.saldo > 3) {
+                return { eligible: false, reason: `Saldo alto (+${agg.saldo}). Pague suas dívidas!` };
+            }
+            
+            // Critério 2: Não pagou nenhuma conta nos últimos 30 dias
+            if (agg.vezes_pagou === 0) {
+                return { eligible: false, reason: 'Não pagou nenhuma conta nos últimos 30 dias' };
+            }
+            
+            return { eligible: true, reason: '' };
+        }
+
         function openBonusModal() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('bonus-date-input').value = today;
             const list = document.getElementById('bonus-participants-checklist');
             list.innerHTML = '';
+            
+            // Garante que os agregados estejam calculados antes de abrir
+            if (Object.keys(currentAggregates).length === 0) calculateAndRender();
+            
             participantNames.forEach(p => {
-                const isElegible = true; // Futuro: regra de elegibilidade aqui
+                const check = checkBonusEligibility(p);
+                const isElegible = check.eligible;
                 const item = document.createElement('div');
                 item.className = 'participant-item';
                 if(!isElegible) item.style.opacity = '0.5';
                 item.innerHTML = `
                     <input type="checkbox" id="bonus-check-${p}" class="participant-checkbox bonus-present-checkbox" value="${p}" ${!isElegible ? 'disabled' : ''}>
                     <label for="bonus-check-${p}" class="participant-name" style="${!isElegible ? 'text-decoration: line-through;' : ''}">${p}</label>
+                    ${!isElegible ? `<span style="font-size: 0.7rem; color: var(--danger); display: block; margin-left: 30px; margin-top: -2px;">🚫 ${check.reason}</span>` : ''}
                 `;
                 list.appendChild(item);
             });

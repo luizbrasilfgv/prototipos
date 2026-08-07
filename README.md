@@ -8,7 +8,7 @@ Um Web App mobile-first (SPA) para organizar e gerenciar de forma justa as famos
 
 - **Registro Ágil de Rodadas**: Registre os pagadores e os presentes em cada rodada com apenas alguns toques.
 - **Cálculo de Saldos Inteligente**: O app calcula automaticamente o saldo de cada pessoa (créditos e débitos) com base em quanto ela pagou e quantos cafés consumiu.
-- **Rodadas Bônus (Ex: Kop Club)**: Suporte para rodadas onde o café é de graça (usando pontos acumulados da cafeteria), com regras estritas: validade de 6 meses (se não for usado, expira) e direito de participar exclusivo para quem contribuiu pagando cafés nos últimos 6 meses.
+- **Rodadas Bônus (Kop Club) — Regra: Catraca do Devedor**: Suporte para rodadas onde o café é de graça (usando pontos acumulados da cafeteria). A regra aprovada: todo mundo é elegível por padrão, exceto quem tem saldo devedor acima de +3 ou não pagou nenhuma conta nos últimos 30 dias. Nome riscado e bloqueado na interface para os inadimplentes.
 - **Estatísticas Detalhadas e "Cobrança"**:
   - **☕ Pagou a rodada**: Quantas vezes a pessoa puxou o cartão.
   - **☕ Total de cafés bancados**: Quantos cafezinhos individuais saíram do bolso daquela pessoa para a galera.
