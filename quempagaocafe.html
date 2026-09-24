@@ -315,6 +315,41 @@
         .menu-btn-text { font-weight: 500; font-size: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; }
         .menu-chevron { fill: var(--text-muted); width: 24px; height: 24px; }
 
+        /* Rosto do personagem de cada participante */
+        .avatar-rosto { display: inline-block; flex-shrink: 0; border-radius: 50%; background-size: cover; background-position: center; background-color: #3e2723; border: 2px solid rgba(255, 213, 79, 0.45); vertical-align: middle; }
+        .participant-com-rosto { display: flex; align-items: center; gap: 0.6rem; }
+        .nome-com-rosto { display: inline-flex; align-items: center; gap: 0.45rem; }
+        .adm-edit-btn { color: var(--primary-color); cursor: pointer; font-weight: bold; }
+        .perfil-avatares { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+        .perfil-avatar-op { min-width: 0; background: none; border: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; color: var(--text-muted); font-size: 0.65rem; font-family: inherit; }
+        .perfil-avatar-op img { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 3px solid transparent; }
+        .perfil-avatar-op.on img { border-color: var(--primary-color); }
+        .perfil-avatar-op.on { color: var(--primary-color); }
+        #sheet-perfil .modal-actions button { font-size: 1rem; }
+
+        /* Tela da trolagem (quem paga hoje) */
+        #troll-screen { align-items: stretch; padding: 0; }
+        .troll-content {
+            position: relative; overflow: hidden; width: 100%; min-height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            padding: 1.5rem 1.2rem calc(1.5rem + env(safe-area-inset-bottom));
+            background: radial-gradient(circle at 50% 32%, #5a3a1c 0%, #2a180e 55%, #140b07 100%);
+        }
+        .troll-kicker { color: #ffcc80; font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; position: relative; }
+        .troll-img { width: min(80vw, 380px); max-height: 48vh; object-fit: contain; margin: 0.5rem 0; position: relative; transform-origin: 50% 100%; -webkit-mask-image: radial-gradient(ellipse at center, #000 60%, transparent 76%); mask-image: radial-gradient(ellipse at center, #000 60%, transparent 76%); }
+        .troll-img.troll-anim { animation: trollPop 0.8s cubic-bezier(.2,1.4,.4,1) both, trollWobble 2.6s ease-in-out 0.8s infinite; }
+        .troll-title { color: #ffcc80; font-size: 2rem; line-height: 1.1; position: relative; }
+        .troll-name { color: #fff; font-size: 2.6rem; font-weight: 800; line-height: 1.1; margin: 0.2rem 0 0.6rem; position: relative; }
+        .troll-reason { color: #ffb74d; font-style: italic; font-size: 0.95rem; max-width: 440px; background: rgba(0,0,0,0.3); padding: 0.8rem 1rem; border-radius: 12px; position: relative; }
+        .troll-cpf { color: var(--text-muted); font-size: 0.8rem; margin: 0.7rem 0 1rem; position: relative; }
+        .troll-content .primary-btn, .troll-content .secondary-btn { max-width: 420px; position: relative; }
+        .troll-beans { position: absolute; inset: 0; pointer-events: none; }
+        .troll-bean { position: absolute; top: -24px; width: 12px; height: 17px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #8d6e63, #4e342e); animation: trollFall linear infinite; }
+        .troll-bean::after { content: ''; position: absolute; left: 50%; top: 15%; bottom: 15%; width: 1.5px; background: #2b1d16; border-radius: 2px; transform: translateX(-50%) rotate(8deg); }
+        @keyframes trollPop { 0% { transform: scale(0.2) translateY(60px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+        @keyframes trollWobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+        @keyframes trollFall { to { transform: translateY(110vh) rotate(540deg); } }
+
         /* Confirmação em 3 etapas (editar/excluir lançamento) */
         .confirm-sheet { border-top: 3px solid var(--primary-color); }
         .confirm-sheet.excluir { border-top-color: var(--danger); }
@@ -764,6 +799,42 @@
         </div>
     </div>
 
+    <!-- Tela da trolagem: quem paga hoje -->
+    <div id="troll-screen" class="modal-overlay hidden" style="z-index: 1200; overflow-y: auto;">
+        <div class="troll-content">
+            <div class="troll-beans" id="troll-beans" aria-hidden="true"></div>
+            <p class="troll-kicker">Veredito do tribunal</p>
+            <img id="troll-img" class="troll-img" alt="">
+            <h2 class="troll-title">Uga uga! 🦍</h2>
+            <div class="troll-name" id="troll-name"></div>
+            <p class="troll-reason" id="troll-reason"></p>
+            <p class="troll-cpf">⚠️ Lembre-se de informar o CPF do Leo no balcão!</p>
+            <button id="troll-aceito" class="primary-btn">Aceito meu destino 💳</button>
+            <button id="troll-voltar" class="secondary-btn">Voltar</button>
+        </div>
+    </div>
+
+    <!-- Perfil do participante: apelido e personagem -->
+    <div id="sheet-perfil" class="modal-overlay hidden" style="z-index: 1200;">
+        <div class="modal-content" style="border-top: 3px solid var(--primary-color);">
+            <h3>Editar participante</h3>
+            <div class="modal-field">
+                <label for="perfil-apelido">Apelido (é o que aparece no app)</label>
+                <input type="text" id="perfil-apelido" class="date-input" maxlength="20" autocomplete="off" spellcheck="false">
+                <p id="perfil-nome-sistema" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem;"></p>
+            </div>
+            <div class="modal-field">
+                <label>Personagem</label>
+                <div class="perfil-avatares" id="perfil-avatares"></div>
+            </div>
+            <p class="confirm-err" id="perfil-err"></p>
+            <div class="modal-actions">
+                <button id="perfil-cancelar" class="secondary-btn">Cancelar</button>
+                <button id="perfil-salvar" class="primary-btn">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirmação em 3 etapas (editar/excluir lançamento) -->
     <div id="confirm-flow" class="modal-overlay hidden" style="z-index: 1200;">
         <div class="modal-content confirm-sheet" id="confirm-sheet">
@@ -844,6 +915,46 @@
         let currentAggregates = {};
         let editingEventId = null;
         let logs = [];
+
+        // Apelido e personagem de cada participante. O nome continua sendo a chave no histórico;
+        // o apelido é só o que aparece na tela. Fica em config_v3.perfis[nome] = { apelido, avatar }.
+        let perfis = {};
+        const TOTAL_AVATARES = 5;
+        const APELIDOS_INICIAIS = { Luiz: 'Brasil' }; // vale só enquanto a pessoa não tiver apelido salvo
+        const APELIDO_VALIDO = /^[\p{L}\p{N} .'-]{1,20}$/u;
+
+        function apelido(nome) {
+            const p = perfis[nome];
+            if (p && typeof p.apelido === 'string') return p.apelido || nome;
+            return APELIDOS_INICIAIS[nome] || nome;
+        }
+        const listaApelidos = nomes => nomes.map(apelido).join(', ');
+
+        function avatarDe(nome) {
+            const p = perfis[nome];
+            if (p && p.avatar) return p.avatar;
+            return (Math.max(participantNames.indexOf(nome), 0) % TOTAL_AVATARES) + 1;
+        }
+        const rostoHTML = (nome, px) => `<span class="avatar-rosto" style="width:${px}px;height:${px}px;background-image:url('avatares/rosto-${avatarDe(nome)}.webp')" aria-hidden="true"></span>`;
+
+        // Grava o personagem (sem repetir enquanto houver livre) e o apelido inicial de quem ainda não tem,
+        // para cada um ficar sempre com o mesmo. Só o admin grava, para não disparar escrita de todo mundo.
+        function garantirPerfis() {
+            if (!currentUserRoles.includes('admin')) return;
+            const usados = participantNames.map(n => perfis[n] && perfis[n].avatar).filter(Boolean);
+            const novos = {};
+            participantNames.forEach((n, i) => {
+                const atual = perfis[n] || {};
+                const falta = {};
+                if (!atual.avatar) {
+                    falta.avatar = Array.from({ length: TOTAL_AVATARES }, (_, k) => k + 1).find(a => !usados.includes(a)) || (i % TOTAL_AVATARES) + 1;
+                    usados.push(falta.avatar);
+                }
+                if (typeof atual.apelido !== 'string' && APELIDOS_INICIAIS[n]) falta.apelido = APELIDOS_INICIAIS[n];
+                if (Object.keys(falta).length) novos[n] = falta;
+            });
+            if (Object.keys(novos).length) setDoc(configDocRef, { perfis: novos }, { merge: true }).catch(console.error);
+        }
 
         // Referências do DOM (Auth)
         const authScreen = document.getElementById("auth-screen");
@@ -1079,7 +1190,7 @@
                 if(!isElegible) item.style.opacity = '0.5';
                 item.innerHTML = `
                     <input type="checkbox" id="bonus-check-${p}" class="participant-checkbox bonus-present-checkbox" value="${p}" ${!isElegible ? 'disabled' : ''}>
-                    <label for="bonus-check-${p}" class="participant-name" style="${!isElegible ? 'text-decoration: line-through;' : ''}">${p}</label>
+                    <label for="bonus-check-${p}" class="participant-name participant-com-rosto" style="${!isElegible ? 'text-decoration: line-through;' : ''}">${rostoHTML(p, 30)}${apelido(p)}</label>
                     ${!isElegible ? `<span style="font-size: 0.7rem; color: var(--danger); display: block; margin-left: 30px; margin-top: -2px;">🚫 ${check.reason}</span>` : ''}
                 `;
                 list.appendChild(item);
@@ -1104,7 +1215,7 @@
             const updatedEvents = [...events, newEvent];
             try {
                 await setDoc(coffeeDocRef, { events: updatedEvents });
-                registrarLog("CRIOU", "criou", `Rodada Bônus em <strong>${date}</strong> para ${present.join(', ')}`);
+                registrarLog("CRIOU", "criou", `Rodada Bônus em <strong>${date}</strong> para ${listaApelidos(present)}`);
                 closeBottomSheet('sheet-bonus-form');
             } catch (err) {
                 console.error(err);
@@ -1155,9 +1266,9 @@
             if(reiBonus === "-") reiBonus = "Ninguém";
             
             let html = `
-                <div class="dash-card king"><div class="dash-icon">👑</div><div class="dash-info"><div class="dash-title">Rei do Café (Pagador)</div><div class="dash-name">${reiCafe}</div><div class="dash-stats">Pagou <strong>${reiPagoQtd}</strong> cafés na rodada</div></div></div>
-                <div class="dash-card leech"><div class="dash-icon">🧛</div><div class="dash-info"><div class="dash-title">Maior Sanguessuga</div><div class="dash-name">${sanguessuga}</div><div class="dash-stats">Tomou <strong>${sangQtd}</strong> cafés de graça</div></div></div>
-                <div class="dash-card bonus"><div class="dash-icon">🎁</div><div class="dash-info"><div class="dash-title">Rei do Kop Club</div><div class="dash-name">${reiBonus}</div><div class="dash-stats">Ganhou <strong>${reiBonusQtd}</strong> bônus</div></div></div>
+                <div class="dash-card king"><div class="dash-icon">👑</div><div class="dash-info"><div class="dash-title">Rei do Café (Pagador)</div><div class="dash-name">${apelido(reiCafe)}</div><div class="dash-stats">Pagou <strong>${reiPagoQtd}</strong> cafés na rodada</div></div></div>
+                <div class="dash-card leech"><div class="dash-icon">🧛</div><div class="dash-info"><div class="dash-title">Maior Sanguessuga</div><div class="dash-name">${apelido(sanguessuga)}</div><div class="dash-stats">Tomou <strong>${sangQtd}</strong> cafés de graça</div></div></div>
+                <div class="dash-card bonus"><div class="dash-icon">🎁</div><div class="dash-info"><div class="dash-title">Rei do Kop Club</div><div class="dash-name">${apelido(reiBonus)}</div><div class="dash-stats">Ganhou <strong>${reiBonusQtd}</strong> bônus</div></div></div>
             `;
 
             html += `<h3 style="color: var(--primary-color); margin-top: 2rem; margin-bottom: 1rem; text-align: center;">Consolidado Geral</h3>`;
@@ -1173,7 +1284,7 @@
             `;
             [...activeUsers].sort((a,b) => stats[b].vezes_pagou - stats[a].vezes_pagou).forEach((p, idx) => {
                 const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
-                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${stats[p].vezes_pagou} vez(es)</span></div>`;
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${apelido(p)}</strong><span>${stats[p].vezes_pagou} vez(es)</span></div>`;
             });
             if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
@@ -1186,7 +1297,7 @@
             `;
             [...activeUsers].sort((a,b) => stats[b].pago - stats[a].pago).forEach((p, idx) => {
                 const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
-                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${stats[p].pago} café(s)</span></div>`;
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${apelido(p)}</strong><span>${stats[p].pago} café(s)</span></div>`;
             });
             if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
@@ -1200,7 +1311,7 @@
             [...activeUsers].sort((a,b) => (stats[b].presente - stats[b].vezes_pagou) - (stats[a].presente - stats[a].vezes_pagou)).forEach((p, idx) => {
                 const tomouDeGraca = stats[p].presente - stats[p].vezes_pagou;
                 const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
-                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${tomouDeGraca > 0 ? tomouDeGraca : 0} vez(es)</span></div>`;
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${apelido(p)}</strong><span>${tomouDeGraca > 0 ? tomouDeGraca : 0} vez(es)</span></div>`;
             });
             if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
@@ -1213,7 +1324,7 @@
             `;
             [...activeUsers].sort((a,b) => stats[b].presente - stats[a].presente).forEach((p, idx) => {
                 const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
-                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${stats[p].presente} vez(es)</span></div>`;
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${apelido(p)}</strong><span>${stats[p].presente} vez(es)</span></div>`;
             });
             if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
@@ -1226,7 +1337,7 @@
             `;
             [...activeUsers].sort((a,b) => stats[b].bonus - stats[a].bonus).forEach((p, idx) => {
                 const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
-                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${p}</strong><span>${stats[p].bonus} vez(es)</span></div>`;
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${apelido(p)}</strong><span>${stats[p].bonus} vez(es)</span></div>`;
             });
             if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
@@ -1247,6 +1358,7 @@
             unsubConfig = onSnapshot(configDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     participantNames = docSnap.data().participants || [];
+                    perfis = docSnap.data().perfis || {};
                 } else {
                     participantNames = ["Leo", "Ademir", "Luiz", "André", "Samuel"]; // Padrão
                     updateConfigCloud();
@@ -1254,6 +1366,7 @@
                 renderCheckboxes();
                 renderAdmParticipantList();
                 calculateAndRender();
+                garantirPerfis();
             });
 
             // Escuta os eventos (banco de dados)
@@ -1413,7 +1526,8 @@
 
 
         function updateConfigCloud() {
-            setDoc(configDocRef, { participants: participantNames }).catch(console.error);
+            // merge: preserva os perfis (apelido e personagem) guardados no mesmo documento
+            setDoc(configDocRef, { participants: participantNames }, { merge: true }).catch(console.error);
         }
 
         addParticipantBtn.addEventListener("click", () => {
@@ -1432,17 +1546,28 @@
             participantNames.forEach(p => {
                 const div = document.createElement("div");
                 div.className = "adm-participant-item";
+                const ap = apelido(p);
                 div.innerHTML = `
-                    <span>${p}</span>
-                    <span class="adm-remove-btn" data-nome="${p}">Remover</span>
+                    <div style="display:flex; align-items:center; gap:0.7rem;">
+                        ${rostoHTML(p, 38)}
+                        <div><strong>${ap}</strong>${ap !== p ? `<div style="font-size:0.72rem; color:var(--text-muted);">no sistema: ${p}</div>` : ''}</div>
+                    </div>
+                    <div style="display:flex; gap:0.9rem; align-items:center;">
+                        <span class="adm-edit-btn" data-nome="${p}">Editar</span>
+                        <span class="adm-remove-btn" data-nome="${p}">Remover</span>
+                    </div>
                 `;
                 admParticipantList.appendChild(div);
+            });
+
+            document.querySelectorAll(".adm-edit-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => abrirPerfil(e.currentTarget.getAttribute("data-nome")));
             });
 
             document.querySelectorAll(".adm-remove-btn").forEach(btn => {
                 btn.addEventListener("click", (e) => {
                     const nome = e.currentTarget.getAttribute("data-nome");
-                    if(confirm(`Remover ${nome} da lista atual?`)) {
+                    if(confirm(`Remover ${apelido(nome)} da lista atual?`)) {
                         participantNames = participantNames.filter(n => n !== nome);
                         updateConfigCloud();
                         registrarLog("APAGOU", "config", `Removeu participante <strong>${nome}</strong>.`);
@@ -1450,6 +1575,65 @@
                 });
             });
         }
+
+        // =====================================
+        // PERFIL DO PARTICIPANTE (apelido e personagem)
+        // =====================================
+        const sheetPerfil = document.getElementById('sheet-perfil');
+        const perfilApelido = document.getElementById('perfil-apelido');
+        const perfilErr = document.getElementById('perfil-err');
+        let perfilEditando = null, avatarEscolhido = null;
+
+        function abrirPerfil(nome) {
+            perfilEditando = nome;
+            avatarEscolhido = avatarDe(nome);
+            perfilApelido.value = apelido(nome);
+            document.getElementById('perfil-nome-sistema').textContent = `Nome no sistema: ${nome} (não muda, para não bagunçar o histórico)`;
+            perfilErr.textContent = '';
+            renderOpcoesAvatar();
+            sheetPerfil.classList.remove('hidden');
+        }
+
+        function renderOpcoesAvatar() {
+            const box = document.getElementById('perfil-avatares');
+            box.innerHTML = '';
+            for (let a = 1; a <= TOTAL_AVATARES; a++) {
+                // Quem está sendo editado aparece embaixo da opção escolhida agora; os outros, embaixo da deles
+                const donos = participantNames.filter(n => n === perfilEditando ? a === avatarEscolhido : avatarDe(n) === a).map(apelido);
+                const op = document.createElement('button');
+                op.type = 'button';
+                op.className = 'perfil-avatar-op' + (a === avatarEscolhido ? ' on' : '');
+                op.innerHTML = `<img src="avatares/rosto-${a}.webp" alt="Personagem ${a}"><span>${donos.length ? donos.join(', ') : 'livre'}</span>`;
+                op.addEventListener('click', () => { avatarEscolhido = a; renderOpcoesAvatar(); });
+                box.appendChild(op);
+            }
+        }
+
+        perfilApelido.addEventListener('input', () => { perfilErr.textContent = ''; });
+        document.getElementById('perfil-cancelar').addEventListener('click', () => {
+            sheetPerfil.classList.add('hidden');
+            perfilEditando = null;
+        });
+        document.getElementById('perfil-salvar').addEventListener('click', async () => {
+            if (!perfilEditando) return;
+            const valor = perfilApelido.value.trim().replace(/\s+/g, ' ');
+            if (!valor) { perfilErr.textContent = 'Digite um apelido.'; return; }
+            if (!APELIDO_VALIDO.test(valor)) { perfilErr.textContent = 'Use só letras, números, espaço, ponto, hífen ou apóstrofo (até 20).'; return; }
+            const repetido = participantNames.some(n => n !== perfilEditando && (apelido(n).toLowerCase() === valor.toLowerCase() || n.toLowerCase() === valor.toLowerCase()));
+            if (repetido) { perfilErr.textContent = 'Já tem alguém com esse nome ou apelido.'; return; }
+            const nome = perfilEditando;
+            const antes = apelido(nome);
+            try {
+                // Apelido igual ao nome é gravado vazio: significa "usar o nome"
+                await setDoc(configDocRef, { perfis: { [nome]: { apelido: valor === nome ? '' : valor, avatar: avatarEscolhido } } }, { merge: true });
+                registrarLog("EDITOU", "config", `Perfil de <strong>${nome}</strong>: apelido ${antes} → <strong>${valor}</strong>, personagem ${avatarEscolhido}`);
+                sheetPerfil.classList.add('hidden');
+                perfilEditando = null;
+            } catch (err) {
+                console.error(err);
+                perfilErr.textContent = 'Não deu para salvar. Tente de novo.';
+            }
+        });
 
         // =====================================
         // LÓGICA PRINCIPAL (Cálculo e CRUD)
@@ -1572,7 +1756,7 @@
                 const id = `check-${p}`;
                 div.innerHTML = `
                     <input type="checkbox" id="${id}" class="participant-checkbox" value="${p}" checked>
-                    <label for="${id}" class="participant-name">${p}</label>
+                    <label for="${id}" class="participant-name participant-com-rosto">${rostoHTML(p, 34)}${apelido(p)}</label>
                 `;
                 listEl.appendChild(div);
             });
@@ -1606,7 +1790,7 @@
                 }
 
                 tr.innerHTML = `
-                    <td class="left-align">${name} ${!participantNames.includes(name) ? '(Inativo)' : ''}</td>
+                    <td class="left-align"><span class="nome-com-rosto">${rostoHTML(name, 26)}${apelido(name)}</span> ${!participantNames.includes(name) ? '(Inativo)' : ''}</td>
                     <td class="${valClass}">${displayBal}</td>
                     <td>${data.vezes_presente}</td>
                     <td>${data.vezes_pagou}</td>
@@ -1660,7 +1844,7 @@
 
         function openStatementModal(name) {
             const data = currentAggregates[name] || { saldo: 0, vezes_presente: 0, vezes_pagou: 0, cafes_pagos: 0 };
-            statementTitle.textContent = `Extrato de ${name}`;
+            statementTitle.textContent = `Extrato de ${apelido(name)}`;
             
             const today = new Date();
             let extratoHTML = "";
@@ -1692,7 +1876,7 @@
                         }
 
                         if (isPresent) {
-                             const text = isPayer ? `Tomou café (Você pagou)` : `Tomou café (${ev.payer} pagou)`;
+                             const text = isPayer ? `Tomou café (Você pagou)` : `Tomou café (${apelido(ev.payer)} pagou)`;
                              extratoHTML += `
                              <div class="extrato-item">
                                 <span class="extrato-item-text">🔴 <strong>${dataBr}</strong> - ${text}</span>
@@ -1738,7 +1922,7 @@
                     const dataBr = ev.date.split('-').reverse().join('/');
                     const dataBrNoYear = dataBr.substring(0, 5);
                     const isBonusStr = ev.isBonus ? "kop club bônus bonus" : "";
-                    const searchStr = `${ev.payer} ${dataBr} ${dataBrNoYear} ${isBonusStr}`.toLowerCase();
+                    const searchStr = `${ev.payer} ${apelido(ev.payer)} ${dataBr} ${dataBrNoYear} ${isBonusStr}`.toLowerCase();
                     return searchStr.includes(filterText);
                 });
             }
@@ -1770,7 +1954,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; cursor: pointer;" onclick="const det = this.nextElementSibling; det.style.display = det.style.display === 'none' ? 'block' : 'none';">
                         <div style="display: flex; flex-grow: 1; align-items: center;">
                             <span style="color: var(--primary-color); font-weight: bold; width: 50px; font-size: 0.9rem;">${dataBr.substring(0,5)}</span>
-                            <span style="color: var(--text-main); font-size: 0.95rem; margin-left: 10px;">${ev.payer}</span>
+                            <span style="color: var(--text-main); font-size: 0.95rem; margin-left: 10px;">${apelido(ev.payer)}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px;">
                             ${actionBtns}
@@ -1778,7 +1962,7 @@
                         </div>
                     </div>
                     <div class="history-details" style="display: none; padding: 10px 5px 15px 5px; color: var(--text-muted); font-size: 0.85rem; background: rgba(0,0,0,0.15);">
-                        <strong style="color: var(--text-main);">Participantes:</strong> ${ev.present.join(', ')}
+                        <strong style="color: var(--text-main);">Participantes:</strong> ${listaApelidos(ev.present)}
                     </div>
                 `;
                 historyList.appendChild(div);
@@ -1796,8 +1980,8 @@
                         acao: 'excluir',
                         titulo: evToDelete.isBonus ? 'Excluir esta rodada bônus?' : 'Excluir este lançamento?',
                         resumoHTML: linhaConfirm('Data', dataBr)
-                            + linhaConfirm('Pagou', evToDelete.isBonus ? '🎁 Kop Club (bônus)' : evToDelete.payer)
-                            + linhaConfirm('Presentes', evToDelete.present.join(', ')),
+                            + linhaConfirm('Pagou', evToDelete.isBonus ? '🎁 Kop Club (bônus)' : apelido(evToDelete.payer))
+                            + linhaConfirm('Presentes', listaApelidos(evToDelete.present)),
                         impacto: impactoNosSaldos(events, events.filter(ev => String(ev.id) !== idToDelete)),
                         nota: evToDelete.isBonus
                             ? '🎁 Rodada bônus não mexe no saldo de ninguém. Ela só sai das estatísticas do Kop Club.'
@@ -1806,8 +1990,8 @@
                     if (!confirmado) return;
 
                     const detalhe = evToDelete.isBonus
-                        ? `Rodada Bônus do dia <strong>${dataBr}</strong> (${evToDelete.present.join(', ')})`
-                        : `Lançamento do dia <strong>${dataBr}</strong> pago por <strong>${evToDelete.payer}</strong>`;
+                        ? `Rodada Bônus do dia <strong>${dataBr}</strong> (${listaApelidos(evToDelete.present)})`
+                        : `Lançamento do dia <strong>${dataBr}</strong> pago por <strong>${apelido(evToDelete.payer)}</strong>`;
                     registrarLog("APAGOU", "apagou", detalhe);
                     events = events.filter(ev => String(ev.id) !== idToDelete);
                     updateCloudData();
@@ -1876,7 +2060,7 @@
                 ? 'Impacto nos saldos:'
                 : excluir ? 'Se excluir, o saldo atual (30 dias) fica assim:' : 'Com a alteração, o saldo atual (30 dias) fica assim:';
             document.getElementById('confirm-impacto').innerHTML = impacto.length
-                ? impacto.map(x => linhaConfirm(x.nome, `${fmtSaldo(x.de)} → <strong class="${x.para > x.de ? 'val-positive' : 'val-negative'}">${fmtSaldo(x.para)}</strong>`)).join('')
+                ? impacto.map(x => linhaConfirm(apelido(x.nome), `${fmtSaldo(x.de)} → <strong class="${x.para > x.de ? 'val-positive' : 'val-negative'}">${fmtSaldo(x.para)}</strong>`)).join('')
                 : `<div style="color: var(--text-muted); text-align: center;">${nota}</div>`;
             document.getElementById('confirm-verbo').textContent = excluir ? 'excluir' : 'salvar';
             document.getElementById('confirm-sim').className = excluir ? 'danger-btn' : 'primary-btn';
@@ -2027,7 +2211,7 @@
                 div.style.marginBottom = "0.5rem";
                 div.innerHTML = `
                     <input type="checkbox" id="edit-check-${p}" class="edit-participant-checkbox participant-checkbox" value="${p}" ${isChecked}>
-                    <label for="edit-check-${p}" class="participant-name" style="font-size:1rem;">${p}</label>
+                    <label for="edit-check-${p}" class="participant-name" style="font-size:1rem;">${apelido(p)}</label>
                 `;
                 editParticipantsList.appendChild(div);
             });
@@ -2036,7 +2220,7 @@
             editPayerSelect.innerHTML = "";
             allPossible.forEach(p => {
                 const selected = (ev.payer === p) ? "selected" : "";
-                editPayerSelect.innerHTML += `<option value="${p}" ${selected}>${p}</option>`;
+                editPayerSelect.innerHTML += `<option value="${p}" ${selected}>${apelido(p)}</option>`;
             });
 
             editModal.classList.remove("hidden");
@@ -2082,9 +2266,9 @@
 
             let resumoHTML = linhaConfirm('Lançamento', fmtData(original.date));
             if (mudouData) resumoHTML += linhaConfirm('Data', `${fmtData(original.date)} → ${fmtData(newDate)}`);
-            if (mudouPagador) resumoHTML += linhaConfirm('Pagador', `${original.payer} → ${novoPagador}`);
-            if (entrou.length) resumoHTML += linhaConfirm('Entrou', entrou.join(', '));
-            if (saiu.length) resumoHTML += linhaConfirm('Saiu', saiu.join(', '));
+            if (mudouPagador) resumoHTML += linhaConfirm('Pagador', `${apelido(original.payer)} → ${apelido(novoPagador)}`);
+            if (entrou.length) resumoHTML += linhaConfirm('Entrou', listaApelidos(entrou));
+            if (saiu.length) resumoHTML += linhaConfirm('Saiu', listaApelidos(saiu));
 
             const atualizado = { ...original, date: newDate, present: newPresent, payer: novoPagador };
             const confirmado = await confirmarTresEtapas({
@@ -2111,10 +2295,10 @@
             events[evIndex].date = newDate;
             events[evIndex].present = newPresent;
             if (isBonus) {
-                registrarLog("EDITOU", "editou", `Editou Rodada Bônus do dia <strong>${dataBr}</strong> (Participantes: ${newPresent.join(', ')})`);
+                registrarLog("EDITOU", "editou", `Editou Rodada Bônus do dia <strong>${dataBr}</strong> (Participantes: ${listaApelidos(newPresent)})`);
             } else {
                 events[evIndex].payer = newPayer;
-                registrarLog("EDITOU", "editou", `Editou lançamento do dia <strong>${dataBr}</strong> (Novo Pagador: <strong>${newPayer}</strong>)`);
+                registrarLog("EDITOU", "editou", `Editou lançamento do dia <strong>${dataBr}</strong> (Novo Pagador: <strong>${apelido(newPayer)}</strong>)`);
             }
             updateCloudData();
 
@@ -2123,13 +2307,47 @@
         });
 
         // =====================================
+        // TROLAGEM (tela do escolhido para pagar)
+        // =====================================
+        const trollScreen = document.getElementById('troll-screen');
+        const trollBeans = document.getElementById('troll-beans');
+        // Grãos de café caindo: criados uma vez, animados só por CSS
+        for (let i = 0; i < 16; i++) {
+            const grao = document.createElement('span');
+            grao.className = 'troll-bean';
+            grao.style.left = `${(i * 37) % 96}%`;
+            grao.style.animationDelay = `${(i % 8) * 0.4}s`;
+            grao.style.animationDuration = `${2.6 + (i % 4) * 0.5}s`;
+            trollBeans.appendChild(grao);
+        }
+
+        function abrirTrolagem(nome, motivo) {
+            const img = document.getElementById('troll-img');
+            img.src = `avatares/caverna-${avatarDe(nome)}.webp`;
+            img.alt = `${apelido(nome)} de homem das cavernas`;
+            // Reinicia a animação de entrada a cada sorteio
+            img.classList.remove('troll-anim');
+            void img.offsetWidth;
+            img.classList.add('troll-anim');
+            document.getElementById('troll-name').textContent = apelido(nome);
+            document.getElementById('troll-reason').textContent = motivo;
+            trollScreen.classList.remove('hidden');
+        }
+        const fecharTrolagem = () => trollScreen.classList.add('hidden');
+        // Voltar só fecha a tela: o resultado continua na aba Início, com o botão de confirmar
+        document.getElementById('troll-voltar').addEventListener('click', fecharTrolagem);
+        document.getElementById('troll-aceito').addEventListener('click', () => { fecharTrolagem(); confirmBtn.click(); });
+
+        // =====================================
         // ROLETAS E SORTEIO
         // =====================================
         calcBtn.addEventListener("click", () => {
             if (!dateInput.value) { alert("Por favor, selecione a data!"); return; }
             if (events.some(e => e.date === dateInput.value)) { alert("Já existe um café registrado para esta data!"); return; }
 
-            const checkboxes = document.querySelectorAll(".participant-checkbox:checked");
+            // Só a lista do Início: os modais de bônus e de edição também usam .participant-checkbox
+            // e continuam no DOM depois de fechados, o que duplicava gente no sorteio
+            const checkboxes = document.querySelectorAll("#participants-list .participant-checkbox:checked");
             currentPresent = Array.from(checkboxes).map(cb => cb.value);
             
             if (currentPresent.length === 0) { alert("Selecione pelo menos uma pessoa!"); return; }
@@ -2192,13 +2410,13 @@
                     
                     if (tiedAfterLeo.length === 1) {
                         tied = tiedAfterLeo;
-                        reasonText = `UGA UGA! 🦍 EMPATE DE DÍVIDA (+${maxBalance})! MAS A REGRA DO LEO MANDOU AVISAR QUE **${tied[0].toUpperCase()}** PAGOU MENOS CAFÉS NOS ÚLTIMOS 7 DIAS. VOCÊ PAGAR HOJE!`;
+                        reasonText = `UGA UGA! 🦍 EMPATE DE DÍVIDA (+${maxBalance})! MAS A REGRA DO LEO MANDOU AVISAR QUE **${apelido(tied[0]).toUpperCase()}** PAGOU MENOS CAFÉS NOS ÚLTIMOS 7 DIAS. VOCÊ PAGAR HOJE!`;
                     } else if (tiedAfterLeo.length > 1 && tiedAfterLeo.length < tied.length) {
                         tied = tiedAfterLeo;
-                        const tiedNames = tied.join(" E ");
+                        const tiedNames = tied.map(apelido).join(" E ");
                         reasonText = `UGA UGA! 🦍 EMPATE ATÉ NO CRITÉRIO DO LEO! ROLETA DE DESEMPATE FINAL ENTRE: ${tiedNames.toUpperCase()}! VOCÊ PERDER!`;
                     } else {
-                        const tiedNames = tied.join(" E ");
+                        const tiedNames = tied.map(apelido).join(" E ");
                         reasonText = `UGA UGA! 🦍 EMPATE DE MAIOR DÍVIDA (+${maxBalance}) ENTRE: ${tiedNames.toUpperCase()}! NADA DEU JEITO, ENTÃO ROLETA GIRAR E VOCÊ PERDER! VOCÊ PAGAR HOJE!`;
                     }
                 } else {
@@ -2213,7 +2431,7 @@
                 
                 spinner.classList.add("hidden");
                 
-                winnerName.textContent = currentWinner;
+                winnerName.textContent = apelido(currentWinner);
                 winnerName.classList.remove("hidden");
                 
                 winnerReason.textContent = reasonText;
@@ -2223,6 +2441,7 @@
                 winnerMsg.classList.remove("hidden");
                 confirmBtn.classList.remove("hidden");
                 calcBtn.disabled = false;
+                abrirTrolagem(currentWinner, reasonText);
             }, 1200);
         });
 
@@ -2240,7 +2459,7 @@
             
             events.push(newEvent);
             updateCloudData();
-            registrarLog("CRIOU", "criou", `Novo sorteio/pagamento no dia <strong>${dateInput.value.split('-').reverse().join('/')}</strong> pago por <strong>${currentWinner}</strong>`);
+            registrarLog("CRIOU", "criou", `Novo sorteio/pagamento no dia <strong>${dateInput.value.split('-').reverse().join('/')}</strong> pago por <strong>${apelido(currentWinner)}</strong>`);
             
             alert(`Sorteio e Pagamento registrados com sucesso! ☁️`);
             

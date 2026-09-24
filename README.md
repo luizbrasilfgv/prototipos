@@ -18,8 +18,10 @@ Um Web App mobile-first (SPA) para organizar e gerenciar de forma justa as famos
 - **Gestão de Acesso (RBAC)**: Login via Google, com aprovação da conta por um administrador. Três perfis:
   - **Membro**: uso do dia a dia (sorteio, rodada bônus, saldos, histórico e estatísticas).
   - **Editor**: tudo do membro + editar e excluir lançamentos (café comum ou rodada bônus).
-  - **Admin**: tudo do editor + gestão de participantes e controle de acessos (inclusive dar/tirar o perfil Editor).
+  - **Admin**: tudo do editor + gestão de participantes (apelido e personagem) e controle de acessos (inclusive dar/tirar o perfil Editor).
 - **Confirmação em 3 etapas**: editar ou excluir um lançamento passa por (1) uma pergunta de sim/não, (2) segurar a xícara por 5 segundos até ela encher de café, vendo o impacto nos saldos, e (3) digitar `CONFIRMO`. A ação fica registrada na auditoria.
+- **Trolagem do escolhido**: quando o sorteio define quem paga, abre uma tela cheia com o personagem de homem das cavernas da pessoa (imagens em `avatares/`), o apelido e o motivo do veredito.
+- **Apelido e personagem**: cada participante tem um apelido (o que aparece em todo o app) e um dos 5 personagens, fixo. O nome original continua sendo a chave no histórico. O admin edita em Painel → Participantes → Editar. Fica em `coffee/config_v3.perfis`.
 - **PWA (Progressive Web App)**: O app pode ser instalado na tela inicial do celular (Android/iOS) para uso como aplicativo nativo e possui cache via Service Worker.
 
 ## 🛠️ Tecnologias Utilizadas
