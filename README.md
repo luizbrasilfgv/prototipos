@@ -15,7 +15,11 @@ Um Web App mobile-first (SPA) para organizar e gerenciar de forma justa as famos
   - **🧛 Tomou de graça**: O famoso "sanguessuga".
   - **👋 Marcou presença**: Quem nunca perde a hora do café.
   - **🎁 Rodadas Kop Club**: Quem mais aproveita os bônus.
-- **Gestão de Acesso (RBAC)**: Login via Google. Apenas administradores do grupo (whitelist configurada na nuvem) podem registrar lançamentos, editar bônus, adicionar participantes ou estornar histórico. Membros comuns têm acesso apenas de leitura (Dashboard, Histórico e Estatísticas).
+- **Gestão de Acesso (RBAC)**: Login via Google, com aprovação da conta por um administrador. Três perfis:
+  - **Membro**: uso do dia a dia (sorteio, rodada bônus, saldos, histórico e estatísticas).
+  - **Editor**: tudo do membro + editar e excluir lançamentos (café comum ou rodada bônus).
+  - **Admin**: tudo do editor + gestão de participantes e controle de acessos (inclusive dar/tirar o perfil Editor).
+- **Confirmação em 3 etapas**: editar ou excluir um lançamento passa por (1) uma pergunta de sim/não, (2) segurar a xícara por 5 segundos até ela encher de café, vendo o impacto nos saldos, e (3) digitar `CONFIRMO`. A ação fica registrada na auditoria.
 - **PWA (Progressive Web App)**: O app pode ser instalado na tela inicial do celular (Android/iOS) para uso como aplicativo nativo e possui cache via Service Worker.
 
 ## 🛠️ Tecnologias Utilizadas

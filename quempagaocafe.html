@@ -315,6 +315,36 @@
         .menu-btn-text { font-weight: 500; font-size: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; }
         .menu-chevron { fill: var(--text-muted); width: 24px; height: 24px; }
 
+        /* Confirmação em 3 etapas (editar/excluir lançamento) */
+        .confirm-sheet { border-top: 3px solid var(--primary-color); }
+        .confirm-sheet.excluir { border-top-color: var(--danger); }
+        .confirm-steps { display: flex; gap: 6px; margin-bottom: 0.6rem; }
+        .confirm-steps span { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.12); transition: background 0.3s; }
+        .confirm-steps span.on { background: var(--primary-color); }
+        .confirm-sheet.excluir .confirm-steps span.on { background: var(--danger); }
+        .confirm-sheet.excluir h3 { color: var(--danger); }
+        .confirm-sheet .modal-actions button { font-size: 1rem; }
+        .confirm-step-label { color: var(--text-muted); font-size: 0.8rem; text-align: center; margin-bottom: 0.8rem; }
+        .confirm-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.8rem 1rem; font-size: 0.9rem; }
+        .confirm-linha { display: flex; justify-content: space-between; gap: 1rem; padding: 0.25rem 0; }
+        .confirm-linha span:first-child { color: var(--text-muted); }
+        .confirm-linha span:last-child { text-align: right; }
+        .confirm-sub { color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-bottom: 0.8rem; }
+        .confirm-err { color: var(--danger); font-size: 0.85rem; text-align: center; min-height: 1.3em; margin-top: 0.5rem; }
+        .confirm-audit { color: var(--text-muted); font-size: 0.75rem; text-align: center; margin-top: 1rem; }
+        #confirm-word { text-align: center; letter-spacing: 3px; text-transform: uppercase; }
+        .coffee-hold {
+            margin: 1rem auto 0; padding: 0.5rem; border-radius: 16px; text-align: center; cursor: pointer; outline: none;
+            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
+        }
+        .coffee-hold:focus-visible { box-shadow: 0 0 0 2px var(--primary-color); }
+        .coffee-hold svg { width: 140px; height: 130px; display: block; margin: 0 auto; transition: transform 0.15s; }
+        .coffee-hold.segurando svg { transform: scale(0.95); }
+        .coffee-hold-msg { color: var(--primary-color); font-weight: 600; min-height: 1.5em; margin-top: 0.3rem; }
+        .coffee-steam path { opacity: 0; }
+        .coffee-hold.cheia .coffee-steam path { animation: steam 1.6s ease-in-out infinite; }
+        @keyframes steam { 0% { opacity: 0; transform: translateY(6px); } 50% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(-8px); } }
+
     </style>
 </head>
 <body>
@@ -563,7 +593,7 @@
     <div id="sheet-access" class="modal-overlay hidden modal-fullscreen">
         <div class="modal-content">
             <h3 style="margin-bottom: 1.5rem;">🔒 Controle de Acessos</h3>
-            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Aprove contas novas e defina quem é ADM ou Usuário comum.</p>
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">Aprove contas novas e defina quem é ADM, Editor (pode editar e excluir lançamentos) ou Usuário comum.</p>
                 <div class="adm-participant-list" id="adm-access-list">
                     <p style="text-align:center; color:var(--text-muted); font-size:0.85rem;">Carregando acessos...</p>
                 </div>
@@ -734,6 +764,63 @@
         </div>
     </div>
 
+    <!-- Confirmação em 3 etapas (editar/excluir lançamento) -->
+    <div id="confirm-flow" class="modal-overlay hidden" style="z-index: 1200;">
+        <div class="modal-content confirm-sheet" id="confirm-sheet">
+            <div class="confirm-steps"><span></span><span></span><span></span></div>
+            <p class="confirm-step-label" id="confirm-step-label">Etapa 1 de 3</p>
+
+            <!-- Etapa 1: sim ou não -->
+            <div id="confirm-step-1">
+                <h3 id="confirm-title"></h3>
+                <div class="confirm-card" id="confirm-resumo"></div>
+                <div class="modal-actions">
+                    <button class="secondary-btn" data-confirm="nao">Não</button>
+                    <button id="confirm-sim" class="danger-btn">Sim</button>
+                </div>
+            </div>
+
+            <!-- Etapa 2: segurar a xícara até encher -->
+            <div id="confirm-step-2" class="hidden">
+                <h3>Encha a xícara para continuar ☕</h3>
+                <p class="confirm-sub" id="confirm-impacto-titulo"></p>
+                <div class="confirm-card" id="confirm-impacto"></div>
+                <div class="coffee-hold" id="coffee-hold" role="button" tabindex="0" aria-label="Segure por 5 segundos para encher a xícara e continuar">
+                    <svg viewBox="0 0 120 112" aria-hidden="true">
+                        <defs><clipPath id="coffee-cup-clip"><path d="M20 34 L90 34 L82 92 Q80 98 74 98 L36 98 Q30 98 28 92 Z"/></clipPath></defs>
+                        <g class="coffee-steam" stroke="#d7ccc8" stroke-width="3" fill="none" stroke-linecap="round">
+                            <path d="M40 27 q-5 -7 0 -13 q5 -6 0 -12"/>
+                            <path d="M55 27 q-5 -7 0 -13 q5 -6 0 -12" style="animation-delay: 0.3s;"/>
+                            <path d="M70 27 q-5 -7 0 -13 q5 -6 0 -12" style="animation-delay: 0.6s;"/>
+                        </g>
+                        <ellipse cx="55" cy="104" rx="46" ry="6" fill="rgba(255,255,255,0.07)" stroke="#bcaaa4" stroke-width="2"/>
+                        <g clip-path="url(#coffee-cup-clip)">
+                            <rect id="coffee-level" x="0" y="98" width="120" height="70" fill="#6d4c41"/>
+                            <rect id="coffee-crema" x="0" y="98" width="120" height="4" fill="#c49a6c"/>
+                        </g>
+                        <path d="M20 34 L90 34 L82 92 Q80 98 74 98 L36 98 Q30 98 28 92 Z" fill="rgba(255,255,255,0.04)" stroke="#fdf5e6" stroke-width="3" stroke-linejoin="round"/>
+                        <path d="M88 46 C106 46 106 76 83 80" fill="none" stroke="#fdf5e6" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <p class="coffee-hold-msg" id="coffee-hold-msg"></p>
+                </div>
+                <button class="secondary-btn" data-confirm="nao">Não, cancelar</button>
+            </div>
+
+            <!-- Etapa 3: digitar a palavra de confirmação -->
+            <div id="confirm-step-3" class="hidden">
+                <h3>Confirmação definitiva 🔒</h3>
+                <p class="confirm-sub">Digite <strong style="color: var(--text-main); letter-spacing: 2px;">CONFIRMO</strong> para <span id="confirm-verbo">excluir</span> de vez.</p>
+                <input type="text" id="confirm-word" class="date-input" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="Digite aqui">
+                <p class="confirm-err" id="confirm-word-err"></p>
+                <div class="modal-actions" style="margin-top: 1rem;">
+                    <button class="secondary-btn" data-confirm="nao">Cancelar</button>
+                    <button id="confirm-final" class="danger-btn">Excluir</button>
+                </div>
+                <p class="confirm-audit">📋 Essa ação fica registrada na auditoria em seu nome.</p>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -822,6 +909,11 @@
                     adminMenus.classList.add('hidden');
                 }
             }
+        }
+
+        // Admin e Editor podem editar/excluir lançamentos (sempre passando pela confirmação em 3 etapas)
+        function podeEditarLancamentos() {
+            return currentUserRoles.includes('admin') || currentUserRoles.includes('editor');
         }
 
         const newParticipantName = document.getElementById("new-participant-name");
@@ -1002,7 +1094,7 @@
             const present = Array.from(checkboxes).map(cb => cb.value);
             if (present.length === 0) { alert("Selecione pelo menos uma pessoa!"); return; }
             const newEvent = {
-                id: Date.now().toString(),
+                id: Date.now(),
                 date: date,
                 isBonus: true,
                 payer: 'Kop Club',
@@ -1230,6 +1322,21 @@
                             }
                         };
                         actionsDiv.appendChild(btnStatus);
+
+                        const isEditor = userRoles.includes('editor');
+                        const editorColor = isEditor ? '#64b5f6' : 'var(--text-main)';
+                        const btnEditor = document.createElement("button");
+                        btnEditor.className = "secondary-btn";
+                        btnEditor.style.cssText = `padding:0.2rem 0.5rem; font-size:0.7rem; margin:0; border-color:${editorColor}; color:${editorColor};`;
+                        btnEditor.textContent = isEditor ? 'Remover Editor' : 'Tornar Editor';
+                        btnEditor.onclick = async () => {
+                            const newRoles = isEditor ? userRoles.filter(r => r !== 'editor') : [...userRoles, 'editor'];
+                            if(confirm(isEditor ? `Remover o perfil Editor de ${u.email}?` : `Dar o perfil Editor para ${u.email}? Ele poderá editar e excluir lançamentos.`)) {
+                                await updateDoc(doc(db, 'users', uid), { roles: newRoles });
+                                registrarLog("EDITOU", "config", `Mudou perfis de ${u.email} para ${newRoles.join(', ')}`);
+                            }
+                        };
+                        actionsDiv.appendChild(btnEditor);
 
                         const btnRole = document.createElement("button");
                         btnRole.className = "secondary-btn";
@@ -1650,7 +1757,7 @@
                 const dataBr = ev.date.split('-').reverse().join('/');
                 
                 let actionBtns = "";
-                if (currentUserRoles.includes('admin')) {
+                if (podeEditarLancamentos()) {
                     actionBtns = `
                         <div style="display:flex; gap: 8px;">
                             <button class="crud-btn edit-btn" data-id="${ev.id}" title="Editar" onclick="event.stopPropagation()" style="background:none; border:none; padding:0; cursor:pointer;">✏️</button>
@@ -1678,22 +1785,38 @@
             });
 
             document.querySelectorAll(".delete-btn").forEach(btn => {
-                btn.addEventListener("click", (e) => {
-                    const idToDelete = parseInt(e.currentTarget.getAttribute("data-id"));
-                    if(confirm("Tem certeza que deseja apagar este lançamento? O saldo de todos será recalculado.")) {
-                        const evToDelete = events.find(e => e.id === idToDelete);
-                        if (evToDelete) {
-                            registrarLog("APAGOU", "apagou", `Lançamento do dia <strong>${evToDelete.date.split('-').reverse().join('/')}</strong> pago por <strong>${evToDelete.payer}</strong>`);
-                        }
-                        events = events.filter(ev => ev.id !== idToDelete);
-                        updateCloudData();
-                    }
+                btn.addEventListener("click", async (e) => {
+                    // Ids legados de rodada bônus são string e os de café comum são number: compara sempre como string
+                    const idToDelete = e.currentTarget.getAttribute("data-id");
+                    const evToDelete = events.find(e => String(e.id) === idToDelete);
+                    if (!evToDelete) return;
+
+                    const dataBr = evToDelete.date.split('-').reverse().join('/');
+                    const confirmado = await confirmarTresEtapas({
+                        acao: 'excluir',
+                        titulo: evToDelete.isBonus ? 'Excluir esta rodada bônus?' : 'Excluir este lançamento?',
+                        resumoHTML: linhaConfirm('Data', dataBr)
+                            + linhaConfirm('Pagou', evToDelete.isBonus ? '🎁 Kop Club (bônus)' : evToDelete.payer)
+                            + linhaConfirm('Presentes', evToDelete.present.join(', ')),
+                        impacto: impactoNosSaldos(events, events.filter(ev => String(ev.id) !== idToDelete)),
+                        nota: evToDelete.isBonus
+                            ? '🎁 Rodada bônus não mexe no saldo de ninguém. Ela só sai das estatísticas do Kop Club.'
+                            : 'Esse lançamento tem mais de 30 dias, então nenhum saldo atual muda.'
+                    });
+                    if (!confirmado) return;
+
+                    const detalhe = evToDelete.isBonus
+                        ? `Rodada Bônus do dia <strong>${dataBr}</strong> (${evToDelete.present.join(', ')})`
+                        : `Lançamento do dia <strong>${dataBr}</strong> pago por <strong>${evToDelete.payer}</strong>`;
+                    registrarLog("APAGOU", "apagou", detalhe);
+                    events = events.filter(ev => String(ev.id) !== idToDelete);
+                    updateCloudData();
                 });
             });
 
             document.querySelectorAll(".edit-btn").forEach(btn => {
                 btn.addEventListener("click", (e) => {
-                    const idToEdit = parseInt(e.currentTarget.getAttribute("data-id"));
+                    const idToEdit = e.currentTarget.getAttribute("data-id");
                     openEditModal(idToEdit);
                 });
             });
@@ -1702,13 +1825,195 @@
         document.getElementById('history-filter')?.addEventListener('input', renderHistory);
 
         // =====================================
+        // CONFIRMAÇÃO EM 3 ETAPAS (editar/excluir lançamento)
+        // 1) sim ou não  2) segurar a xícara até encher  3) digitar CONFIRMO
+        // =====================================
+        const PALAVRA_CONFIRMACAO = 'CONFIRMO';
+        const TEMPO_XICARA_MS = 5000;
+        const confirmFlow = document.getElementById("confirm-flow");
+        const confirmSheet = document.getElementById("confirm-sheet");
+        const coffeeHold = document.getElementById("coffee-hold");
+        const coffeeLevel = document.getElementById("coffee-level");
+        const coffeeCrema = document.getElementById("coffee-crema");
+        const coffeeHoldMsg = document.getElementById("coffee-hold-msg");
+        const confirmWord = document.getElementById("confirm-word");
+        const confirmWordErr = document.getElementById("confirm-word-err");
+        let fluxoConfirmacao = null; // { resolve, etapa }
+
+        // Mesmo cálculo de saldo da janela de 30 dias usado em calculateAndRender
+        function saldosAtuais(lista) {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const saldos = {};
+            lista.forEach(ev => {
+                if (ev.isBonus) return;
+                const diffDays = Math.ceil(Math.abs(hoje - new Date(ev.date + 'T00:00:00')) / (1000 * 60 * 60 * 24));
+                if (diffDays > 30) return;
+                ev.present.forEach(p => { saldos[p] = (saldos[p] || 0) + 1; });
+                saldos[ev.payer] = (saldos[ev.payer] || 0) - ev.present.length;
+            });
+            return saldos;
+        }
+
+        function impactoNosSaldos(antes, depois) {
+            const a = saldosAtuais(antes), d = saldosAtuais(depois);
+            return [...new Set([...Object.keys(a), ...Object.keys(d)])]
+                .map(nome => ({ nome, de: a[nome] || 0, para: d[nome] || 0 }))
+                .filter(x => x.de !== x.para)
+                .sort((x, y) => (y.para - y.de) - (x.para - x.de));
+        }
+
+        const fmtSaldo = n => n > 0 ? `+${n}` : `${n}`;
+        const linhaConfirm = (rotulo, valor) => `<div class="confirm-linha"><span>${rotulo}</span><span>${valor}</span></div>`;
+
+        function confirmarTresEtapas({ acao, titulo, resumoHTML, impacto, nota }) {
+            if (fluxoConfirmacao) encerrarConfirmacao(false);
+            const excluir = acao === 'excluir';
+            confirmSheet.classList.toggle('excluir', excluir);
+            document.getElementById('confirm-title').textContent = titulo;
+            document.getElementById('confirm-resumo').innerHTML = resumoHTML;
+            document.getElementById('confirm-impacto-titulo').textContent = !impacto.length
+                ? 'Impacto nos saldos:'
+                : excluir ? 'Se excluir, o saldo atual (30 dias) fica assim:' : 'Com a alteração, o saldo atual (30 dias) fica assim:';
+            document.getElementById('confirm-impacto').innerHTML = impacto.length
+                ? impacto.map(x => linhaConfirm(x.nome, `${fmtSaldo(x.de)} → <strong class="${x.para > x.de ? 'val-positive' : 'val-negative'}">${fmtSaldo(x.para)}</strong>`)).join('')
+                : `<div style="color: var(--text-muted); text-align: center;">${nota}</div>`;
+            document.getElementById('confirm-verbo').textContent = excluir ? 'excluir' : 'salvar';
+            document.getElementById('confirm-sim').className = excluir ? 'danger-btn' : 'primary-btn';
+            const btnFinal = document.getElementById('confirm-final');
+            btnFinal.className = excluir ? 'danger-btn' : 'primary-btn';
+            btnFinal.textContent = excluir ? 'Excluir' : 'Salvar';
+
+            return new Promise(resolve => {
+                fluxoConfirmacao = { resolve, etapa: 1 };
+                irParaEtapa(1);
+                confirmFlow.classList.remove('hidden');
+            });
+        }
+
+        function irParaEtapa(n) {
+            fluxoConfirmacao.etapa = n;
+            [1, 2, 3].forEach(i => document.getElementById(`confirm-step-${i}`).classList.toggle('hidden', i !== n));
+            confirmSheet.querySelectorAll('.confirm-steps span').forEach((s, i) => s.classList.toggle('on', i < n));
+            document.getElementById('confirm-step-label').textContent = `Etapa ${n} de 3`;
+            if (n === 2) resetarXicara();
+            if (n === 3) {
+                confirmWord.value = '';
+                confirmWordErr.textContent = '';
+                setTimeout(() => confirmWord.focus(), 50);
+            }
+        }
+
+        function encerrarConfirmacao(confirmado) {
+            if (!fluxoConfirmacao) return;
+            resetarXicara();
+            const { resolve } = fluxoConfirmacao;
+            fluxoConfirmacao = null;
+            confirmFlow.classList.add('hidden');
+            resolve(confirmado);
+        }
+
+        confirmFlow.querySelectorAll('[data-confirm="nao"]').forEach(b => b.addEventListener('click', () => encerrarConfirmacao(false)));
+        document.getElementById('confirm-sim').addEventListener('click', () => irParaEtapa(2));
+
+        function validarPalavra() {
+            const valor = confirmWord.value.trim().toUpperCase();
+            if (!valor) { confirmWordErr.textContent = 'Digite a palavra primeiro.'; return; }
+            if (valor !== PALAVRA_CONFIRMACAO) { confirmWordErr.textContent = `Palavra não confere. Digite ${PALAVRA_CONFIRMACAO}.`; return; }
+            encerrarConfirmacao(true);
+        }
+        document.getElementById('confirm-final').addEventListener('click', validarPalavra);
+        confirmWord.addEventListener('input', () => { confirmWordErr.textContent = ''; });
+        confirmWord.addEventListener('keydown', e => { if (e.key === 'Enter') validarPalavra(); });
+
+        // Xícara: precisa segurar sem soltar até encher. Soltou antes, o café escorre e recomeça.
+        // Usa timer (e não requestAnimationFrame) para a conclusão não depender do navegador estar desenhando a tela.
+        let xicaraTimer = null, xicaraNivel = 0, xicaraSegurando = false, xicaraCheia = false;
+
+        function desenharXicara(p) {
+            xicaraNivel = p;
+            const y = 98 - p * 62; // 98 = fundo vazio, 36 = cheia até a borda
+            coffeeLevel.setAttribute('y', y);
+            coffeeCrema.setAttribute('y', y);
+        }
+
+        function fraseXicara(p) {
+            const s = Math.ceil((1 - p) * TEMPO_XICARA_MS / 1000);
+            if (p < 0.25) return `Moendo os grãos… ${s}s`;
+            if (p < 0.5) return `Passando o café… ${s}s`;
+            if (p < 0.8) return `Enchendo a xícara… ${s}s`;
+            return `Quase lá, não solta! ${s}s`;
+        }
+
+        function resetarXicara() {
+            clearInterval(xicaraTimer);
+            xicaraTimer = null;
+            xicaraSegurando = false;
+            xicaraCheia = false;
+            coffeeHold.classList.remove('segurando', 'cheia');
+            desenharXicara(0);
+            coffeeHoldMsg.textContent = 'Segure a xícara por 5 segundos';
+        }
+
+        function comecarAEncher(e) {
+            if (e) e.preventDefault();
+            if (!fluxoConfirmacao || fluxoConfirmacao.etapa !== 2 || xicaraSegurando || xicaraCheia) return;
+            clearInterval(xicaraTimer);
+            xicaraSegurando = true;
+            coffeeHold.classList.add('segurando');
+            desenharXicara(0);
+            coffeeHoldMsg.textContent = fraseXicara(0);
+            const inicio = performance.now();
+            const passo = () => {
+                const p = Math.min(1, (performance.now() - inicio) / TEMPO_XICARA_MS);
+                desenharXicara(p);
+                if (p < 1) {
+                    coffeeHoldMsg.textContent = fraseXicara(p);
+                    return;
+                }
+                clearInterval(xicaraTimer);
+                xicaraTimer = null;
+                xicaraSegurando = false;
+                xicaraCheia = true;
+                coffeeHold.classList.remove('segurando');
+                coffeeHold.classList.add('cheia');
+                coffeeHoldMsg.textContent = 'Xícara cheia! ☕ Pode soltar.';
+                setTimeout(() => { if (fluxoConfirmacao && fluxoConfirmacao.etapa === 2) irParaEtapa(3); }, 1100);
+            };
+            xicaraTimer = setInterval(passo, 30);
+        }
+
+        function soltarXicara() {
+            if (!xicaraSegurando) return;
+            xicaraSegurando = false;
+            coffeeHold.classList.remove('segurando');
+            clearInterval(xicaraTimer);
+            coffeeHoldMsg.textContent = 'Derramou! 😅 Segure até a xícara encher.';
+            const de = xicaraNivel, inicio = performance.now();
+            const escorrer = () => {
+                const q = Math.min(1, (performance.now() - inicio) / 450);
+                desenharXicara(de * (1 - q));
+                if (q >= 1) { clearInterval(xicaraTimer); xicaraTimer = null; }
+            };
+            xicaraTimer = setInterval(escorrer, 30);
+        }
+
+        coffeeHold.addEventListener('pointerdown', comecarAEncher);
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => coffeeHold.addEventListener(ev, soltarXicara));
+        coffeeHold.addEventListener('contextmenu', e => e.preventDefault());
+        coffeeHold.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) comecarAEncher(e); });
+        coffeeHold.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') soltarXicara(); });
+
+        // =====================================
         // EDIÇÃO CRUD MODAL
         // =====================================
         function openEditModal(eventId) {
-            const ev = events.find(e => e.id === eventId);
+            const ev = events.find(e => String(e.id) === String(eventId));
             if(!ev) return;
             
-            editingEventId = eventId;
+            editingEventId = String(eventId);
+            // Rodada bônus não tem pagador (é o Kop Club): esconde o campo
+            editPayerSelect.closest('.modal-field').classList.toggle('hidden', !!ev.isBonus);
             editDateInput.value = ev.date;
 
             // Popular checkboxes unindo a lista atual + quem estava presente na época
@@ -1742,31 +2047,76 @@
             editingEventId = null;
         });
 
-        saveEditBtn.addEventListener("click", () => {
+        saveEditBtn.addEventListener("click", async () => {
             if (!editingEventId) return;
+            const idEditado = editingEventId;
 
             const newDate = editDateInput.value;
             const checkboxes = document.querySelectorAll(".edit-participant-checkbox:checked");
             const newPresent = Array.from(checkboxes).map(cb => cb.value);
             const newPayer = editPayerSelect.value;
 
-            if (newPresent.length === 0) { alert("O lançamento precisa ter pelo menos 1 pessoa presente."); return; }
-            if (!newPresent.includes(newPayer)) { alert("O pagador da conta precisa estar entre os presentes!"); return; }
+            const original = events.find(e => String(e.id) === idEditado);
+            if (!original) return;
+            const isBonus = !!original.isBonus;
 
-            if (events.some(e => e.date === newDate && e.id !== editingEventId)) {
+            if (newPresent.length === 0) { alert("O lançamento precisa ter pelo menos 1 pessoa presente."); return; }
+            if (!isBonus && !newPresent.includes(newPayer)) { alert("O pagador da conta precisa estar entre os presentes!"); return; }
+
+            // Data única por tipo: um café comum e uma rodada bônus podem coexistir no mesmo dia
+            if (events.some(e => e.date === newDate && String(e.id) !== idEditado && !!e.isBonus === isBonus)) {
                 alert("Já existe outro café registrado para esta mesma data!");
                 return;
             }
 
-            // Atualiza o evento no array
-            const evIndex = events.findIndex(e => e.id === editingEventId);
-            if (evIndex > -1) {
-                events[evIndex].date = newDate;
-                events[evIndex].present = newPresent;
-                events[evIndex].payer = newPayer;
-                updateCloudData(); 
-                registrarLog("EDITOU", "editou", `Editou lançamento do dia <strong>${newDate.split('-').reverse().join('/')}</strong> (Novo Pagador: <strong>${newPayer}</strong>)`);
+            const fmtData = d => d.split('-').reverse().join('/');
+            const novoPagador = isBonus ? original.payer : newPayer;
+            const entrou = newPresent.filter(p => !original.present.includes(p));
+            const saiu = original.present.filter(p => !newPresent.includes(p));
+            const mudouData = newDate !== original.date;
+            const mudouPagador = novoPagador !== original.payer;
+            if (!mudouData && !mudouPagador && !entrou.length && !saiu.length) {
+                alert("Nenhuma alteração para salvar.");
+                return;
             }
+
+            let resumoHTML = linhaConfirm('Lançamento', fmtData(original.date));
+            if (mudouData) resumoHTML += linhaConfirm('Data', `${fmtData(original.date)} → ${fmtData(newDate)}`);
+            if (mudouPagador) resumoHTML += linhaConfirm('Pagador', `${original.payer} → ${novoPagador}`);
+            if (entrou.length) resumoHTML += linhaConfirm('Entrou', entrou.join(', '));
+            if (saiu.length) resumoHTML += linhaConfirm('Saiu', saiu.join(', '));
+
+            const atualizado = { ...original, date: newDate, present: newPresent, payer: novoPagador };
+            const confirmado = await confirmarTresEtapas({
+                acao: 'editar',
+                titulo: isBonus ? 'Salvar as alterações da rodada bônus?' : 'Salvar as alterações?',
+                resumoHTML,
+                impacto: impactoNosSaldos(events, events.map(e => String(e.id) === idEditado ? atualizado : e)),
+                nota: isBonus
+                    ? '🎁 Rodada bônus não mexe no saldo de ninguém. Só muda quem aparece nas estatísticas do Kop Club.'
+                    : 'Nenhum saldo atual (30 dias) muda com essa alteração.'
+            });
+            // Cancelou: volta para o formulário de edição com as alterações preservadas
+            if (!confirmado) return;
+
+            // Reaplica sobre a lista atual: ela pode ter sido atualizada pela nuvem durante a confirmação
+            const evIndex = events.findIndex(e => String(e.id) === idEditado);
+            if (evIndex === -1) {
+                alert("Esse lançamento não existe mais (foi apagado por outra pessoa).");
+                editModal.classList.add("hidden");
+                editingEventId = null;
+                return;
+            }
+            const dataBr = fmtData(newDate);
+            events[evIndex].date = newDate;
+            events[evIndex].present = newPresent;
+            if (isBonus) {
+                registrarLog("EDITOU", "editou", `Editou Rodada Bônus do dia <strong>${dataBr}</strong> (Participantes: ${newPresent.join(', ')})`);
+            } else {
+                events[evIndex].payer = newPayer;
+                registrarLog("EDITOU", "editou", `Editou lançamento do dia <strong>${dataBr}</strong> (Novo Pagador: <strong>${newPayer}</strong>)`);
+            }
+            updateCloudData();
 
             editModal.classList.add("hidden");
             editingEventId = null;
