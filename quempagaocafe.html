@@ -257,12 +257,12 @@
             position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
             background: rgba(26, 16, 12, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border-top: 1px solid var(--surface-border); display: flex; justify-content: space-around;
-            align-items: center; z-index: 1100; padding: 0 10px;
+            align-items: center; z-index: 1100; padding: 0 4px;
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--text-muted); cursor: pointer; font-size: 0.75rem; text-transform: uppercase;
-            letter-spacing: 0.5px; transition: all 0.3s; position: relative; flex: 1; min-width: 0;
+            color: var(--text-muted); cursor: pointer; font-size: 0.6rem; text-transform: uppercase;
+            letter-spacing: 0.2px; white-space: nowrap; transition: all 0.3s; position: relative; flex: 1; min-width: 0;
         }
         .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
         .nav-item.active { color: var(--primary-color); }
@@ -295,6 +295,76 @@
         .dash-name { font-size: 1.4rem; font-weight: bold; color: white; margin-bottom: 2px; }
         .dash-stats { font-size: 0.9rem; color: var(--text-main); }
         .dash-stats strong { color: var(--primary-color); }
+
+        /* Meu Dash: tudo sobre uma pessoa, em todo o histórico */
+        .md-titulo { color: var(--primary-color); margin-bottom: 1rem; text-align: center; }
+        .md-pessoas { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.4rem; margin-bottom: 1rem; scrollbar-width: none; }
+        .md-pessoa { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); border-radius: 20px; padding: 0.25rem 0.75rem 0.25rem 0.25rem; font-family: inherit; font-size: 0.85rem; cursor: pointer; }
+        .md-pessoa.on { border-color: var(--primary-color); color: var(--primary-color); font-weight: 600; background: rgba(255,213,79,0.08); }
+        .md-pessoa small { font-size: 0.65rem; font-weight: 400; }
+        .md-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
+        .md-card-titulo { font-weight: 700; color: var(--text-main); margin-bottom: 0.2rem; }
+        .md-card-sub { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.9rem; line-height: 1.4; }
+        .md-card-sub strong { color: var(--text-main); }
+        .md-hero { display: flex; align-items: center; gap: 1rem; }
+        .md-hero img { width: 84px; height: 84px; object-fit: cover; border-radius: 50%; border: 3px solid var(--primary-color); background: #3e2723; flex-shrink: 0; }
+        .md-hero-nome { font-size: 1.6rem; font-weight: 800; line-height: 1.1; color: var(--text-main); }
+        .md-veredito { display: inline-block; margin: 0.35rem 0; font-size: 0.8rem; font-weight: 600; color: var(--primary-color); background: rgba(255,213,79,0.1); border: 1px solid rgba(255,213,79,0.3); border-radius: 20px; padding: 0.15rem 0.6rem; }
+        .md-hero-meta { color: var(--text-muted); font-size: 0.8rem; line-height: 1.45; }
+        .md-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
+        .md-kpi { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.75rem 0.85rem; min-width: 0; }
+        .md-rotulo { color: var(--text-muted); font-size: 0.75rem; }
+        .md-num { font-size: 1.8rem; font-weight: 800; line-height: 1.15; }
+        .md-kpi .md-num { color: var(--text-main); }
+        .md-sub { color: var(--text-muted); font-size: 0.72rem; line-height: 1.35; }
+        .md-saldos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; margin-top: 0.6rem; }
+        .md-nota { color: var(--text-muted); font-size: 0.72rem; margin-top: 0.8rem; padding-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.08); line-height: 1.4; }
+        /* Gráfico de colunas empilhadas (de onde veio o café) */
+        .md-legenda { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+        .md-legenda i, .md-key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+        .md-colunas { display: flex; overflow-x: auto; scrollbar-width: none; }
+        .md-coluna { flex: 1 0 36px; display: flex; flex-direction: column; align-items: center; cursor: pointer; outline: none; border-radius: 6px 6px 0 0; }
+        .md-coluna:hover, .md-coluna:focus-visible, .md-coluna.on { background: rgba(255,255,255,0.06); }
+        .md-plot { height: 145px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; border-bottom: 1px solid rgba(255,255,255,0.15); }
+        .md-coluna-valor { font-size: 0.75rem; font-weight: 600; color: var(--text-main); margin-bottom: 3px; }
+        .md-pilha { width: 22px; display: flex; flex-direction: column; gap: 2px; border-radius: 4px 4px 0 0; overflow: hidden; }
+        .md-pilha i { display: block; flex-basis: 0; min-height: 3px; }
+        .md-mes { font-size: 0.7rem; color: var(--text-muted); padding: 4px 0 2px; }
+        .md-leitura { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.7rem; min-height: 2.6em; line-height: 1.5; }
+        .md-leitura strong { color: var(--text-main); }
+        .md-tabela { margin-top: 0.6rem; font-size: 0.8rem; color: var(--text-muted); }
+        .md-tabela summary { cursor: pointer; color: var(--primary-color); }
+        .md-tabela table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-variant-numeric: tabular-nums; }
+        .md-tabela th { font-weight: 400; text-align: right; padding: 0.3rem 0.2rem; border-bottom: 1px solid rgba(255,255,255,0.12); }
+        .md-tabela td { text-align: right; padding: 0.3rem 0.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-main); }
+        .md-tabela th:first-child, .md-tabela td:first-child { text-align: left; }
+        /* Balança: quem pagou pra quem (barras divergentes) */
+        .md-destaques { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-bottom: 0.9rem; font-size: 0.78rem; color: var(--text-muted); }
+        .md-destaques strong { display: block; color: var(--text-main); font-size: 0.95rem; margin-top: 0.15rem; }
+        .md-bal-cab, .md-bal-linha { display: grid; grid-template-columns: 82px minmax(0, 1fr) minmax(0, 1fr) 68px; gap: 0.35rem; align-items: center; }
+        .md-bal-cab { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+        .md-bal-cab span:nth-child(2) { text-align: right; }
+        .md-bal-linha { padding: 0.3rem 0; }
+        .md-bal-nome { display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; color: var(--text-main); min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .md-bal-esq, .md-bal-dir { display: flex; align-items: center; gap: 4px; height: 22px; font-size: 0.75rem; color: var(--text-main); }
+        .md-bal-esq { justify-content: flex-end; }
+        .md-bal-dir { border-left: 1px solid rgba(255,255,255,0.2); }
+        .md-bal-barra { display: block; height: 12px; min-width: 3px; }
+        .md-bal-barra.esq { border-radius: 4px 0 0 4px; }
+        .md-bal-barra.dir { border-radius: 0 4px 4px 0; }
+        .md-bal-net { font-size: 0.7rem; color: var(--text-muted); text-align: right; line-height: 1.25; }
+        /* Dia favorito (destaque em um, o resto em cinza) */
+        .md-dia { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); align-items: center; gap: 0.4rem; margin: 0.25rem 0; font-size: 0.78rem; color: var(--text-muted); }
+        .md-dia-barra { display: flex; align-items: center; gap: 6px; color: var(--text-main); }
+        .md-dia-barra i { display: block; height: 12px; min-width: 3px; border-radius: 0 4px 4px 0; background: rgba(215, 204, 200, 0.35); }
+        .md-dia.fav .md-dia-barra i { background: var(--primary-color); }
+        .md-curiosidades { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-top: 0.9rem; }
+        .md-trocar { display: block; margin: 0.5rem auto 1.5rem; background: none; border: none; color: var(--text-muted); text-decoration: underline; font-family: inherit; font-size: 0.8rem; cursor: pointer; }
+        /* Escolha de quem é você */
+        .md-quem { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; margin-top: 0.4rem; }
+        .md-quem-op { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; background: none; border: none; color: var(--text-main); font-family: inherit; font-size: 0.9rem; cursor: pointer; padding: 0; }
+        .md-quem-op img { width: 100%; max-width: 84px; aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 3px solid rgba(255,213,79,0.25); }
+        .md-quem-op.on img { border-color: var(--primary-color); }
 
         .tab-content.active { display: block; }
         
@@ -586,6 +656,12 @@
                     </div>
             </div>
 
+            <!-- MEU DASH -->
+            <div id="tab-meudash" class="tab-content">
+                    <h2 class="md-titulo">Meu Dash</h2>
+                    <div id="meudash-area"><!-- Renderizado via JS --></div>
+            </div>
+
         </main>
     </div>
 
@@ -606,7 +682,11 @@
         
         <div class="nav-item" data-tab="tab-dashboard">
             <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-            Estatísticas
+            Ranking
+        </div>
+        <div class="nav-item" data-tab="tab-meudash">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            Meu Dash
         </div>
         <div class="nav-item" data-tab="tab-perfil">
             <div class="badge-notification" id="pending-badge"></div>
@@ -1014,6 +1094,7 @@
                 const targetId = item.dataset.tab;
                 if(targetId === 'tab-saldos') { renderStats(); }
                 if(targetId === 'tab-dashboard') { renderDashboard(); }
+                if(targetId === 'tab-meudash') { renderMeuDash(); }
             });
         });
 
@@ -1091,6 +1172,7 @@
         // =====================================
         let unsubUser = null;
         let currentUserRoles = []; // Array global para checar permissões na UI
+        let meuParticipante = null; // participante ligado a esta conta (users/{uid}.participante), usado no Meu Dash
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -1106,6 +1188,7 @@
                         }
                         
                         currentUserRoles = userData.roles || ['member'];
+                        meuParticipante = userData.participante || null;
 
                         if (userData.status === 'approved') {
                             authScreen.classList.add("hidden");
@@ -1154,6 +1237,10 @@
                 if (unsubData) unsubData();
                 if (unsubConfig) unsubConfig();
                 if (unsubLogs) unsubLogs();
+                if (unsubUsers) unsubUsers();
+                appIniciado = false;
+                meuParticipante = null;
+                dashPessoa = null;
             }
         });
 
@@ -1383,9 +1470,297 @@
         document.getElementById('dash-period')?.addEventListener('change', renderDashboard);
 
         // =====================================
+        // MEU DASH (tudo sobre uma pessoa, em todo o histórico)
+        // =====================================
+        let dashPessoa = null;       // quem está sendo visto (começa em quem é dono da conta)
+        let dashEscolhendo = false;  // mostrando a tela "Quem é você?"
+        const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+        const MESES_LONGOS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+        const DIAS_SEMANA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+        // De onde veio o café. Cores validadas para daltonismo no fundo escuro do app
+        const COR_DASH = { outros: '#3987e5', pagou: '#d95926', kop: '#199e70' };
+        const nomeMes = (chave, longo) => { const [a, m] = chave.split('-'); return longo ? `${MESES_LONGOS[m - 1]}/${a}` : MESES[m - 1]; };
+        const fmtDataBr = d => d.split('-').reverse().join('/');
+        // Quem tem o maior número (todos os empatados): { nomes, qtd } ou null
+        function maioresDe(obj) {
+            const qtd = Math.max(0, ...Object.values(obj));
+            return qtd ? { nomes: Object.keys(obj).filter(k => obj[k] === qtd), qtd } : null;
+        }
+        const juntarNomes = nomes => nomes.length > 1 ? `${nomes.slice(0, -1).join(', ')} e ${nomes[nomes.length - 1]}` : nomes[0];
+        const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+        function quando(d) {
+            const dias = Math.round((new Date(hojeLocal() + 'T00:00:00') - new Date(d + 'T00:00:00')) / 864e5);
+            return dias === 0 ? 'hoje' : dias === 1 ? 'ontem' : `há ${dias} dias`;
+        }
+
+        function dadosDoDash(p) {
+            const ordenados = [...events].sort((a, b) => a.date.localeCompare(b.date));
+            const regulares = ordenados.filter(e => !e.isBonus);
+            const tomou = regulares.filter(e => e.present.includes(p));
+            const deGraca = tomou.filter(e => e.payer !== p);
+            const pagou = regulares.filter(e => e.payer === p);
+            const kop = ordenados.filter(e => e.isBonus && e.present.includes(p));
+            // Foi ao café: tomou (pago ou pelo Kop Club) ou pagou sem tomar
+            const foi = ordenados.filter(e => e.present.includes(p) || (!e.isBonus && e.payer === p));
+            const dias = [...new Set(foi.map(e => e.date))];
+            const diasDaTurma = [...new Set(ordenados.map(e => e.date))];
+
+            const somar = (obj, k, n = 1) => { obj[k] = (obj[k] || 0) + n; };
+            const paraQuem = {}, deQuem = {}, junto = {};
+            pagou.forEach(e => e.present.forEach(x => { if (x !== p) somar(paraQuem, x); }));
+            deGraca.forEach(e => somar(deQuem, e.payer));
+            // Parceiro de café: conta dias juntos (café pago e bônus no mesmo dia valem um só)
+            const outrosNoDia = {};
+            foi.forEach(e => e.present.forEach(x => { if (x !== p) (outrosNoDia[e.date] = outrosNoDia[e.date] || new Set()).add(x); }));
+            Object.values(outrosNoDia).forEach(s => s.forEach(x => somar(junto, x)));
+
+            // Cafés por mês, separados por quem pagou
+            const porMes = {};
+            const doMes = d => (porMes[d.slice(0, 7)] = porMes[d.slice(0, 7)] || { outros: 0, pagou: 0, kop: 0, bancados: 0 });
+            tomou.forEach(e => { doMes(e.date)[e.payer === p ? 'pagou' : 'outros']++; });
+            kop.forEach(e => { doMes(e.date).kop++; });
+            pagou.forEach(e => { doMes(e.date).bancados += e.present.length; });
+            // Do mês do primeiro café da pessoa até o mês atual; mês sem café aparece com zero
+            const meses = [];
+            if (dias.length) {
+                let [a, m] = dias[0].split('-').map(Number);
+                const [aFim, mFim] = hojeLocal().split('-').map(Number);
+                while (a < aFim || (a === aFim && m <= mFim)) {
+                    const chave = `${a}-${String(m).padStart(2, '0')}`;
+                    const v = porMes[chave] || { outros: 0, pagou: 0, kop: 0, bancados: 0 };
+                    meses.push({ chave, ...v, total: v.outros + v.pagou + v.kop });
+                    if (++m > 12) { m = 1; a++; }
+                }
+            }
+
+            // Maior sequência de cafés da turma sem faltar
+            const meusDias = new Set(dias);
+            let seq = 0, maiorSequencia = 0;
+            diasDaTurma.forEach(d => { seq = meusDias.has(d) ? seq + 1 : 0; maiorSequencia = Math.max(maiorSequencia, seq); });
+
+            const porDiaSemana = [0, 0, 0, 0, 0, 0, 0];
+            dias.forEach(d => { porDiaSemana[new Date(d + 'T00:00:00').getDay()]++; });
+
+            const bancadosOutros = Object.values(paraQuem).reduce((s, n) => s + n, 0);
+            return {
+                tomou, deGraca, pagou, kop, dias, diasDaTurma, paraQuem, deQuem, junto, meses, maiorSequencia, porDiaSemana,
+                maiorRodada: pagou.reduce((m, e) => (!m || e.present.length > m.present.length ? e : m), null),
+                bancados: pagou.reduce((s, e) => s + e.present.length, 0),
+                bancadosOutros,
+                // Mesmo que o "Saldo Histórico" dos Saldos: tomou de graça menos o que pagou pros outros
+                saldoHistorico: deGraca.length - bancadosOutros
+            };
+        }
+
+        function vereditoDash(d) {
+            if (!d.dias.length) return '👻 Fantasma do café';
+            if (d.saldoHistorico <= -3) return '👑 Mecenas do café';
+            if (d.saldoHistorico >= 3) return '🧛 Sanguessuga oficial';
+            return '⚖️ Equilibrado';
+        }
+
+        async function escolherQuemSouEu(nome) {
+            meuParticipante = nome;
+            dashPessoa = nome;
+            dashEscolhendo = false;
+            renderMeuDash();
+            try {
+                await updateDoc(doc(db, 'users', auth.currentUser.uid), { participante: nome });
+            } catch (err) {
+                console.error('Não deu para salvar quem é você:', err);
+            }
+        }
+
+        function renderMeuDash() {
+            const area = document.getElementById('meudash-area');
+            if (!area) return;
+
+            if (dashEscolhendo || !meuParticipante) {
+                area.innerHTML = `
+                    <div class="md-card" style="text-align: center;">
+                        <div class="md-card-titulo">Quem é você?</div>
+                        <div class="md-card-sub">Toque no seu rosto. O app vai abrir sempre no seu dash (dá pra trocar depois).</div>
+                        <div class="md-quem">${participantNames.map(n => `
+                            <button type="button" class="md-quem-op${n === meuParticipante ? ' on' : ''}" data-nome="${n}">
+                                <img src="avatares/rosto-${avatarDe(n)}.webp" alt=""><span>${apelido(n)}</span>
+                            </button>`).join('')}
+                        </div>
+                    </div>`;
+                area.querySelectorAll('.md-quem-op').forEach(b => b.addEventListener('click', () => escolherQuemSouEu(b.dataset.nome)));
+                return;
+            }
+
+            if (!dashPessoa) dashPessoa = meuParticipante;
+            const p = dashPessoa;
+            const d = dadosDoDash(p);
+            const souEu = p === meuParticipante;
+            const ele = souEu ? 'você' : apelido(p);
+            const Ele = souEu ? 'Você' : apelido(p);
+            const pessoas = [...new Set([...participantNames, meuParticipante])];
+
+            let html = `<div class="md-pessoas">${pessoas.map(n => `
+                <button type="button" class="md-pessoa${n === p ? ' on' : ''}" data-nome="${n}">${rostoHTML(n, 26)}${apelido(n)}${n === meuParticipante ? ' <small>(você)</small>' : ''}</button>`).join('')}
+            </div>`;
+
+            const primeiro = d.dias[0], ultimo = d.dias[d.dias.length - 1];
+            html += `
+                <div class="md-card md-hero">
+                    <img src="avatares/rosto-${avatarDe(p)}.webp" alt="">
+                    <div>
+                        <div class="md-hero-nome">${apelido(p)}</div>
+                        <span class="md-veredito">${vereditoDash(d)}</span>
+                        <div class="md-hero-meta">${primeiro
+                            ? `No tribunal desde ${fmtDataBr(primeiro)}<br>Último café: ${quando(ultimo)} (${fmtDataBr(ultimo).slice(0, 5)})`
+                            : 'Ainda não foi a nenhum café.'}</div>
+                    </div>
+                </div>`;
+
+            if (d.dias.length) {
+                const kpi = (rotulo, valor, sub) => `<div class="md-kpi"><div class="md-rotulo">${rotulo}</div><div class="md-num">${valor}</div><div class="md-sub">${sub}</div></div>`;
+                html += `<div class="md-kpis">
+                    ${kpi('📅 Dias de café', d.dias.length, `${pct(d.dias.length, d.diasDaTurma.length)}% dos ${d.diasDaTurma.length} dias da turma`)}
+                    ${kpi('☕ Cafés tomados', d.tomou.length + d.kop.length, `${d.kop.length} deles pelo Kop Club`)}
+                    ${kpi('🧛 Tomou de graça', d.deGraca.length, 'alguém pagou o café')}
+                    ${kpi('💳 Pagou a rodada', d.pagou.length, d.pagou.length === 1 ? 'vez' : 'vezes')}
+                    ${kpi('🧾 Cafés bancados', d.bancados, `${d.bancadosOutros} pros outros`)}
+                    ${kpi('🔥 Maior sequência', d.maiorSequencia, 'cafés seguidos sem faltar')}
+                </div>`;
+
+                // Situação: saldo de agora (decide quem paga) e de todos os tempos
+                const atual = (currentAggregates[p] || { saldo: 0 }).saldo;
+                const ativo = participantNames.includes(p);
+                const posicao = 1 + participantNames.filter(n => n !== p && (currentAggregates[n] || { saldo: 0 }).saldo > atual).length;
+                const classe = n => n > 0 ? 'val-positive' : n < 0 ? 'val-negative' : '';
+                html += `<div class="md-card">
+                    <div class="md-card-titulo">Situação no tribunal</div>
+                    <div class="md-saldos">
+                        <div><div class="md-rotulo">Saldo agora (30 dias)</div><div class="md-num ${classe(atual)}">${fmtSaldo(atual)}</div>
+                            <div class="md-sub">${ativo ? `${posicao}º de ${participantNames.length} no ranking de quem deve mais` : 'fora da lista atual'}</div></div>
+                        <div><div class="md-rotulo">Saldo de todos os tempos</div><div class="md-num ${classe(d.saldoHistorico)}">${fmtSaldo(d.saldoHistorico)}</div>
+                            <div class="md-sub">tomou ${d.deGraca.length} de graça, pagou ${d.bancadosOutros} pros outros</div></div>
+                    </div>
+                    <div class="md-nota">Positivo = deve café pra turma. Negativo = tem crédito. Quem paga a rodada é decidido pelo saldo dos últimos 30 dias.</div>
+                </div>`;
+
+                // Cafés por mês (colunas empilhadas: quem pagou cada café). Mostra os últimos 12 meses
+                const mesesGrafico = d.meses.slice(-12);
+                const maxMes = Math.max(1, ...mesesGrafico.map(m => m.total));
+                const recorde = d.meses.reduce((r, m) => (m.total > (r ? r.total : 0) ? m : r), null);
+                const ALTURA_MAX = 118;
+                const seg = (m, k) => m[k] ? `<i style="flex-grow:${m[k]}; background:${COR_DASH[k]}"></i>` : '';
+                html += `<div class="md-card">
+                    <div class="md-card-titulo">Cafés por mês</div>
+                    <div class="md-card-sub">${recorde
+                        ? `Mês recorde: <strong>${nomeMes(recorde.chave, true)}</strong>, com ${recorde.total} café(s). Toque num mês para ver o detalhe.`
+                        : 'Nenhum café tomado ainda.'}</div>
+                    <div class="md-legenda">
+                        <span><i style="background:${COR_DASH.outros}"></i>Outros pagaram</span>
+                        <span><i style="background:${COR_DASH.pagou}"></i>${Ele} pagou</span>
+                        <span><i style="background:${COR_DASH.kop}"></i>Kop Club</span>
+                    </div>
+                    <div class="md-colunas">${mesesGrafico.map(m => `
+                        <div class="md-coluna" tabindex="0" data-mes="${m.chave}" aria-label="${nomeMes(m.chave, true)}: ${m.total} cafés">
+                            <div class="md-plot">
+                                <span class="md-coluna-valor">${m.total}</span>
+                                ${m.total ? `<div class="md-pilha" style="height:${Math.max(4, Math.round(m.total / maxMes * ALTURA_MAX))}px">${seg(m, 'kop')}${seg(m, 'pagou')}${seg(m, 'outros')}</div>` : ''}
+                            </div>
+                            <span class="md-mes">${nomeMes(m.chave)}</span>
+                        </div>`).join('')}
+                    </div>
+                    <div class="md-leitura" id="md-leitura"></div>
+                    <details class="md-tabela"><summary>Ver mês a mês em tabela</summary>
+                        <table>
+                            <thead><tr><th>Mês</th><th>Tomou</th><th>De graça</th><th>Kop</th><th>Bancou</th></tr></thead>
+                            <tbody>${[...d.meses].reverse().map(m => `<tr><td>${nomeMes(m.chave, true)}</td><td>${m.total}</td><td>${m.outros}</td><td>${m.kop}</td><td>${m.bancados}</td></tr>`).join('')}</tbody>
+                        </table>
+                    </details>
+                </div>`;
+
+                // Balança: pra quem pagou e quem pagou pra ela
+                const nomesBal = [...new Set([...Object.keys(d.paraQuem), ...Object.keys(d.deQuem)])]
+                    .sort((a, b) => ((d.paraQuem[b] || 0) + (d.deQuem[b] || 0)) - ((d.paraQuem[a] || 0) + (d.deQuem[a] || 0)));
+                const maxBal = Math.max(1, ...nomesBal.map(n => Math.max(d.paraQuem[n] || 0, d.deQuem[n] || 0)));
+                const barra = (n, lado, cor) => `<i class="md-bal-barra ${lado}" style="width:calc((100% - 1.4rem) * ${n / maxBal}); background:${cor}"></i>`;
+                const maisPagouPara = maioresDe(d.paraQuem), maisPagouPraEle = maioresDe(d.deQuem);
+                const destaque = top => top ? `${juntarNomes(top.nomes.map(apelido))} (${top.qtd} café${top.qtd === 1 ? '' : 's'}${top.nomes.length > 1 ? ' cada' : ''})` : 'ninguém ainda';
+                html += `<div class="md-card">
+                    <div class="md-card-titulo">Quem pagou pra quem</div>
+                    <div class="md-card-sub">Cafés de todo o histórico, pessoa por pessoa.</div>
+                    <div class="md-destaques">
+                        <div>💸 Pra quem ${ele} mais pagou<strong>${destaque(maisPagouPara)}</strong></div>
+                        <div>🤲 Quem mais pagou pra ${ele}<strong>${destaque(maisPagouPraEle)}</strong></div>
+                    </div>
+                    ${nomesBal.length ? `
+                    <div class="md-bal-cab"><span></span>
+                        <span><i class="md-key" style="background:${COR_DASH.outros}"></i>pagou pra ${ele}</span>
+                        <span><i class="md-key" style="background:${COR_DASH.pagou}"></i>${ele} pagou</span>
+                        <span></span></div>
+                    ${nomesBal.map(n => {
+                        const deu = d.paraQuem[n] || 0, recebeu = d.deQuem[n] || 0, dif = deu - recebeu;
+                        const conta = dif > 0 ? `deve ${dif} pra ${ele}` : dif < 0 ? `${ele} deve ${-dif}` : 'quites';
+                        return `<div class="md-bal-linha">
+                            <span class="md-bal-nome">${rostoHTML(n, 22)}${apelido(n)}</span>
+                            <span class="md-bal-esq">${recebeu ? `${recebeu}${barra(recebeu, 'esq', COR_DASH.outros)}` : ''}</span>
+                            <span class="md-bal-dir">${deu ? `${barra(deu, 'dir', COR_DASH.pagou)}${deu}` : ''}</span>
+                            <span class="md-bal-net">${conta}</span>
+                        </div>`;
+                    }).join('')}` : ''}
+                </div>`;
+
+                // Curiosidades: dia favorito (destaque), parceiro, maior rodada paga
+                const maxDia = Math.max(...d.porDiaSemana);
+                const diasMostrar = [1, 2, 3, 4, 5, 6, 0].filter(i => (i >= 1 && i <= 5) || d.porDiaSemana[i]);
+                const favoritos = diasMostrar.filter(i => d.porDiaSemana[i] === maxDia);
+                const parceiro = maioresDe(d.junto);
+                const mini = (rotulo, valor, sub) => `<div class="md-kpi"><div class="md-rotulo">${rotulo}</div><div class="md-num" style="font-size:1.15rem;">${valor}</div><div class="md-sub">${sub}</div></div>`;
+                html += `<div class="md-card">
+                    <div class="md-card-titulo">${favoritos.length > 1 ? 'Dias favoritos' : 'Dia favorito'}: ${juntarNomes(favoritos.map(i => DIAS_SEMANA[i]))}</div>
+                    <div class="md-card-sub">Em quais dias da semana ${ele} mais vai ao café.</div>
+                    ${diasMostrar.map(i => `<div class="md-dia${favoritos.includes(i) ? ' fav' : ''}"><span>${DIAS_SEMANA[i].slice(0, 3)}</span>
+                        <span class="md-dia-barra"><i style="width:calc((100% - 1.6rem) * ${d.porDiaSemana[i] / Math.max(1, maxDia)})"></i>${d.porDiaSemana[i]}</span></div>`).join('')}
+                    <div class="md-curiosidades">
+                        ${mini('🤝 Parceiro de café', parceiro ? juntarNomes(parceiro.nomes.map(apelido)) : '—', parceiro ? `${parceiro.qtd} dias juntos` : 'sempre sozinho')}
+                        ${mini('🧾 Maior rodada paga', d.maiorRodada ? `${d.maiorRodada.present.length} cafés` : '—', d.maiorRodada ? `em ${fmtDataBr(d.maiorRodada.date)}` : 'nunca pagou')}
+                    </div>
+                </div>`;
+            }
+
+            html += `<button type="button" class="md-trocar" id="md-trocar">Não é ${apelido(meuParticipante)}? Trocar quem eu sou</button>`;
+            area.innerHTML = html;
+
+            area.querySelectorAll('.md-pessoa').forEach(b => b.addEventListener('click', () => { dashPessoa = b.dataset.nome; renderMeuDash(); }));
+            document.getElementById('md-trocar').addEventListener('click', () => { dashEscolhendo = true; renderMeuDash(); });
+
+            // Detalhe do mês: no toque, no foco ou passando o mouse. Começa no mês recorde
+            const leitura = document.getElementById('md-leitura');
+            const colunas = area.querySelectorAll('.md-coluna');
+            const mostrarMes = col => {
+                colunas.forEach(c => c.classList.toggle('on', c === col));
+                const m = d.meses.find(x => x.chave === col.dataset.mes);
+                const chave = (k, texto) => `<i class="md-key" style="background:${COR_DASH[k]}"></i>${texto}`;
+                leitura.innerHTML = `<strong>${nomeMes(m.chave, true)}: ${m.total} café(s)</strong><br>`
+                    + `${chave('outros', `${m.outros} outros pagaram`)} · ${chave('pagou', `${m.pagou} ${ele} pagou`)} · ${chave('kop', `${m.kop} Kop Club`)}`
+                    + (m.bancados ? `<br>Bancou ${m.bancados} café(s) no mês.` : '');
+            };
+            colunas.forEach(c => ['mouseenter', 'focus', 'click'].forEach(ev => c.addEventListener(ev, () => mostrarMes(c))));
+            if (colunas.length) {
+                const recordeChave = (d.meses.reduce((r, m) => (m.total > (r ? r.total : 0) ? m : r), null) || {}).chave;
+                mostrarMes([...colunas].find(c => c.dataset.mes === recordeChave) || colunas[colunas.length - 1]);
+                const caixa = area.querySelector('.md-colunas');
+                caixa.scrollLeft = caixa.scrollWidth; // meses mais recentes à vista
+            }
+        }
+
+        // =====================================
         // INICIALIZAÇÃO DO APP
         // =====================================
+        let appIniciado = false;
+        let unsubUsers = null;
         function initApp() {
+            // O cadastro do usuário muda (perfil, quem é você no Meu Dash) e chama isto de novo:
+            // não reabre os ouvintes do banco, só atualiza o que depende do perfil
+            if (appIniciado) { renderHistory(); return; }
+            appIniciado = true;
             dateInput.value = hojeLocal();
 
             // Escuta as configurações (lista de participantes)
@@ -1427,7 +1802,7 @@
 
             // Escuta a coleção de Usuários (para o painel de Acessos)
             if (!bottomNav.classList.contains("hidden")) {
-                onSnapshot(collection(db, 'users'), (snapshot) => {
+                unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
                     admAccessList.innerHTML = "";
                     snapshot.forEach(docSnap => {
                         const u = docSnap.data();
@@ -1448,6 +1823,7 @@
                                 <span style="font-size:0.75rem;">
                                     Status: <span style="color:${statusColor}">${u.status.toUpperCase()}</span> | 
                                     Perfis: <span style="color:${roleColor}">${userRoles.join(', ')}</span>
+                                    ${u.participante ? ` | É: <span style="color:var(--text-main)">${apelido(u.participante)}</span>` : ''}
                                 </span>
                             </div>
                             <div style="display:flex; flex-direction:column; gap:0.3rem;" id="actions-${uid}">
@@ -1772,6 +2148,7 @@
 
             renderStats();
             renderHistory();
+            if (document.getElementById('tab-meudash').classList.contains('active')) renderMeuDash();
         }
 
         function updateCloudData() {
