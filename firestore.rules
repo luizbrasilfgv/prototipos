@@ -1,25 +1,59 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    function isApprovedUser() {
-      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
+
+    function logado() {
+      return request.auth != null;
     }
 
-    function hasRole(role) {
-      return role in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles;
+    // Cadastro de quem está logado (users/{uid})
+    function meuCadastro() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function aprovado() {
+      return logado()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && meuCadastro().status == 'approved';
+    }
+
+    function admin() {
+      return aprovado() && meuCadastro().get('roles', []).hasAny(['admin']);
+    }
+
+    // Dono do app: o único cadastro que já nasce aprovado e admin
+    function ehDono() {
+      return request.auth.token.email == 'luizbrasil.rj@gmail.com'
+        && request.auth.token.email_verified == true;
     }
 
     match /users/{userId} {
-      allow create: if request.auth.uid == userId; 
-      allow read: if request.auth.uid == userId || (request.auth != null && hasRole('admin'));
-      allow update: if (request.auth != null && hasRole('admin')) 
-                    || (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['roles', 'status', 'role']));
-      allow delete: if request.auth != null && hasRole('admin');
+      // Cada um lê o próprio cadastro; o admin lê todos (painel de acessos)
+      allow read: if logado() && (request.auth.uid == userId || admin());
+
+      // Cadastro novo nasce pendente e como membro, com o e-mail do login
+      allow create: if logado() && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['email', 'status', 'roles'])
+        && request.resource.data.email == request.auth.token.email
+        && ((request.resource.data.status == 'pending' && request.resource.data.roles == ['member'])
+            || ehDono());
+
+      // Admin muda status e perfis; a própria pessoa só diz quem ela é no Meu Dash
+      allow update: if admin()
+        || (logado() && request.auth.uid == userId
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participante'])
+            && request.resource.data.participante is string);
+
+      allow delete: if admin();
     }
 
-    match /coffee/{document=**} {
-      allow read, write: if isApprovedUser();
+    // Lançamentos (data_v3), logs (logs_v3) e participantes/apelidos (config_v3).
+    // Qualquer aprovado lança café e grava log; editar/excluir lançamento é controlado no app.
+    // Participantes, apelidos e personagens só o admin muda.
+    match /coffee/{docId} {
+      allow read: if aprovado();
+      allow create, update: if aprovado() && (docId != 'config_v3' || admin());
+      allow delete: if admin();
     }
   }
 }

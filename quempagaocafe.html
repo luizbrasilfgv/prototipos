@@ -1237,7 +1237,7 @@
                 if (unsubData) unsubData();
                 if (unsubConfig) unsubConfig();
                 if (unsubLogs) unsubLogs();
-                if (unsubUsers) unsubUsers();
+                if (unsubUsers) { unsubUsers(); unsubUsers = null; }
                 appIniciado = false;
                 meuParticipante = null;
                 dashPessoa = null;
@@ -1759,7 +1759,7 @@
         function initApp() {
             // O cadastro do usuário muda (perfil, quem é você no Meu Dash) e chama isto de novo:
             // não reabre os ouvintes do banco, só atualiza o que depende do perfil
-            if (appIniciado) { renderHistory(); return; }
+            if (appIniciado) { renderHistory(); ajustarOuvinteCadastros(); return; }
             appIniciado = true;
             dateInput.value = hojeLocal();
 
@@ -1800,8 +1800,15 @@
                 renderLogs();
             });
 
-            // Escuta a coleção de Usuários (para o painel de Acessos)
-            if (!bottomNav.classList.contains("hidden")) {
+            ajustarOuvinteCadastros();
+        }
+
+        // Painel de acessos: só o admin pode ler a lista de cadastros (regras do Firestore).
+        // Liga ou desliga quando o perfil muda com o app aberto
+        function ajustarOuvinteCadastros() {
+            const ehAdmin = currentUserRoles.includes('admin');
+            if (!ehAdmin && unsubUsers) { unsubUsers(); unsubUsers = null; admAccessList.innerHTML = ""; }
+            if (ehAdmin && !unsubUsers) {
                 unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
                     admAccessList.innerHTML = "";
                     snapshot.forEach(docSnap => {
@@ -1879,7 +1886,7 @@
                         };
                         actionsDiv.appendChild(btnRole);
                     });
-                });
+                }, err => console.error("Lista de cadastros:", err));
             }
         }
 
