@@ -28,6 +28,15 @@ O app suporta rodadas de café em que o pagamento não sai do bolso de ninguém,
 - Na tela de cadastro da rodada bônus, quem estiver bloqueado aparece com o nome **riscado**, checkbox desabilitado e uma mensagem indicando o motivo do bloqueio.
 - Sem impacto financeiro: rodadas bônus NÃO afetam o saldo de caixa e não influenciam quem será sorteado para pagar com dinheiro real.
 
+**Kop Club no dia de um café pago (caso de 13/10/2026):**
+Samuel faltou na rodada bônus de 28/09. Em 13/10 ele tomou o café dele pelo Kop Club e, no mesmo dia, era o maior devedor da rodada paga. O app não deixava lançar as duas coisas no mesmo dia, nem ter um pagador que não toma da rodada.
+- No sorteio, quem toma pelo Kop Club é marcado com **🎁 Kop Club**. A pessoa **continua concorrendo** para pagar.
+- Se for escolhida, paga só os cafés dos outros: o lançamento fica com ela como pagadora, fora dos presentes. O café dela entra como rodada bônus do dia (junta na que já existir).
+- O botão passa pela Catraca do Devedor.
+- Para o saldo, "pagou para N sem tomar" dá o mesmo resultado que "tomou e pagou para N+1". Só as estatísticas mudam (presença e cafés bancados).
+- Um café pago e uma rodada bônus podem coexistir no mesmo dia. A Trava de Repetição considera só o último café **pago** (antes, um bônus no meio desligava a trava).
+- Na edição, o pagador pode ficar fora dos presentes, com aviso.
+
 ---
 
 ### 3. Estatísticas e Justiça (Leaderboards)

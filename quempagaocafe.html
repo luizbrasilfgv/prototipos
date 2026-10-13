@@ -80,6 +80,10 @@
         .participant-item { display: flex; align-items: center; gap: 1rem; }
         .participant-checkbox { width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary-color); }
         .participant-name { font-size: 1.2rem; color: var(--text-main); cursor: pointer; user-select: none; }
+        /* "Toma pelo Kop Club": concorre para pagar, mas o café dele sai de graça */
+        .kop-toggle { margin-left: auto; flex-shrink: 0; background: transparent; border: 1px dashed rgba(129, 199, 132, 0.45); color: var(--text-muted); border-radius: 20px; padding: 0.3rem 0.7rem; font-size: 0.75rem; font-family: inherit; cursor: pointer; white-space: nowrap; }
+        .kop-toggle.on { background: rgba(129, 199, 132, 0.2); border-style: solid; border-color: var(--success); color: var(--success); font-weight: 600; }
+        .kop-hint { color: var(--text-muted); font-size: 0.78rem; margin-top: 0.6rem; line-height: 1.4; }
 
         .primary-btn, .secondary-btn {
             width: 100%; padding: 1rem; border: none; border-radius: 12px; font-size: 1.1rem;
@@ -449,6 +453,7 @@
                 <div class="participants-list" id="participants-list">
                     <!-- Checkboxes populados via JS -->
                 </div>
+                <p class="kop-hint">Alguém vai tomar pelo Kop Club (ex.: bônus que ficou pendente)? Toque em <strong>🎁 Kop Club</strong> ao lado do nome: a pessoa continua no sorteio para pagar, mas o café dela não entra na conta.</p>
             </div>
 
             <button id="calculate-btn" class="primary-btn">Descobrir quem paga</button>
@@ -730,12 +735,20 @@
                 <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">3. Trava de Repetição (Nova)</h4>
                 <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
                     <li>Quem pagou a última rodada <strong>está blindado</strong> e NÃO pode ser escolhido hoje (mesmo se for o maior devedor). O sistema pula automaticamente para o segundo maior devedor.</li>
+                    <li>Rodada bônus não conta aqui: vale o último café pago com dinheiro.</li>
                 </ul>
 
                 <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">4. Desempate do Leo (Novo)</h4>
                 <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
                     <li>Duas ou mais pessoas empataram na liderança da dívida? O desempate agora pune quem pagou menos cafés (vezes abriu a carteira) nos <strong>últimos 7 dias</strong>. Paga o "mais pão-duro da semana".</li>
                     <li><strong>A Roleta</strong> só entra em ação se houver empate até nisso!</li>
+                </ul>
+
+                <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">5. Kop Club no dia do café (Novo)</h4>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li>Alguém vai tomar pelo Kop Club enquanto a turma toma café pago (ex.: faltou na rodada bônus e o café dele ficou pendente)? Marque a pessoa e toque em <strong>🎁 Kop Club</strong>.</li>
+                    <li>Ela <strong>continua no sorteio</strong>. Se for a escolhida, paga só os cafés dos outros. O dela entra como rodada bônus do dia (vale a Catraca do Devedor).</li>
+                    <li>No mesmo dia pode ter um café pago e uma rodada bônus.</li>
                 </ul>
 
             </div>
@@ -1057,7 +1070,8 @@
         const saveEditBtn = document.getElementById("save-edit-btn");
 
         let currentWinner = null;
-        let currentPresent = [];
+        let currentPresent = []; // todos que concorrem para pagar
+        let currentKop = [];     // dentre eles, quem toma pelo Kop Club (não entra na conta da rodada)
         let coffeeDocRef = doc(db, "coffee", "data_v3");
         let configDocRef = doc(db, "coffee", "config_v3");
         let logsDocRef = doc(db, "coffee", "logs_v3");
@@ -1238,15 +1252,17 @@
                 return diffDays <= parseInt(period);
             });
             let stats = {};
-            participantNames.forEach(p => { stats[p] = { pago: 0, vezes_pagou: 0, presente: 0, bonus: 0 }; });
+            const statsVazio = () => ({ pago: 0, vezes_pagou: 0, presente: 0, bonus: 0, gratis: 0 });
+            participantNames.forEach(p => { stats[p] = statsVazio(); });
             filteredEvents.forEach(ev => {
                 if (ev.isBonus) {
-                    ev.present.forEach(p => { if(!stats[p]) stats[p]={pago:0, vezes_pagou:0, presente:0, bonus:0}; stats[p].bonus++; });
+                    ev.present.forEach(p => { if(!stats[p]) stats[p]=statsVazio(); stats[p].bonus++; });
                 } else {
-                    if(!stats[ev.payer]) stats[ev.payer]={pago:0, vezes_pagou:0, presente:0, bonus:0};
+                    if(!stats[ev.payer]) stats[ev.payer]=statsVazio();
                     stats[ev.payer].pago += ev.present.length;
                     stats[ev.payer].vezes_pagou += 1;
-                    ev.present.forEach(p => { if(!stats[p]) stats[p]={pago:0, vezes_pagou:0, presente:0, bonus:0}; stats[p].presente++; });
+                    // Conta quem tomou sem ser o pagador: o pagador pode não ter tomado (foi pelo Kop Club)
+                    ev.present.forEach(p => { if(!stats[p]) stats[p]=statsVazio(); stats[p].presente++; if (p !== ev.payer) stats[p].gratis++; });
                 }
             });
             
@@ -1256,7 +1272,7 @@
             
             Object.keys(stats).forEach(p => {
                 if(stats[p].pago > maxPago){maxPago=stats[p].pago; reiCafe=p; reiPagoQtd=stats[p].pago;}
-                const ls = stats[p].presente - stats[p].vezes_pagou;
+                const ls = stats[p].gratis;
                 if(ls > maxSang){maxSang=ls; sanguessuga=p; sangQtd=ls;}
                 if(stats[p].bonus > maxBonus){maxBonus=stats[p].bonus; reiBonus=p; reiBonusQtd=stats[p].bonus;}
             });
@@ -1308,10 +1324,9 @@
                 <div style="font-weight: bold; font-size: 1.1rem; color: var(--danger); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">🧛 Tomou de graça</div>
                 <div style="display: flex; flex-direction: column; font-size: 0.9rem; color: var(--text-muted);">
             `;
-            [...activeUsers].sort((a,b) => (stats[b].presente - stats[b].vezes_pagou) - (stats[a].presente - stats[a].vezes_pagou)).forEach((p, idx) => {
-                const tomouDeGraca = stats[p].presente - stats[p].vezes_pagou;
+            [...activeUsers].sort((a,b) => stats[b].gratis - stats[a].gratis).forEach((p, idx) => {
                 const border = (idx === activeUsers.length - 1) ? 'none' : '1px solid rgba(255,255,255,0.05)';
-                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${apelido(p)}</strong><span>${tomouDeGraca > 0 ? tomouDeGraca : 0} vez(es)</span></div>`;
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: ${border};"><strong style="color:var(--text-main);">${apelido(p)}</strong><span>${stats[p].gratis} vez(es)</span></div>`;
             });
             if(activeUsers.length === 0) html += `<div style="padding: 6px 0;">Nenhum dado no período.</div>`;
             html += `</div></div>`;
@@ -1757,7 +1772,20 @@
                 div.innerHTML = `
                     <input type="checkbox" id="${id}" class="participant-checkbox" value="${p}" checked>
                     <label for="${id}" class="participant-name participant-com-rosto">${rostoHTML(p, 34)}${apelido(p)}</label>
+                    <button type="button" class="kop-toggle" data-nome="${p}" aria-pressed="false" title="Concorre para pagar, mas o café dele sai pelo Kop Club">🎁 Kop Club</button>
                 `;
+                const check = div.querySelector('.participant-checkbox');
+                const kop = div.querySelector('.kop-toggle');
+                const marcarKop = on => { kop.classList.toggle('on', on); kop.setAttribute('aria-pressed', String(on)); };
+                kop.addEventListener('click', () => {
+                    if (kop.classList.contains('on')) { marcarKop(false); return; }
+                    // Mesma Catraca do Devedor da rodada bônus, com o saldo de agora
+                    const catraca = checkBonusEligibility(p);
+                    if (!catraca.eligible) { alert(`🚫 ${apelido(p)} não pode tomar pelo Kop Club: ${catraca.reason}`); return; }
+                    check.checked = true; // quem vai pelo Kop Club está na rodada e concorre para pagar
+                    marcarKop(true);
+                });
+                check.addEventListener('change', () => { if (!check.checked) marcarKop(false); });
                 listEl.appendChild(div);
             });
         }
@@ -1963,6 +1991,7 @@
                     </div>
                     <div class="history-details" style="display: none; padding: 10px 5px 15px 5px; color: var(--text-muted); font-size: 0.85rem; background: rgba(0,0,0,0.15);">
                         <strong style="color: var(--text-main);">Participantes:</strong> ${listaApelidos(ev.present)}
+                        ${!ev.isBonus && !ev.present.includes(ev.payer) ? `<br>💳 <strong style="color: var(--text-main);">${apelido(ev.payer)}</strong> pagou sem tomar desta rodada.` : ''}
                     </div>
                 `;
                 historyList.appendChild(div);
@@ -2245,7 +2274,10 @@
             const isBonus = !!original.isBonus;
 
             if (newPresent.length === 0) { alert("O lançamento precisa ter pelo menos 1 pessoa presente."); return; }
-            if (!isBonus && !newPresent.includes(newPayer)) { alert("O pagador da conta precisa estar entre os presentes!"); return; }
+            // Pagador fora dos presentes = pagou sem tomar (ex.: o café dele saiu pelo Kop Club)
+            const pagouSemTomar = !isBonus && !newPresent.includes(newPayer);
+            const jaEraAssim = newPayer === original.payer && !original.present.includes(original.payer);
+            if (pagouSemTomar && !jaEraAssim && !confirm(`${apelido(newPayer)} não está marcado como presente.\n\nEle pagou a rodada sem tomar dela (ex.: o café dele saiu pelo Kop Club)?`)) return;
 
             // Data única por tipo: um café comum e uma rodada bônus podem coexistir no mesmo dia
             if (events.some(e => e.date === newDate && String(e.id) !== idEditado && !!e.isBonus === isBonus)) {
@@ -2269,6 +2301,7 @@
             if (mudouPagador) resumoHTML += linhaConfirm('Pagador', `${apelido(original.payer)} → ${apelido(novoPagador)}`);
             if (entrou.length) resumoHTML += linhaConfirm('Entrou', listaApelidos(entrou));
             if (saiu.length) resumoHTML += linhaConfirm('Saiu', listaApelidos(saiu));
+            if (pagouSemTomar) resumoHTML += linhaConfirm('Obs.', `${apelido(newPayer)} paga sem tomar`);
 
             const atualizado = { ...original, date: newDate, present: newPresent, payer: novoPagador };
             const confirmado = await confirmarTresEtapas({
@@ -2343,15 +2376,23 @@
         // =====================================
         calcBtn.addEventListener("click", () => {
             if (!dateInput.value) { alert("Por favor, selecione a data!"); return; }
-            if (events.some(e => e.date === dateInput.value)) { alert("Já existe um café registrado para esta data!"); return; }
+            // Data única por tipo: uma rodada bônus no mesmo dia não impede o café pago
+            if (events.some(e => e.date === dateInput.value && !e.isBonus)) { alert("Já existe um café registrado para esta data!"); return; }
 
             // Só a lista do Início: os modais de bônus e de edição também usam .participant-checkbox
             // e continuam no DOM depois de fechados, o que duplicava gente no sorteio
             const checkboxes = document.querySelectorAll("#participants-list .participant-checkbox:checked");
             currentPresent = Array.from(checkboxes).map(cb => cb.value);
-            
+
             if (currentPresent.length === 0) { alert("Selecione pelo menos uma pessoa!"); return; }
-            
+
+            const marcadosKop = new Set(Array.from(listEl.querySelectorAll('.kop-toggle.on')).map(b => b.dataset.nome));
+            currentKop = currentPresent.filter(p => marcadosKop.has(p));
+            if (currentKop.length === currentPresent.length) { alert("Todo mundo vai pelo Kop Club? Então registre como 🎁 Rodada Bônus."); return; }
+            // Confere a Catraca de novo: o saldo pode ter mudado desde que o botão foi marcado
+            const barrado = currentKop.find(p => !checkBonusEligibility(p).eligible);
+            if (barrado) { alert(`🚫 ${apelido(barrado)} não pode tomar pelo Kop Club: ${checkBonusEligibility(barrado).reason}`); return; }
+
             winnerName.classList.add("hidden");
             winnerReason.classList.add("hidden");
             cpfBox.classList.add("hidden");
@@ -2365,11 +2406,11 @@
                 let eligiblePresent = [...currentPresent];
                 let lastPayer = null;
 
-                // 1. Trava de repetição: Quem pagou o último café não pode pagar hoje (exceto se for o único no grupo)
-                if (events.length > 0) {
-                    const sortedEvents = [...events].sort((a, b) => new Date(b.date + 'T00:00:00') - new Date(a.date + 'T00:00:00'));
-                    lastPayer = sortedEvents[0].payer;
-                }
+                // 1. Trava de repetição: Quem pagou o último café não pode pagar hoje (exceto se for o único no grupo).
+                // Rodada bônus não conta: o "pagador" dela é o Kop Club, e isso desligava a trava no café seguinte
+                const ultimoCafe = events.filter(e => !e.isBonus)
+                    .sort((a, b) => b.date.localeCompare(a.date) || Number(b.id) - Number(a.id))[0];
+                if (ultimoCafe) lastPayer = ultimoCafe.payer;
                 
                 if (currentPresent.length > 1 && lastPayer && currentPresent.includes(lastPayer)) {
                     eligiblePresent = eligiblePresent.filter(p => p !== lastPayer);
@@ -2428,7 +2469,15 @@
                 if (lastPayer && !tied.includes(lastPayer) && currentPresent.includes(lastPayer) && currentAggregates[lastPayer].saldo >= maxBalance) {
                      reasonText += ` (OBS: O último pagador foi blindado pela Trava de Repetição!)`;
                 }
-                
+
+                const qtdCafes = currentPresent.length - currentKop.length;
+                if (currentKop.includes(currentWinner)) {
+                    reasonText += ` 🎁 SEU CAFÉ SAIR PELO KOP CLUB, MAS VOCÊ PAGAR O DOS OUTROS (${qtdCafes})!`;
+                }
+                winnerMsg.textContent = currentKop.length
+                    ? `Prepare a carteira! 💳 São ${qtdCafes} café(s): ${listaApelidos(currentKop)} vai pelo Kop Club 🎁`
+                    : 'Prepare a carteira! 💳';
+
                 spinner.classList.add("hidden");
                 
                 winnerName.textContent = apelido(currentWinner);
@@ -2450,21 +2499,33 @@
         confirmBtn.addEventListener("click", () => {
             if (!currentWinner || !coffeeDocRef) return;
             
+            const date = dateInput.value;
+            // Quem foi pelo Kop Club não toma desta rodada: se for o pagador, ele fica fora dos presentes
             const newEvent = {
                 id: Date.now(),
-                date: dateInput.value,
-                present: currentPresent,
+                date: date,
+                present: currentPresent.filter(p => !currentKop.includes(p)),
                 payer: currentWinner
             };
-            
+
             events.push(newEvent);
+            if (currentKop.length) {
+                // O café de quem foi pelo Kop Club vira a rodada bônus do dia (uma por dia: junta na que já existir)
+                const bonusDoDia = events.find(e => e.isBonus && e.date === date);
+                if (bonusDoDia) bonusDoDia.present = [...new Set([...bonusDoDia.present, ...currentKop])];
+                else events.push({ id: newEvent.id + 1, date: date, isBonus: true, payer: 'Kop Club', present: [...currentKop], timestamp: new Date().toISOString() });
+            }
             updateCloudData();
-            registrarLog("CRIOU", "criou", `Novo sorteio/pagamento no dia <strong>${dateInput.value.split('-').reverse().join('/')}</strong> pago por <strong>${apelido(currentWinner)}</strong>`);
+            const kopLog = currentKop.length ? ` (🎁 ${listaApelidos(currentKop)} tomou pelo Kop Club)` : '';
+            registrarLog("CRIOU", "criou", `Novo sorteio/pagamento no dia <strong>${date.split('-').reverse().join('/')}</strong> pago por <strong>${apelido(currentWinner)}</strong>${kopLog}`);
             
             alert(`Sorteio e Pagamento registrados com sucesso! ☁️`);
             
             resultContainer.classList.add("hidden");
             currentWinner = null;
+            currentKop = [];
+            // Kop Club é exceção: não fica marcado para o próximo café
+            listEl.querySelectorAll('.kop-toggle.on').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); });
         });
 
     </script>
