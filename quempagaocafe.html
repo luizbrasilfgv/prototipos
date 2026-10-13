@@ -943,6 +943,12 @@
         }
         const listaApelidos = nomes => nomes.map(apelido).join(', ');
 
+        // Data de hoje no fuso do aparelho (AAAA-MM-DD). O toISOString usa UTC: depois das 21h no Brasil já virava o dia seguinte
+        function hojeLocal() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
         function avatarDe(nome) {
             const p = perfis[nome];
             if (p && p.avatar) return p.avatar;
@@ -1188,8 +1194,7 @@
         }
 
         function openBonusModal() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('bonus-date-input').value = today;
+            document.getElementById('bonus-date-input').value = hojeLocal();
             const list = document.getElementById('bonus-participants-checklist');
             list.innerHTML = '';
             
@@ -1217,19 +1222,34 @@
             const date = document.getElementById('bonus-date-input').value;
             const checkboxes = document.querySelectorAll('.bonus-present-checkbox:checked');
             const present = Array.from(checkboxes).map(cb => cb.value);
+            if (!date) { alert("Por favor, selecione a data!"); return; }
             if (present.length === 0) { alert("Selecione pelo menos uma pessoa!"); return; }
-            const newEvent = {
-                id: Date.now(),
-                date: date,
-                isBonus: true,
-                payer: 'Kop Club',
-                present: present,
-                timestamp: new Date().toISOString()
-            };
-            const updatedEvents = [...events, newEvent];
+
+            // Uma rodada bônus por dia: se já existe, junta as pessoas novas nela em vez de criar outra
+            const dataBr = date.split('-').reverse().join('/');
+            const existente = events.find(e => e.isBonus && e.date === date);
+            let updatedEvents, log;
+            if (existente) {
+                const novos = present.filter(p => !existente.present.includes(p));
+                if (!novos.length) { alert(`Já existe uma rodada bônus em ${dataBr} com essas pessoas.`); return; }
+                if (!confirm(`Já existe uma rodada bônus em ${dataBr} (${listaApelidos(existente.present)}).\n\nAdicionar ${listaApelidos(novos)} nela?`)) return;
+                updatedEvents = events.map(e => e === existente ? { ...e, present: [...e.present, ...novos] } : e);
+                log = ["EDITOU", "editou", `Adicionou ${listaApelidos(novos)} na Rodada Bônus de <strong>${dataBr}</strong>`];
+            } else {
+                const newEvent = {
+                    id: Date.now(),
+                    date: date,
+                    isBonus: true,
+                    payer: 'Kop Club',
+                    present: present,
+                    timestamp: new Date().toISOString()
+                };
+                updatedEvents = [...events, newEvent];
+                log = ["CRIOU", "criou", `Rodada Bônus em <strong>${date}</strong> para ${listaApelidos(present)}`];
+            }
             try {
                 await setDoc(coffeeDocRef, { events: updatedEvents });
-                registrarLog("CRIOU", "criou", `Rodada Bônus em <strong>${date}</strong> para ${listaApelidos(present)}`);
+                registrarLog(...log);
                 closeBottomSheet('sheet-bonus-form');
             } catch (err) {
                 console.error(err);
@@ -1366,8 +1386,7 @@
         // INICIALIZAÇÃO DO APP
         // =====================================
         function initApp() {
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.value = today;
+            dateInput.value = hojeLocal();
 
             // Escuta as configurações (lista de participantes)
             unsubConfig = onSnapshot(configDocRef, (docSnap) => {

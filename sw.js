@@ -5,7 +5,7 @@
 
 /* SUBA ESTE NÚMERO A CADA PUBLICAÇÃO. É ele que descarta o
    cache antigo — sem isso a pessoa fica presa numa versão. */
-const VERSAO = "quempaga-v7";
+const VERSAO = "quempaga-v8";
 
 /* O casco: sem estes arquivos o app não abre. */
 const CASCO = [
