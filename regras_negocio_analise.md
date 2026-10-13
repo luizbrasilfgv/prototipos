@@ -37,6 +37,10 @@ Samuel faltou na rodada bônus de 28/09. Em 13/10 ele tomou o café dele pelo Ko
 - Um café pago e uma rodada bônus podem coexistir no mesmo dia. A Trava de Repetição considera só o último café **pago** (antes, um bônus no meio desligava a trava).
 - Na edição, o pagador pode ficar fora dos presentes, com aviso.
 
+**Uma rodada bônus por dia:** salvar uma rodada bônus numa data que já tem uma não cria outra. O app pergunta se junta as pessoas novas na existente; se todo mundo já está nela, avisa e não grava. Assim um lançamento repetido nunca conta bônus em dobro.
+
+**Data dos formulários:** o café e o bônus abrem com a data do celular. Antes usavam UTC, e depois das 21h já vinha o dia seguinte.
+
 ---
 
 ### 3. Estatísticas e Justiça (Leaderboards)
@@ -46,6 +50,31 @@ Para manter o ambiente divertido e transparente, o app ranqueia a galera em cate
 * **🧛 Tomou de graça:** Maior volume consumido sem o próprio pagamento.
 * **👋 Marcou presença:** Engajamento puro no café.
 * **🎁 Rodadas Kop Club:** Quem mais aproveitou os bônus.
+
+"Tomou de graça" conta os cafés pagos em que a pessoa estava presente e não era a pagadora.
+
+---
+
+### 4. Meu Dash (tudo sobre uma pessoa)
+Usa **todo o histórico**, não só os 30 dias do saldo. Na primeira vez a pessoa escolhe quem é (fica no cadastro dela); dá para ver o dash de qualquer participante.
+
+| Número | Como é calculado |
+|---|---|
+| Dias de café | Datas em que a pessoa tomou café (pago ou Kop Club) ou pagou sem tomar. O % é sobre todas as datas com lançamento. |
+| Cafés tomados | Cafés pagos em que estava presente + rodadas bônus em que estava. |
+| Tomou de graça | Cafés pagos em que estava presente e outra pessoa pagou. |
+| Pagou a rodada | Vezes em que foi a pagadora. |
+| Cafés bancados | Soma dos presentes das rodadas que pagou (inclui o próprio café, se tomou). "Pros outros" tira o dela. |
+| Maior sequência | Maior série de datas com lançamento seguidas em que a pessoa foi. |
+| Saldo agora | O mesmo da aba Saldos (30 dias), com a posição entre os participantes. |
+| Saldo de todos os tempos | Tomou de graça − cafés pagos pros outros. Igual ao "Saldo Histórico" da aba Saldos. |
+| Cafés por mês | Cada café tomado, separado por quem pagou: os outros, a própria pessoa ou o Kop Club. Do mês do primeiro café até o atual (últimos 12 no gráfico; todos na tabela). |
+| Quem pagou pra quem | Para cada pessoa: quantos cafés ela pagou pra esta e quantos esta pagou pra ela. A diferença diz quem deve café pra quem. |
+| Dia favorito | Dia da semana com mais dias de café. |
+| Parceiro de café | Quem esteve junto em mais dias. |
+| Veredito | Saldo de todos os tempos ≤ −3: Mecenas. ≥ +3: Sanguessuga. Entre os dois: Equilibrado. Nunca foi: Fantasma. |
+
+Empates mostram todos os nomes.
 
 ---
 

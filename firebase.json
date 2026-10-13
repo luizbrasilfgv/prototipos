@@ -1,0 +1,36 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/.*/**",
+      "**/node_modules/**",
+      "add_check.js",
+      "add_dashboard.js",
+      "execute_plan.js",
+      "fix_html_errors.js",
+      "fix_js_errors.js",
+      "refactor_painel.js",
+      "split_rules.js",
+      "design_system_referencia.md",
+      "infra_acesso.md",
+      "mapeamento_arquitetura.md",
+      "README.md",
+      "regras_negocio_analise.md",
+      "firestore.rules",
+      "fix_js.js",
+      "backup_quempagaocafe_antes_rbac.html",
+      "scripts/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/quempagaocafe.html"
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

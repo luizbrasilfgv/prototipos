@@ -12,3 +12,7 @@ desktop.ini
 *.tmp
 *.bak
 *~
+
+# Backups locais do Firestore (têm e-mails) e cache do Firebase CLI
+.backups/
+.firebase/
